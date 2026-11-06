@@ -23,7 +23,7 @@ Front y back están separados: el backend no genera HTML, solo responde JSON. As
 
 ## Requisitos
 
-- Node.js 20 o superior
+- Node.js 22 o superior
 - npm
 
 ## Primer uso
