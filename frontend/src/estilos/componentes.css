@@ -1,0 +1,168 @@
+/* ==========================================================================
+   Piezas reutilizables: tarjetas, mosaicos, pestañas, modal, bandeja, gráficos
+   ========================================================================== */
+.icono { flex: none; vertical-align: -3px; }
+.grilla { display: grid; gap: 20px; }
+.grilla.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grilla.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grilla.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grilla.auto { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.fila { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.fila.entre { justify-content: space-between; }
+.apilado { display: grid; gap: 12px; }
+
+/* ---------- Menú de usuario (encabezado) ---------- */
+.menu-usuario { position: relative; }
+.menu-usuario .chip-usuario { border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+.menu-usuario:hover .submenu, .menu-usuario:focus-within .submenu { display: grid; }
+.submenu.derecha { left: auto; right: 0; top: calc(100% + 4px); }
+.menu-usuario .submenu::before, .menu > div .submenu::before { content: ''; position: absolute; left: 0; right: 0; top: -10px; height: 10px; }
+
+/* ---------- Tarjeta de producto ---------- */
+.tarjeta-producto {
+  background: var(--panel); border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden;
+  display: flex; flex-direction: column; transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+}
+.tarjeta-producto:hover { box-shadow: var(--sombra); transform: translateY(-2px); border-color: var(--violeta-borde); }
+.tarjeta-producto .foto { position: relative; display: block; aspect-ratio: 4 / 3; background: #fff; border-bottom: 1px solid var(--borde); }
+.tarjeta-producto .foto img { width: 100%; height: 100%; object-fit: contain; padding: 14px; }
+.sobre-foto { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; }
+.foto-referencia { position: absolute; right: 8px; bottom: 8px; font-size: 10.5px; font-weight: 600; color: var(--tenue); background: rgba(255, 255, 255, 0.92); padding: 2px 7px; border-radius: 6px; }
+.tarjeta-producto .cuerpo { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.tarjeta-producto .categoria { font-size: 12px; color: var(--tenue); font-weight: 600; }
+.tarjeta-producto h3 { font-size: 17px; line-height: 1.25; }
+.tarjeta-producto h3 a { color: var(--texto); }
+.pie-tarjeta { margin-top: auto; padding-top: 8px; display: flex; justify-content: space-between; align-items: end; gap: 8px; }
+.precio { font: 800 21px var(--titulos); color: var(--texto); display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.precio.referencia { color: var(--tenue); }
+.tienda-linea { font-size: 12.5px; color: var(--tenue); line-height: 1.35; margin-top: 2px; }
+.acciones { display: flex; gap: 6px; }
+
+/* ---------- Mosaicos de categoría con foto ---------- */
+.mosaicos { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.mosaico { position: relative; border-radius: var(--radio); overflow: hidden; aspect-ratio: 5 / 4; display: block; background: var(--marino); }
+.mosaico img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+.mosaico:hover img { transform: scale(1.06); }
+.mosaico .velo { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 22, 58, 0) 35%, rgba(18, 22, 58, 0.92)); }
+.mosaico .texto { position: absolute; left: 14px; right: 14px; bottom: 12px; color: #fff; display: grid; line-height: 1.25; }
+.mosaico .texto b { font: 800 17px var(--titulos); }
+.mosaico .texto small { color: #d9dcf5; font-size: 12.5px; }
+.mosaico:hover { text-decoration: none; }
+.mosaico.activo { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+.mosaicos.compactos { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.mosaicos.compactos .mosaico { aspect-ratio: 4 / 3; }
+
+/* ---------- Tarjeta de configuración ---------- */
+.tarjeta-config { background: var(--panel); border: 1px solid var(--borde); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
+.tarjeta-config.recomendada { border: 2px solid var(--violeta); box-shadow: 0 16px 40px rgba(107, 75, 255, 0.18); }
+.tarjeta-config .foto { position: relative; aspect-ratio: 16 / 9; background: var(--marino); }
+.tarjeta-config .foto img { width: 100%; height: 100%; object-fit: cover; }
+.tarjeta-config .foto .insignia { position: absolute; left: 14px; top: 14px; }
+.tarjeta-config .foto .recomendada-insignia { left: auto; right: 14px; }
+.tarjeta-config .cuerpo { padding: 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.tarjeta-config h3 { font-size: 21px; }
+.destacadas { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13.5px; }
+.destacadas li { display: grid; grid-template-columns: 62px 1fr; gap: 8px; }
+.destacadas b { font: 800 11px/20px var(--titulos); color: var(--violeta); letter-spacing: 0.06em; }
+.precio-config { display: flex; justify-content: space-between; align-items: end; gap: 14px; padding-top: 12px; border-top: 1px solid var(--borde); margin-top: auto; }
+.precio-config small { display: block; font-size: 12px; color: var(--tenue); }
+.precio-config strong { font: 800 26px var(--titulos); }
+.rendimiento-mini { text-align: right; display: grid; gap: 3px; justify-items: end; font-size: 13px; }
+.barra-mini { width: 110px; height: 7px; border-radius: 7px; background: var(--panel-2); overflow: hidden; display: block; }
+.barra-mini i { display: block; height: 100%; background: linear-gradient(90deg, var(--violeta), #9b84ff); border-radius: 7px; }
+.acciones-config { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ---------- Tarjeta de guía ---------- */
+.tarjeta-guia { background: var(--panel); border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden; color: var(--texto); display: flex; flex-direction: column; transition: box-shadow 0.15s, transform 0.15s; }
+.tarjeta-guia:hover { text-decoration: none; box-shadow: var(--sombra); transform: translateY(-2px); }
+.tarjeta-guia .foto { aspect-ratio: 16 / 9; background: var(--marino); }
+.tarjeta-guia .foto img { width: 100%; height: 100%; object-fit: cover; }
+.tarjeta-guia .cuerpo { padding: 18px; display: grid; gap: 10px; }
+.tarjeta-guia h3 { font-size: 18px; }
+
+/* ---------- Pestañas ---------- */
+.pestanas { display: inline-flex; gap: 4px; padding: 5px; background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; flex-wrap: wrap; }
+.pestanas button { border: 0; background: none; padding: 9px 16px; border-radius: 10px; font: 700 14px var(--titulos); color: var(--tenue); cursor: pointer; }
+.pestanas button:hover { color: var(--violeta); }
+.pestanas button.activa { background: var(--violeta); color: #fff; }
+
+/* ---------- Modal ---------- */
+.modal-fondo { position: fixed; inset: 0; z-index: 80; background: rgba(12, 14, 40, 0.6); display: grid; place-items: center; padding: 20px; animation: aparecer 0.15s; }
+.modal { width: 100%; max-height: calc(100vh - 40px); background: var(--panel); border-radius: 18px; box-shadow: var(--sombra-fuerte); display: flex; flex-direction: column; overflow: hidden; }
+.modal-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 22px; border-bottom: 1px solid var(--borde); }
+.modal-cuerpo { padding: 18px 22px 22px; overflow: auto; }
+@keyframes aparecer { from { opacity: 0; } }
+
+/* ---------- Bandeja de comparación ---------- */
+.bandeja-comparar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--marino); color: #fff; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2); padding: 10px 0; }
+.bandeja-comparar .contenedor { display: flex; align-items: center; gap: 16px; }
+.bandeja-comparar strong { display: flex; align-items: center; gap: 8px; font-family: var(--titulos); white-space: nowrap; }
+.bandeja-items { display: flex; gap: 8px; flex: 1; overflow-x: auto; }
+.bandeja-items span { display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.08); padding: 5px 8px 5px 5px; border-radius: 10px; font-size: 13px; white-space: nowrap; }
+.bandeja-items img { width: 34px; height: 34px; object-fit: contain; background: #fff; border-radius: 7px; }
+.bandeja-items em { font-style: normal; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.bandeja-items button { background: none; border: 0; color: #aab0d6; cursor: pointer; }
+.bandeja-comparar .enlace { color: #c9bfff; }
+.boton.deshabilitado { opacity: 0.5; pointer-events: none; }
+
+/* ---------- Gráfico de historial ---------- */
+.grafico { position: relative; }
+.grafico svg { width: 100%; height: auto; display: block; overflow: visible; }
+.grafico .eje { stroke: var(--borde); }
+.grafico text { fill: var(--tenue); font: 11px 'Inter', sans-serif; }
+.grafico .linea { fill: none; stroke-width: 1.5; opacity: 0.45; }
+.grafico .linea.mejor { stroke: var(--violeta); stroke-width: 3; opacity: 1; }
+.grafico .area { fill: url(#degradado-grafico); }
+.grafico .guia-vertical { stroke: var(--violeta); stroke-dasharray: 3 3; }
+.grafico-tooltip { position: absolute; pointer-events: none; background: var(--marino); color: #fff; padding: 8px 11px; border-radius: 10px; font-size: 12.5px; white-space: nowrap; transform: translate(-50%, -110%); box-shadow: var(--sombra-fuerte); }
+.leyenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--tenue); margin-top: 10px; }
+.leyenda i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+
+/* ---------- Barras horizontales (puntajes y desgloses) ---------- */
+.barras { display: grid; gap: 10px; }
+.barra-h { display: grid; grid-template-columns: minmax(120px, 1fr) 2fr auto; gap: 12px; align-items: center; font-size: 14px; }
+.barra-h .pista { height: 10px; border-radius: 10px; background: var(--panel-2); overflow: hidden; }
+.barra-h .pista i { display: block; height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--violeta), #9b84ff); }
+.barra-h b { font-family: var(--titulos); min-width: 54px; text-align: right; }
+
+/* ---------- Estado de compatibilidad ---------- */
+.estado-compat { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; font-weight: 700; }
+.estado-compat.ok { background: var(--verde-claro); color: #0d6b37; }
+.estado-compat.mal { background: var(--rojo-claro); color: #a3133a; }
+.estado-compat.pendiente { background: var(--panel-2); color: var(--tenue); }
+.reglas { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 13.5px; }
+.reglas li { display: grid; grid-template-columns: 20px 1fr; gap: 8px; align-items: start; }
+.reglas li small { display: block; color: var(--tenue); }
+.reglas .ok { color: var(--verde); }
+.reglas .mal { color: var(--rojo); }
+.reglas .omitida { color: #b5b8cc; }
+
+/* ---------- Paginación ---------- */
+.paginacion { display: flex; gap: 6px; justify-content: center; margin-top: 26px; flex-wrap: wrap; }
+.paginacion button { min-width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--borde); background: #fff; font-weight: 700; cursor: pointer; color: var(--texto); }
+.paginacion button.activa { background: var(--violeta); color: #fff; border-color: var(--violeta); }
+
+/* ---------- Tarjetas de acción con icono ---------- */
+.tarjeta-accion { display: flex; gap: 14px; align-items: flex-start; padding: 18px; border-radius: var(--radio); background: var(--panel); border: 1px solid var(--borde); color: var(--texto); transition: border-color 0.15s, box-shadow 0.15s; }
+.tarjeta-accion:hover { text-decoration: none; border-color: var(--violeta-borde); box-shadow: var(--sombra); }
+.tarjeta-accion .icono-caja { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: var(--violeta-claro); color: var(--violeta); flex: none; }
+.tarjeta-accion h3 { font-size: 16.5px; margin-bottom: 3px; }
+.tarjeta-accion p { font-size: 13.5px; color: var(--tenue); line-height: 1.45; }
+.tarjeta-accion .ir { margin-left: auto; color: var(--violeta); align-self: center; }
+
+@media (max-width: 1080px) {
+  .grilla.g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grilla.g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .grilla.g2, .grilla.g3, .grilla.g4 { grid-template-columns: 1fr; }
+  .bandeja-comparar .contenedor { flex-wrap: wrap; gap: 8px; }
+  .bandeja-items em { max-width: 110px; }
+  .barra-h { grid-template-columns: 1fr auto; }
+  .barra-h .pista { grid-column: 1 / -1; grid-row: 2; }
+}
+.mosaico.todas { background: linear-gradient(135deg, var(--violeta-2), var(--violeta) 60%, #8f74ff); }
+.mosaico.todas .velo { background: none; }
+/* Con la bandeja de comparación abierta: el aviso flotante sube y el pie no queda tapado */
+body:has(.bandeja-comparar:not(.oculto)) { padding-bottom: 72px; }
+body:has(.bandeja-comparar:not(.oculto)) .aviso-flotante { bottom: 92px; }

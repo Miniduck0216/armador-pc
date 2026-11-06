@@ -1,0 +1,19 @@
+@startsalt
+{+
+  <b>ArmadorPC</b> | [Armar PC] | [Componentes] | [Herramientas] | [Ingresar]
+  ==
+  <b>Lista de compra</b>
+  ..
+  [Por separado: $2,596.48 (recomendada)] | [Todo en una tienda: $2,641.98]
+  ..
+  {#
+    Tienda | Pieza | Precio | Envío | Enlace
+    PixelStore | AMD Ryzen 9 9950X3D | $647.99 | $3.50 | [Ver en tienda]
+    TecnoMundo | NVIDIA GeForce RTX 5090 | $1,944.99 | $0.00 | [Ver en tienda]
+  }
+  ..
+  <b>Total recomendado: $2,596.48</b>
+  ==
+  [Copiar lista] | [Enviar por WhatsApp] | [Enviar por correo] | [Copiar enlace]
+}
+@endsalt

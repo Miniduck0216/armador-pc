@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comparar componentes · ArmadorPC</title>
+  <meta name="description" content="Compara hasta 3 componentes de PC lado a lado: especificaciones, rendimiento y precio.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/comparar.js"></script>
+</head>
+<body>
+<main>
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <div class="migas"><a href="/">Inicio</a> / Comparar</div>
+      <h1>Compara componentes</h1>
+      <p>Elige una categoría y hasta 3 modelos. Resaltamos en verde el mejor valor de cada fila.</p>
+      <div class="mosaicos compactos" id="categorias" style="margin-top:24px"></div>
+    </div>
+  </section>
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="ranuras" id="ranuras"></div>
+      <div id="resultado"></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

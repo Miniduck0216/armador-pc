@@ -1,0 +1,51 @@
+@startuml casos-uso-global
+title Diagrama de Casos de Uso (global)
+left to right direction
+skinparam packageStyle rectangle
+skinparam defaultFontSize 11
+
+actor "Visitante" as V
+actor "Usuario registrado" as U
+actor "Administrador" as A
+actor "Tiendas (fuentes de precio)" as T
+
+V <|-- U
+U <|-- A
+
+rectangle "ArmadorPC" {
+  usecase "Consultar catálogo" as UC1
+  usecase "Comparar componentes" as UC2
+  usecase "Ver precios por tienda" as UC3
+  usecase "Armar PC (configurador)" as UC4
+  usecase "Validar compatibilidad" as UC5
+  usecase "Ver lista de compra" as UC6
+  usecase "Registrarse / ingresar" as UC7
+  usecase "Guardar armado" as UC8
+  usecase "Compartir armado" as UC9
+  usecase "Crear alerta de precio" as UC10
+  usecase "Escribir reseña" as UC11
+  usecase "Gestionar componentes" as UC12
+  usecase "Gestionar reglas de compatibilidad" as UC13
+  usecase "Gestionar tiendas y precios" as UC14
+  usecase "Actualizar precios" as UC15
+}
+
+V --> UC1
+V --> UC2
+V --> UC3
+V --> UC4
+V --> UC6
+V --> UC7
+U --> UC8
+U --> UC9
+U --> UC10
+U --> UC11
+A --> UC12
+A --> UC13
+A --> UC14
+T <-- UC15
+UC4 .> UC5 : <<include>>
+UC6 .> UC3 : <<include>>
+UC9 .> UC8 : <<extend>>
+UC14 .> UC15 : <<include>>
+@enduml

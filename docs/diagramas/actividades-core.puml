@@ -1,0 +1,37 @@
+@startuml actividades-core
+title Diagrama de actividades (Core: armar y pedir un PC)
+|Usuario|
+start
+:Elige una categoría;
+|Sistema|
+:Lista las piezas y marca las que no encajan con lo ya elegido;
+|Usuario|
+:Elige una pieza;
+|Sistema|
+:Aplica las reglas de compatibilidad;
+:Calcula total, consumo y rendimiento;
+|Usuario|
+while (¿Hay conflictos?) is (sí)
+  |Sistema|
+  :Muestra el motivo del conflicto;
+  |Usuario|
+  :Cambia la pieza;
+  |Sistema|
+  :Vuelve a validar;
+endwhile (no)
+|Usuario|
+if (¿Desea pedir el armado?) then (sí)
+  |Sistema|
+  :Busca la mejor oferta con stock de cada pieza;
+  :Compara la compra separada con una sola tienda;
+  :Muestra la lista de compra;
+endif
+|Usuario|
+if (¿Desea guardar o compartir?) then (sí)
+  |Sistema|
+  :Guarda el armado con los precios del momento
+  o genera un enlace público;
+endif
+|Usuario|
+stop
+@enduml

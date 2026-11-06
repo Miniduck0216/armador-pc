@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crear cuenta · ArmadorPC</title>
+  <meta name="description" content="Crea tu cuenta gratis en ArmadorPC.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/registro.js"></script>
+</head>
+<body>
+<main class="acceso">
+    <div class="acceso-arte">
+      <a class="logo" href="/"><img src="/logo-icono.svg" alt="" width="44" height="44"><span>Armador<b>PC</b></span></a>
+      <h2 style="font-size:36px">Tu cuenta guarda todo lo que armas</h2>
+      <ul id="beneficios"></ul>
+    </div>
+    <div class="acceso-formulario">
+      <div class="caja sombra">
+        <h1>Crear cuenta</h1>
+        <p class="tenue" style="margin-bottom:20px">¿Ya tienes una? <a href="/ingresar.html" id="ir-ingresar">Ingresa</a></p>
+        <form class="formulario" id="formulario" novalidate>
+          <div class="aviso error oculto" id="error"></div>
+          <label class="campo"><span>Nombre</span><input name="nombre" autocomplete="name" minlength="2" maxlength="40" required></label>
+          <label class="campo"><span>Correo</span><input name="correo" type="email" autocomplete="email" required></label>
+          <label class="campo"><span>Contraseña</span><input name="contrasena" type="password" autocomplete="new-password" minlength="8" required></label>
+          <div class="fuerza"><i id="fuerza"></i></div>
+          <small class="tenue" id="fuerza-texto">Mínimo 8 caracteres, con letras y números.</small>
+          <label class="campo"><span>Confirmar contraseña</span><input name="confirmar" type="password" autocomplete="new-password" required></label>
+          <button class="boton violeta grande ancho">Crear cuenta</button>
+        </form>
+      </div>
+    </div>
+</main>
+</body>
+</html>

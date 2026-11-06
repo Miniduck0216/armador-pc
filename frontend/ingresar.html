@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingresar · ArmadorPC</title>
+  <meta name="description" content="Ingresa a tu cuenta de ArmadorPC.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/ingresar.js"></script>
+</head>
+<body>
+<main class="acceso">
+    <div class="acceso-arte">
+      <a class="logo" href="/"><img src="/logo-icono.svg" alt="" width="44" height="44"><span>Armador<b>PC</b></span></a>
+      <h2 style="font-size:36px">Tu cuenta guarda todo lo que armas</h2>
+      <ul id="beneficios"></ul>
+    </div>
+    <div class="acceso-formulario">
+      <div class="caja sombra">
+        <h1>Ingresar</h1>
+        <p class="tenue" style="margin-bottom:20px">¿No tienes cuenta? <a href="/registro.html" id="ir-registro">Créala gratis</a></p>
+        <form class="formulario" id="formulario" novalidate>
+          <div class="aviso error oculto" id="error"></div>
+          <label class="campo"><span>Correo</span><input name="correo" type="email" autocomplete="email" required></label>
+          <label class="campo"><span>Contraseña</span><input name="contrasena" type="password" autocomplete="current-password" required></label>
+          <button class="boton violeta grande ancho">Ingresar</button>
+        </form>
+        <div class="cuentas-prueba" style="margin-top:18px"><b>Cuentas de prueba</b><br>Usuario: demo@armadorpc.com · Demo12345<br>Administrador: admin@armadorpc.com · Admin12345</div>
+      </div>
+    </div>
+</main>
+</body>
+</html>

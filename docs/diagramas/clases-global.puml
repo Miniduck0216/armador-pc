@@ -1,0 +1,139 @@
+@startuml clases-global
+title Diagrama de Clases (global)
+skinparam classAttributeIconSize 0
+skinparam defaultFontSize 11
+hide empty members
+
+enum Rol {
+  usuario
+  admin
+}
+
+class Usuario {
+  +id : int
+  +nombre : string
+  +correo : string
+  -contrasena : string
+  +rol : Rol
+  +favoritos : Componente[*]
+  +guardarArmado(nombre, piezas) : Armado
+}
+
+class Categoria {
+  +id : int
+  +codigo : string
+  +nombre : string
+  +orden : int
+}
+
+class Componente {
+  +id : int
+  +marca : string
+  +nombre : string
+  +precioReferencia : float
+  +consumoW : int
+  +categoria : Categoria
+  +ofertas : Oferta[*]
+  +mejorOferta() : Oferta
+}
+
+class EspecificacionCpu {
+  +nucleos : int
+  +puntajeRendimiento : float
+  +zocalo : string
+}
+
+class Tienda {
+  +id : int
+  +nombre : string
+  +costoEnvio : float
+  +activa : bool
+}
+
+class Oferta {
+  +precio : float
+  +enStock : bool
+  +url : string
+  +actualizado : datetime
+  +total() : float
+}
+
+class HistorialPrecio {
+  +fecha : date
+  +precio : float
+}
+
+class AlertaPrecio {
+  +precioObjetivo : float
+  +disparada : bool
+  +verificar(precioActual) : bool
+}
+
+class ReglaCompatibilidad {
+  +nombre : string
+  +tipo : string
+  +mensajeError : string
+  +activa : bool
+}
+
+class Armado {
+  +id : int
+  +nombre : string
+  +precioTotal : float
+  +consumoTotal : int
+  +puntajeTotal : int
+  +esCompatible : bool
+  +tokenPublico : string
+  +compartir() : string
+}
+
+class Resena {
+  +calificacion : int
+  +comentario : string
+  +fecha : datetime
+}
+
+class ConfiguradorService {
+  +resumen(piezas) : Resumen
+  +opciones(categoria, piezas) : Opcion[*]
+  +sugerir(presupuesto, uso) : Sugerencia
+}
+
+class CompatibilidadService {
+  +verificar(piezas) : Resultado
+  +conflicto(candidato, seleccion) : string
+}
+
+class RendimientoService {
+  +calcular(piezas, uso) : int
+}
+
+class PreciosService {
+  +mejoresPrecios(ids) : Map
+  +ofertasDe(componente) : Oferta[*]
+  +historial(componente) : HistorialPrecio[*]
+}
+
+class PedidoService {
+  +calcular(ids) : Pedido
+}
+
+Usuario "1" -- "0..*" Armado : guarda >
+Usuario "0..*" -- "0..*" Componente : favoritos >
+Usuario "1" -- "0..*" AlertaPrecio
+Usuario "1" -- "0..*" Resena
+Categoria "1" -- "0..*" Componente : clasifica >
+Componente "1" *-- "0..1" EspecificacionCpu
+Componente "1" -- "0..*" Oferta
+Tienda "1" -- "0..*" Oferta : publica >
+Oferta "1" -- "0..*" HistorialPrecio
+Componente "1" -- "0..*" AlertaPrecio
+Armado "0..*" o-- "1..*" Componente : piezas >
+Componente "1" -- "0..*" Resena
+Usuario --> Rol
+ConfiguradorService ..> CompatibilidadService : usa
+ConfiguradorService ..> RendimientoService : usa
+ConfiguradorService ..> PreciosService : usa
+PedidoService ..> PreciosService : usa
+ConfiguradorService ..> ReglaCompatibilidad : lee
+@enduml

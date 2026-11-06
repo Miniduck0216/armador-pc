@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accesorios · ArmadorPC</title>
+  <meta name="description" content="Cables, adaptadores y pasta térmica de NomadaWare con precio y foto.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/accesorios.js"></script>
+</head>
+<body>
+<main>
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <div class="migas"><a href="/">Inicio</a> / Accesorios</div>
+      <h1>Accesorios de NomadaWare</h1>
+      <p>Cables, adaptadores, cargadores y pasta térmica de la tienda NomadaWare (Ecuador), con su foto y precio. Los precios son los que publica la tienda; confírmalos en su sitio antes de comprar.</p>
+    </div>
+  </section>
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="fila entre" style="margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <input type="search" id="buscar" placeholder="Buscar accesorio…" style="max-width:320px" aria-label="Buscar accesorio">
+        <select id="orden" aria-label="Ordenar" style="width:auto;min-width:230px"><option value="nombre">Nombre</option><option value="precio">Precio: menor a mayor</option><option value="precioDesc">Precio: mayor a menor</option></select>
+      </div>
+      <div class="chips" id="grupos"></div>
+      <p class="tenue pequeno" id="total" style="margin:10px 0 16px"></p>
+      <div class="nomada-grid" id="resultados"></div>
+      <p class="pequeno tenue" style="margin-top:24px">Fotos y datos: <a href="https://nomadaware.com.ec/tiendanomada/" target="_blank" rel="noopener noreferrer">NomadaWare</a>. Datos tomados el 19/10/2026. El precio efectivo es el de promoción en efectivo; el de tarjeta es el precio con tarjeta publicado por la tienda.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

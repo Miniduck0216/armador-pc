@@ -1,0 +1,20 @@
+@startsalt
+{+
+  <b>ArmadorPC</b> | [Armar PC] | [Componentes] | [Herramientas] | [Ingresar]
+  ==
+  <b>Paso 2: elige la placa base</b>
+  ..
+  {#
+    Pieza | Precio | Compatibilidad
+    (X) AMD Ryzen 9 9950X3D | $647.99 | OK
+    ( ) Intel Core i7-14700K | $389.00 | No encaja (zócalo)
+    ( ) AMD Ryzen 7 7800X3D | $349.00 | OK
+  }
+  ..
+  [Elegir pieza] | [Cambiar categoría]
+  ==
+  <b>Total: $1,037.99</b> | Consumo: 410 W | Rendimiento: 82/100
+  ..
+  [Guardar armado] | [Ver lista de compra] | [Compartir]
+}
+@endsalt

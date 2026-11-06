@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Herramientas · ArmadorPC</title>
+  <meta name="description" content="Comprobador de compatibilidad, calculadora de fuente de poder y de refrigeración para tu PC.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/herramientas.js"></script>
+</head>
+<body>
+<main>
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <div class="migas"><a href="/">Inicio</a> / Herramientas</div>
+      <h1>Herramientas</h1>
+      <p>Resuelve las dudas típicas antes de comprar: ¿encajan mis piezas?, ¿qué fuente necesito?, ¿alcanza un disipador de aire?</p>
+      <div class="fila" style="margin-top:18px">
+        <a class="boton secundario pequeno" href="#comprobador">Compatibilidad</a>
+        <a class="boton secundario pequeno" href="#fuente">Fuente de poder</a>
+        <a class="boton secundario pequeno" href="#refrigeracion">Refrigeración</a>
+      </div>
+    </div>
+  </section>
+  <section class="seccion">
+    <div class="contenedor">
+
+      <article class="herramienta caja sombra" id="comprobador">
+        <div class="herramienta-cabecera"><span class="icono-caja" data-icono="escudo"></span><div><h2>Comprobador de compatibilidad</h2><p class="tenue">Elige las piezas que tienes en mente; revisamos zócalo, memoria, tamaños, refrigeración y fuente.</p></div></div>
+        <div class="herramienta-grilla">
+          <form class="formulario" id="form-compat">
+            <div class="dos-campos" id="selects-compat"></div>
+            <div class="fila"><button class="boton violeta">Comprobar</button><button class="boton secundario" type="button" id="cargar-pc">Usar mi PC del configurador</button></div>
+          </form>
+          <div id="res-compat"><div class="vacio">Elige al menos dos piezas y pulsa <b>Comprobar</b>.</div></div>
+        </div>
+      </article>
+
+      <article class="herramienta caja sombra" id="fuente">
+        <div class="herramienta-cabecera"><span class="icono-caja" data-icono="rayo"></span><div><h2>Calculadora de fuente de poder</h2><p class="tenue">Sumamos el consumo de cada pieza y añadimos un margen del 30 % para picos y envejecimiento.</p></div></div>
+        <div class="herramienta-grilla">
+          <form class="formulario" id="form-fuente">
+            <label class="campo"><span>Procesador</span><select name="cpuId" data-cat="CPU"></select></label>
+            <label class="campo"><span>Tarjeta gráfica</span><select name="gpuId" data-cat="GPU" data-vacio="Sin tarjeta gráfica (gráficos integrados)"></select></label>
+            <div class="dos-campos">
+              <label class="campo"><span>Módulos de RAM</span><input name="modulosRam" type="number" min="1" max="8" value="2"></label>
+              <label class="campo"><span>Discos (SSD o HDD)</span><input name="discos" type="number" min="1" max="10" value="1"></label>
+            </div>
+            <label class="campo"><span>Ventiladores de la caja</span><input name="ventiladores" type="number" min="0" max="12" value="3"></label>
+            <label class="casilla"><input type="checkbox" name="refrigeracionLiquida"> Refrigeración líquida (bomba)</label>
+            <label class="casilla"><input type="checkbox" name="overclock"> Voy a hacer overclock</label>
+            <button class="boton violeta">Calcular</button>
+          </form>
+          <div id="res-fuente"><div class="vacio">Elige tu procesador y tarjeta gráfica.</div></div>
+        </div>
+      </article>
+
+      <article class="herramienta caja sombra" id="refrigeracion">
+        <div class="herramienta-cabecera"><span class="icono-caja" data-icono="ventilador"></span><div><h2>Calculadora de refrigeración</h2><p class="tenue">Estimamos el calor real según el procesador, el uso, la temperatura de tu ciudad y la caja.</p></div></div>
+        <div class="herramienta-grilla">
+          <form class="formulario" id="form-refrig">
+            <label class="campo"><span>Procesador</span><select name="cpuId" data-cat="CPU"></select></label>
+            <label class="campo"><span>Uso principal</span><select name="uso"><option value="oficina">Oficina y estudio</option><option value="juegos" selected>Juegos</option><option value="render">Render, edición y 3D</option></select></label>
+            <div class="dos-campos">
+              <label class="campo"><span>Temperatura ambiente (°C)</span><input name="temperatura" type="number" min="5" max="45" value="22" title="Quito ronda los 15–22 °C; Guayaquil, 25–32 °C"></label>
+              <label class="campo"><span>Tamaño de la caja</span><select name="caja"><option value="compacta">Compacta (ITX)</option><option value="media" selected>Media torre</option><option value="grande">Torre grande</option></select></label>
+            </div>
+            <label class="casilla"><input type="checkbox" name="overclock"> Voy a hacer overclock</label>
+            <button class="boton violeta">Calcular</button>
+          </form>
+          <div id="res-refrig"><div class="vacio">Elige tu procesador.</div></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+</main>
+</body>
+</html>

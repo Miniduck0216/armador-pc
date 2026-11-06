@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configuraciones recomendadas · ArmadorPC</title>
+  <meta name="description" content="PCs recomendados para jugar, crear contenido o trabajar, con precios actuales de Ecuador.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/configuraciones.js"></script>
+</head>
+<body>
+<main>
+  <section class="cabecera-pagina">
+    <div class="contenedor">
+      <div class="migas"><a href="/">Inicio</a> / Configuraciones</div>
+      <h1>Configuraciones recomendadas</h1>
+      <p>Equipos completos y compatibles, recalculados con los precios de hoy. Úsalos como punto de partida y personalízalos.</p>
+    </div>
+  </section>
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="barra-pestanas">
+        <div class="pestanas" id="pestanas" role="tablist">
+          <button class="activa" data-uso="">Todas</button>
+          <button data-uso="gaming">Gaming</button>
+          <button data-uso="creacion">Creación</button>
+          <button data-uso="trabajo">Trabajo</button>
+        </div>
+        <a class="boton violeta" href="/configurador.html?modo=guiado">Armar con mi presupuesto</a>
+      </div>
+      <div class="grilla g3" id="lista"></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

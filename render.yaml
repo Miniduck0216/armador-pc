@@ -1,0 +1,27 @@
+# Despliegue en Render (plan con disco persistente, necesario para que SQLite no se borre).
+# Pasos: en render.com → New → Blueprint → elige el repositorio de GitHub.
+services:
+  - type: web
+    name: armadorpc
+    runtime: node
+    plan: starter            # el disco persistente requiere plan pago
+    buildCommand: npm run instalar && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/inicio
+    disk:
+      name: armadorpc-datos
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRETO
+        generateValue: true  # Render genera un secreto aleatorio
+      - key: BASE_DATOS
+        value: /var/data/armadorpc.db
+      - key: PRECIOS_MODO
+        value: demo          # cambia a "real" cuando quieras consultar tiendas de Ecuador
+      - key: PRECIOS_AL_INICIAR
+        value: "no"

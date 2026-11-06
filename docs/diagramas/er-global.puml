@@ -1,0 +1,147 @@
+@startuml er-global
+title Diagrama Entidad Relación (global)
+hide circle
+skinparam linetype ortho
+skinparam defaultFontSize 11
+
+entity usuarios {
+  * id : INTEGER <<PK>>
+  --
+  * nombre : TEXT
+  * correo : TEXT <<U>>
+  * contrasena : TEXT
+  * rol : TEXT  (usuario | admin)
+  activo : BOOLEAN
+  fechaCreacion : DATETIME
+}
+
+entity categorias {
+  * id : INTEGER <<PK>>
+  --
+  * codigo : TEXT <<U>>  (CPU, GPU, RAM...)
+  * nombre : TEXT
+  orden : INTEGER
+}
+
+entity componentes {
+  * id : INTEGER <<PK>>
+  --
+  * categoriaId : INTEGER <<FK>>
+  * nombre : TEXT
+  * marca : TEXT
+  * precioReferencia : REAL
+  consumoW : INTEGER
+  imagenUrl : TEXT
+  especificaciones : JSON
+}
+
+entity especificaciones_cpu {
+  * id : INTEGER <<PK>>
+  --
+  * componenteId : INTEGER <<FK>> <<U>>
+  * nucleos : INTEGER
+  * puntajeRendimiento : REAL
+  * zocalo : TEXT
+}
+
+entity tiendas {
+  * id : INTEGER <<PK>>
+  --
+  * nombre : TEXT
+  * costoEnvio : REAL
+  * activa : BOOLEAN
+  color : TEXT
+}
+
+entity ofertas {
+  * id : INTEGER <<PK>>
+  --
+  * componenteId : INTEGER <<FK>>
+  * tiendaId : INTEGER <<FK>>
+  * precio : REAL
+  * enStock : BOOLEAN
+  * url : TEXT
+  actualizado : DATETIME
+}
+
+entity historial_precios {
+  * id : INTEGER <<PK>>
+  --
+  * ofertaId : INTEGER <<FK>>
+  * fecha : TEXT
+  * precio : REAL
+}
+
+entity alertas_precio {
+  * id : INTEGER <<PK>>
+  --
+  * usuarioId : INTEGER <<FK>>
+  * componenteId : INTEGER <<FK>>
+  * precioObjetivo : REAL
+  disparada : BOOLEAN
+}
+
+entity armados {
+  * id : INTEGER <<PK>>
+  --
+  * usuarioId : INTEGER <<FK>>
+  * nombre : TEXT
+  * precioTotal : REAL
+  consumoTotal : INTEGER
+  puntajeTotal : INTEGER
+  esCompatible : BOOLEAN
+  tokenPublico : TEXT <<U>>
+}
+
+entity armado_componentes {
+  * armadoId : INTEGER <<FK>>
+  * componenteId : INTEGER <<FK>>
+  --
+  <<PK compuesta>>
+}
+
+entity favoritos {
+  * usuarioId : INTEGER <<FK>>
+  * componenteId : INTEGER <<FK>>
+  --
+  <<PK compuesta>>
+}
+
+entity resenas {
+  * id : INTEGER <<PK>>
+  --
+  * usuarioId : INTEGER <<FK>>
+  * componenteId : INTEGER <<FK>>
+  * calificacion : INTEGER  (1 a 5)
+  comentario : TEXT
+  fecha : DATETIME
+}
+
+entity reglas_compatibilidad {
+  * id : INTEGER <<PK>>
+  --
+  * nombre : TEXT
+  * tipo : TEXT  (igual | contiene | menor_igual | suma_consumo)
+  categoriaOrigen : TEXT
+  * categoriaDestino : TEXT
+  * atributoDestino : TEXT
+  margen : INTEGER
+  * mensajeError : TEXT
+  activa : BOOLEAN
+}
+
+categorias ||--o{ componentes : clasifica
+componentes ||--o| especificaciones_cpu : detalla
+componentes ||--o{ ofertas : se_vende_en
+tiendas ||--o{ ofertas : publica
+ofertas ||--o{ historial_precios : registra
+usuarios ||--o{ alertas_precio : crea
+componentes ||--o{ alertas_precio : vigila
+usuarios ||--o{ armados : guarda
+armados ||--o{ armado_componentes : contiene
+componentes ||--o{ armado_componentes : esta_en
+usuarios ||--o{ favoritos : marca
+componentes ||--o{ favoritos : es_marcado
+usuarios ||--o{ resenas : escribe
+componentes ||--o{ resenas : recibe
+@enduml

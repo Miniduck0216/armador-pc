@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configurador de PC · ArmadorPC</title>
+  <meta name="description" content="Arma tu PC pieza por pieza con compatibilidad, consumo y precios de Ecuador en vivo.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/configurador.js"></script>
+</head>
+<body>
+<main>
+  <section class="cabecera-pagina">
+    <div class="contenedor fila entre">
+      <div>
+        <div class="migas"><a href="/">Inicio</a> / Configurador</div>
+        <h1>Configurador de PC</h1>
+        <p>Elige cada pieza: comprobamos la compatibilidad, el consumo y el mejor precio mientras armas.</p>
+      </div>
+      <button class="boton violeta" id="abrir-asistente" type="button"></button>
+    </div>
+  </section>
+  <section class="seccion" style="padding-top:28px">
+    <div class="contenedor">
+      <form class="asistente oculto" id="asistente">
+        <div><span class="antetitulo">Asistente por presupuesto</span><h2>¿Cuánto quieres gastar?</h2>
+          <p class="tenue">Armamos un equipo completo y compatible con los mejores precios de hoy. Después puedes cambiar cualquier pieza.</p></div>
+        <div class="asistente-grilla">
+          <div class="campo"><span>Presupuesto</span>
+            <div class="presupuesto-valor" id="valor-presupuesto">$1,200</div>
+            <input type="range" name="presupuesto" min="400" max="5000" step="50" value="1200" aria-label="Presupuesto en dólares">
+            <div class="fila entre pequeno tenue"><span>$400</span><span>$5,000</span></div>
+          </div>
+          <div class="apilado">
+            <div class="campo"><span>¿Para qué lo usarás?</span>
+              <div class="selector-uso">
+                <label><input type="radio" name="uso" value="juegos" checked><span>Juegos</span></label>
+                <label><input type="radio" name="uso" value="trabajo"><span>Trabajo y creación</span></label>
+              </div>
+            </div>
+            <label class="casilla"><input type="checkbox" name="sinGrafica"> Sin tarjeta gráfica (usar gráficos integrados)</label>
+          </div>
+          <button class="boton grande">Armar mi PC</button>
+        </div>
+      </form>
+      <div class="configurador">
+        <div>
+          <div class="fila entre" style="margin-bottom:12px"><h2 style="font-size:22px">Componentes</h2><button class="enlace peligro" id="vaciar" type="button">Vaciar todo</button></div>
+          <div class="lista-categorias" id="lista"></div>
+          <div class="fila entre" style="margin:28px 0 12px"><h2 style="font-size:22px">Periféricos <span class="tenue pequeno" style="font-family:Inter">(opcional)</span></h2></div>
+          <div class="lista-categorias" id="perifericos"></div>
+        </div>
+        <aside class="resumen-config" id="resumen"></aside>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArmadorPC · Arma tu PC con precios de Ecuador</title>
+  <meta name="description" content="Configurador de PC con compatibilidad en vivo y comparador de precios de tiendas de Ecuador.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
+  <script type="module" src="/src/paginas/inicio.js"></script>
+</head>
+<body>
+<main>
+  <section class="heroe">
+    <div class="contenedor heroe-grilla">
+      <div class="heroe-texto">
+        <span class="insignia amarilla" id="modo-precios">Precios de tiendas de Ecuador</span>
+        <h1>Arma tu PC ideal y paga <em>lo justo</em></h1>
+        <p>Elige cada pieza con compatibilidad comprobada en vivo, compara precios de tiendas ecuatorianas y recibe un aviso cuando baje lo que te interesa.</p>
+        <div class="fila">
+          <a class="boton grande" href="/configurador.html">Empezar a armar</a>
+          <a class="boton grande contorno-claro" href="/configuraciones.html">Ver configuraciones</a>
+        </div>
+        <div class="cifras" id="cifras">
+          <div><b>—</b><small>tiendas</small></div><div><b>—</b><small>modelos</small></div><div><b>—</b><small>precios hoy</small></div>
+        </div>
+      </div>
+      <div class="caja que-hacer">
+        <h2>¿Qué quieres hacer hoy?</h2>
+        <p class="tenue">Elige un camino y te llevamos paso a paso.</p>
+        <div class="apilado" id="acciones-inicio"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="cabecera-seccion">
+        <div><span class="antetitulo">Configura según tu uso</span><h2>Configuraciones listas para personalizar</h2></div>
+        <a class="boton secundario" href="/configuraciones.html">Ver todas</a>
+      </div>
+      <div class="grilla g3" id="configs"></div>
+    </div>
+  </section>
+
+  <section class="seccion blanca">
+    <div class="contenedor">
+      <div class="cabecera-seccion">
+        <div><span class="antetitulo">Biblioteca</span><h2>Explora por categoría</h2></div>
+        <p class="tenue">Fotos reales de referencia, especificaciones y el mejor precio de hoy en cada categoría.</p>
+      </div>
+      <div class="mosaicos" id="categorias"></div>
+      <h3 class="subtitulo">Periféricos</h3>
+      <div class="mosaicos compactos" id="perifericos"></div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="cabecera-seccion">
+        <div><span class="antetitulo">Ofertas</span><h2>Bajadas de precio</h2></div>
+        <a class="boton secundario" href="/componentes.html?orden=bajada">Ver más ofertas</a>
+      </div>
+      <div class="grilla g4" id="bajadas"></div>
+    </div>
+  </section>
+
+  <section class="seccion oscura">
+    <div class="contenedor">
+      <div class="cabecera-seccion">
+        <div><span class="antetitulo">Herramientas</span><h2>Resuelve dudas antes de comprar</h2></div>
+        <p class="tenue">Calculadoras basadas en el consumo y la temperatura reales de cada pieza.</p>
+      </div>
+      <div class="grilla g3" id="herramientas"></div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor grilla dos-columnas">
+      <div>
+        <div class="cabecera-seccion"><div><span class="antetitulo">Ranking</span><h2>Procesadores más potentes</h2></div></div>
+        <div class="tabla-envoltura"><table class="tabla" id="ranking"></table></div>
+      </div>
+      <div>
+        <div class="cabecera-seccion"><div><span class="antetitulo">Tiendas</span><h2>De dónde salen los precios</h2></div></div>
+        <div class="apilado" id="tiendas"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion blanca">
+    <div class="contenedor">
+      <div class="cabecera-seccion">
+        <div><span class="antetitulo">Aprende</span><h2>Guías para comprar mejor</h2></div>
+        <a class="boton secundario" href="/guias.html">Todas las guías</a>
+      </div>
+      <div class="grilla g3" id="guias"></div>
+    </div>
+  </section>
+
+  <section class="contenedor">
+    <div class="banda-cta">
+      <div>
+        <h2>¿No sabes por dónde empezar?</h2>
+        <p>Dinos tu presupuesto y para qué usarás el equipo: armamos una configuración compatible y la puedes ajustar pieza por pieza.</p>
+      </div>
+      <a class="boton grande" href="/configurador.html?modo=guiado">Usar el asistente</a>
+    </div>
+  </section>
+</main>
+</body>
+</html>

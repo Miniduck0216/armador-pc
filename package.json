@@ -1,0 +1,17 @@
+{
+  "name": "armadorpc",
+  "version": "3.0.0",
+  "private": true,
+  "description": "ArmadorPC: configurador de PC y comparador de precios de Ecuador (NestJS + SQLite + Vite)",
+  "scripts": {
+    "instalar": "npm install && npm install --prefix backend && npm install --prefix frontend",
+    "dev": "concurrently -n api,web -c magenta,yellow \"npm run start:dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "demo": "concurrently -n api,web -c magenta,yellow \"npm run start:demo --prefix backend\" \"npm run dev --prefix frontend\"",
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "start": "npm run start:prod --prefix backend",
+    "prueba": "npm run prueba --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
