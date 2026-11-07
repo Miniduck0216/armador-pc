@@ -7,7 +7,8 @@ services:
     name: armadorpc
     runtime: node
     plan: free
-    buildCommand: npm run instalar && npm run build
+    # --include=dev: Render usa NODE_ENV=production y npm omitiría nest, typescript y vite
+    buildCommand: npm install --include=dev && npm install --include=dev --prefix backend && npm install --include=dev --prefix frontend && npm run build
     startCommand: npm start
     healthCheckPath: /api/inicio
     envVars:

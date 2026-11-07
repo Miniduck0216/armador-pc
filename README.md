@@ -3,7 +3,7 @@
 Aplicación web para armar una computadora pieza por pieza: revisa que las piezas sean compatibles, calcula el rendimiento y muestra el precio más bajo de cada pieza en tiendas de Ecuador. Tiene un panel de administración que mantiene los datos que usa el configurador (precios por tienda, procesadores, tiendas y usuarios). Está hecha con el patrón **Modelo – Vista – Controlador**.
 
 - **Deploy:** _pendiente_
-- **Video:** _pendiente_
+- **Video:** https://youtu.be/EWQa9NILkZE
 
 ## Tecnologías
 
@@ -149,7 +149,7 @@ Abrir http://localhost:5173
 
 1. Subir el proyecto a GitHub.
 2. En Render: **New → Blueprint** y elegir el repositorio. Render lee el `render.yaml`.
-3. Build command: `npm run instalar && npm run build`
+3. Build command: `npm install --include=dev && npm install --include=dev --prefix backend && npm install --include=dev --prefix frontend && npm run build` (el `--include=dev` hace falta porque Render usa `NODE_ENV=production` y sin él no instala las herramientas de compilación)
 4. Start command: `npm start`
 5. Plan Free → **Deploy**.
 
