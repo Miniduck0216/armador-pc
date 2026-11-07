@@ -2,7 +2,7 @@
 
 Aplicación web para armar una computadora pieza por pieza: revisa que las piezas sean compatibles, calcula el rendimiento y muestra el precio más bajo de cada pieza en tiendas de Ecuador. Tiene un panel de administración que mantiene los datos que usa el configurador (precios por tienda, procesadores, tiendas y usuarios). Está hecha con el patrón **Modelo – Vista – Controlador**.
 
-- **Deploy:** _pendiente_
+- **Deploy:** https://armadorpc.onrender.com
 - **Video:** https://youtu.be/EWQa9NILkZE
 
 ## Tecnologías
