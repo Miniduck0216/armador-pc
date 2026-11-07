@@ -1,201 +1,171 @@
-# ArmadorPC
+# ArmadorPC – Configurador de PC y comparador de precios (MVC con NestJS)
 
-Configurador de PC y comparador de precios de tiendas de Ecuador.
-Proyecto de Ingeniería Web (UDLA) con **NestJS + SQLite** en el backend y **HTML, CSS y JavaScript con Vite** en el frontend.
+Aplicación web para armar una computadora pieza por pieza: revisa que las piezas sean compatibles, calcula el rendimiento y muestra el precio más bajo de cada pieza en tiendas de Ecuador. Tiene un panel de administración que mantiene los datos que usa el configurador (precios por tienda, procesadores, tiendas y usuarios). Está hecha con el patrón **Modelo – Vista – Controlador**.
+
+- **Deploy:** _pendiente_
+- **Video:** _pendiente_
+
+## Tecnologías
+
+- Node.js 22 o superior + NestJS 10 (API REST)
+- TypeORM + SQLite (better-sqlite3); los datos de prueba se cargan solos al iniciar
+- HTML, CSS y JavaScript con Vite para las vistas
+- class-validator para validar los datos en el servidor
+- bcrypt y JWT en cookie HttpOnly para las sesiones
+- Render para el despliegue
+
+## Estructura MVC
 
 ```
 armador-pc/
-├── backend/    API REST (NestJS, TypeORM, SQLite)  → puerto 3000
-├── frontend/   Páginas web (Vite, sin framework)     → puerto 5173 en desarrollo
-├── package.json  Scripts para correr los dos a la vez
-└── README.md
+├── backend/                         # API (puerto 3000)
+│   └── src/
+│       ├── main.ts                  # arranca NestJS y sirve el frontend compilado
+│       ├── componentes/             # MODELO: entidad Componente y su servicio
+│       ├── categorias/              # MODELO: entidad Categoria
+│       ├── precios/                 # MODELO: Tienda, Oferta, historial y sincronización de precios
+│       ├── usuarios/                # MODELO: entidad Usuario (contraseña con bcrypt)
+│       ├── configurador/            # core: compatibilidad, rendimiento y armado automático
+│       ├── admin/                   # CONTROLADOR del panel de administración
+│       │   ├── admin.controller.ts  # rutas /api/admin (solo rol administrador)
+│       │   └── dto/                 # validación en el servidor de los datos sensibles
+│       ├── auth/                    # ingreso, sesiones, guardias de roles
+│       └── semilla/                 # datos de prueba (componentes, tiendas, cuentas)
+├── frontend/                        # VISTA (puerto 5173 en desarrollo)
+│   ├── *.html                       # una página por pantalla
+│   └── src/paginas/                 # JS de cada página (admin.js = panel)
+├── docs/                            # especificación funcional, diagramas y guion del video
+├── package.json                     # scripts para correr backend y frontend a la vez
+└── render.yaml                      # configuración del despliegue
 ```
 
-## Cómo se reparte el MVC
+| Capa | Qué hace aquí |
+|------|---------------|
+| Modelo | Entidades de TypeORM (`*.entity.ts`) y servicios (`*.service.ts`): tablas, compatibilidad, puntajes y precios. |
+| Vista | Páginas HTML que piden datos a la API y los muestran. No guardan nada por su cuenta. |
+| Controlador | Recibe la petición, valida los datos con DTOs, llama al servicio y responde JSON. |
 
-| Capa | Dónde está | Qué hace |
-|---|---|---|
-| **Modelo** | `backend/src/**/**.entity.ts` y los `*.service.ts` | Tablas (componentes, ofertas, usuarios, armados…) y reglas de negocio: compatibilidad, puntajes, precios. |
-| **Controlador** | `backend/src/**/**.controller.ts` | Rutas `/api/...`: reciben la petición, validan (DTOs con class-validator), llaman al servicio y devuelven JSON. |
-| **Vista** | `frontend/` | Páginas HTML + CSS + JS que piden datos a la API con `fetch` y los dibujan. |
+## Panel de administración
 
-Front y back están separados: el backend no genera HTML, solo responde JSON. Así cada parte se puede desarrollar, probar y publicar por separado.
+Ruta: `/admin.html`. Solo entran cuentas con rol **Administrador**; el servidor rechaza a cualquier otro usuario aunque conozca las rutas.
 
-## Requisitos
+| Sección | Qué permite |
+|---------|-------------|
+| Tablero | Cifras del sistema y estado de los precios |
+| Tiendas y precios | Activar o desactivar tiendas, actualizar precios y **cargar un precio manual** |
+| Procesadores | Crear, editar y eliminar procesadores (los puntajes se recalculan) |
+| Usuarios | Cambiar rol o estado de una cuenta y **crear usuarios** |
+| Reportes | Resolver reportes de datos incorrectos enviados por usuarios |
+| Reglas | Ver las reglas de compatibilidad que usa el configurador |
 
-- Node.js 22 o superior
-- npm
+### Validación en el backend de datos sensibles
 
-## Primer uso
+El navegador revisa los formularios, pero eso no basta: cada dato sensible se valida otra vez en el servidor antes de grabarse. Si no cumple, la API responde `400` con el mensaje y no guarda nada.
+
+| Dato | Archivo | Regla |
+|------|---------|-------|
+| Contraseña | `backend/src/admin/dto/usuario-admin.dto.ts` | 8 a 72 caracteres, con letras y números. Se cifra con bcrypt |
+| Correo | `usuario-admin.dto.ts` | Formato válido, máximo 120 caracteres, no repetido |
+| Rol | `usuario-admin.dto.ts` | Solo `admin` o `usuario` |
+| Enlace de la oferta | `backend/src/admin/dto/oferta-admin.dto.ts` | Solo `http` o `https`; bloquea enlaces `javascript:` |
+| Precio de la oferta | `oferta-admin.dto.ts` | Entre 0,01 y 100 000 |
+
+### Desplegables dependientes
+
+Una oferta (precio) tiene dos llaves foráneas: el componente y la tienda. Y cada componente pertenece a una categoría. En el formulario **Cargar precio manual** no se escribe ningún ID:
+
+1. **Categoría:** desplegable con la tabla `categorias`.
+2. **Componente:** se carga solo con los componentes de la categoría elegida (`GET /api/admin/componentes?categoria=CPU`). Está deshabilitado hasta elegir categoría.
+3. **Tienda:** desplegable con la tabla `tiendas`.
+
+Antes de guardar, el servidor comprueba que el componente y la tienda existan. Si ya hay un precio para ese par, lo actualiza en vez de duplicarlo.
+
+## Reglas de compatibilidad (core)
+
+| Regla | Qué revisa |
+|-------|-----------|
+| Zócalo del procesador y la placa | Que el socket coincida (AM5, LGA1700…) |
+| Tipo de memoria de la placa | DDR4 o DDR5 según la placa |
+| Memoria soportada por el procesador | Que el procesador admita ese tipo de RAM |
+| Tamaño de la placa y la caja | ATX, Micro-ATX o Mini-ITX |
+| Largo de la tarjeta gráfica | Que entre en la caja |
+| Zócalo y capacidad de la refrigeración | Que sirva para el procesador y disipe su calor |
+| Potencia de la fuente | Que cubra el consumo total con margen |
+
+Las reglas están en la tabla `reglas_compatibilidad`.
+
+## Rutas
+
+| Ruta | Descripción |
+|------|-------------|
+| `GET /` | Página de inicio |
+| `GET /configurador.html` | Configurador pieza por pieza (core) |
+| `GET /pedido.html` | Lista de compra por tienda |
+| `GET /admin.html` | Panel de administración |
+| `GET /api/docs` | Documentación de la API (Swagger) |
+| `POST /api/configurador/resumen` | Total, compatibilidad y rendimiento de un armado |
+| `GET /api/pedido?ids=1,2,3` | Lista de compra con la mejor tienda por pieza |
+| `GET /api/admin/tiendas` | Tiendas para el desplegable |
+| `GET /api/admin/componentes?categoria=` | Componentes de una categoría (desplegable dependiente) |
+| `POST /api/admin/ofertas` | Guarda un precio manual (validado en el servidor) |
+| `POST /api/admin/usuarios` | Crea una cuenta (validada en el servidor) |
+| `GET /api/admin/tablero` | Cifras del panel |
+
+## Ejecutar en local
 
 ```bash
-npm run instalar      # instala la raíz, backend y frontend
-copy backend\.env.example backend\.env    # (Windows)  — en Mac/Linux: cp backend/.env.example backend/.env
-npm run dev           # levanta API (3000) y web (5173) a la vez
+npm run instalar                       # instala raíz, backend y frontend
+cp backend/.env.example backend/.env   # en PowerShell: copy backend\.env.example backend\.env
+npm run dev                            # API en :3000 y web en :5173
 ```
 
-Abre **http://localhost:5173**. La documentación interactiva de la API está en **http://localhost:3000/api/docs** (Swagger).
+Abrir http://localhost:5173
 
-- `npm run demo` → igual, pero con tiendas ficticias y precios simulados (no necesita internet; útil para presentar).
-- `npm run prueba` → pruebas del emparejador de productos y del adaptador WooCommerce.
-- `npm run build` y luego `npm start` → modo producción: el backend sirve también el frontend compilado en http://localhost:3000.
-
-La base de datos `backend/armadorpc.db` se crea sola la primera vez con todo el catálogo. Si cambias los datos de la semilla, bórrala y vuelve a arrancar.
+- `npm run demo`: igual, pero con tiendas y precios simulados (no necesita internet).
+- `npm run prueba`: pruebas del emparejador de productos.
+- En PowerShell, si sale "la ejecución de scripts está deshabilitada", usar `npm.cmd` en lugar de `npm`.
 
 **Cuentas de prueba**
 
 | Rol | Correo | Contraseña |
-|---|---|---|
-| Usuario | demo@armadorpc.com | Demo12345 |
+|-----|--------|------------|
 | Administrador | admin@armadorpc.com | Admin12345 |
+| Usuario | demo@armadorpc.com | Demo12345 |
 
-## Páginas
+## Casos de prueba
 
-| Página | Para qué sirve |
-|---|---|
-| `/` | Inicio: ¿qué quieres hacer hoy?, configuraciones, categorías, bajadas de precio, ranking de procesadores, guías |
-| `/componentes.html` | Biblioteca con filtros (marca, gama, precio, stock) y orden |
-| `/producto.html?id=` | Precios por tienda, historial de 90 días, alerta de precio, especificaciones, análisis (procesadores), reseñas |
-| `/comparar.html` | Hasta 3 modelos de la misma categoría lado a lado (gana el verde) |
-| `/configurador.html` | Pieza por pieza con compatibilidad en vivo; `?modo=guiado` abre el asistente por presupuesto |
-| `/configuraciones.html` | Equipos recomendados (gaming, creación, trabajo) recalculados con los precios de hoy |
-| `/herramientas.html` | Comprobador de compatibilidad, calculadora de fuente y de refrigeración |
-| `/guias.html` | Guías de compra |
-| `/cuenta.html` | Armados guardados, alertas, favoritos, comparaciones y reseñas (requiere sesión) |
-| `/admin.html` | Tablero, tiendas y precios, procesadores, usuarios, reportes y reglas (solo administrador) |
+| Formulario | Dato enviado | Resultado |
+|------------|--------------|-----------|
+| Cargar precio | Enlace `javascript:alert(1)` | `400` El enlace debe empezar con https:// |
+| Cargar precio | Precio `-5` | `400` El precio debe ser mayor a 0 |
+| Cargar precio | Tienda que no existe (`tiendaId: 999`) | `404` Esa tienda no existe |
+| Cargar precio | Datos correctos | Precio guardado; si se repite, se actualiza |
+| Nuevo usuario | Contraseña `solotexto` | `400` La contraseña debe tener letras y números |
+| Nuevo usuario | Rol `superadmin` | `400` El rol debe ser Administrador o Usuario |
+| Nuevo usuario | Correo ya registrado | `409` Ya existe una cuenta con ese correo |
+| Cualquier ruta `/api/admin` | Sin sesión | `401` |
 
-## API (resumen)
+## Despliegue en Render
 
-Todas las rutas empiezan con `/api`. Las marcadas con 🔒 requieren sesión (cookie `sesion`, HttpOnly, la deja `POST /api/auth/ingresar`).
+1. Subir el proyecto a GitHub.
+2. En Render: **New → Blueprint** y elegir el repositorio. Render lee el `render.yaml`.
+3. Build command: `npm run instalar && npm run build`
+4. Start command: `npm start`
+5. Plan Free → **Deploy**.
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/inicio` | Datos de la portada |
-| GET | `/categorias` | Categorías con conteos y precio desde |
-| GET | `/componentes?categoria&buscar&marca&gama&precioMin&precioMax&enStock&orden&pagina` | Listado con facetas |
-| GET | `/componentes/:id` · `/ofertas` · `/historial` | Ficha, precios por tienda e historial |
-| GET | `/comparar-componentes?ids=1,2,3` | Comparación de 2 o 3 piezas |
-| GET | `/comparar?a&b` | Comparación detallada de 2 procesadores |
-| GET | `/procesadores/:id/analisis` | Puntaje, a favor y en contra |
-| GET | `/buscar?q=` · `/bajadas` · `/tiendas` | Búsqueda rápida, ofertas y tiendas |
-| POST | `/configurador/resumen` | Total, consumo, compatibilidad y rendimiento de un armado |
-| GET | `/configurador/opciones?categoria&piezas` | Opciones de una categoría marcando las incompatibles |
-| GET | `/configurador/sugerir?presupuesto&uso&sinGrafica` | Arma un equipo automáticamente |
-| GET | `/configuraciones?uso=` · `/configuraciones/:slug` | Configuraciones recomendadas |
-| POST | `/herramientas/fuente` · `/herramientas/refrigeracion` | Calculadoras |
-| GET | `/guias` · `/guias/:slug` | Guías |
-| POST | `/auth/registro` · `/auth/ingresar` · `/auth/salir` · GET `/auth/yo` | Sesión |
-| 🔒 | `/cuenta`, `/armados`, `/alertas`, `/favoritos/:id`, `/componentes/:id/resenas`, `/comparaciones` | Datos del usuario |
-| 🔒 admin | `/admin/...` | Panel de administración |
+El backend sirve también el frontend compilado, así que todo queda en una sola dirección. En el plan Free la base de datos vuelve a los datos de prueba cada vez que el servicio se reinicia, y el servicio se duerme tras unos minutos sin uso (la primera visita tarda más). Render genera `JWT_SECRETO` automáticamente; en producción la API no arranca sin esa variable.
 
-### Seguridad
-
-- Contraseñas con bcrypt; sesión con JWT en cookie HttpOnly + SameSite.
-- Bloqueo temporal tras varios intentos fallidos de ingreso.
-- Guardias de NestJS: `AutenticadoGuard` (sesión) y `RolesGuard` (`@Roles('admin')`); el frontend esconde lo que no corresponde, pero quien decide es el servidor.
-- Validación de todos los datos de entrada con DTOs; errores en JSON uniforme (`{ estado, mensaje }`).
-- El enlace `?volver=` del ingreso solo acepta rutas del mismo sitio.
-
-## De dónde salen los precios
-
-`PRECIOS_MODO` en `backend/.env`:
-
-- **real** (por defecto): cada 6 horas el backend consulta tiendas reales y guarda el precio más bajo con stock de cada componente.
-- **demo**: 5 tiendas ficticias con precios simulados (cada hora).
-
-| Fuente | Cómo se consulta | Estado |
-|---|---|---|
-| Computron, Tecnosmart, MTEC, Neutron PC Gamer (Ecuador) | API pública de WooCommerce (`/wp-json/wc/store/v1/products?search=`) | Funciona sin claves |
-| Mercado Libre Ecuador | API oficial (`/sites/MEC/search`) | Opcional: requiere `MERCADOLIBRE_CLIENT_ID` y `SECRET` |
-| AliExpress | API de afiliados (`aliexpress.affiliate.product.query`, envío a EC) | Opcional: requiere App Key, Secret y Tracking ID |
-| Amazon | — | No se integró: la Product Advertising API 5 se apaga el 30 de abril de 2026 y su reemplazo (Creators API) exige una cuenta de afiliado aprobada |
-
-Detalles importantes:
-
-- **Emparejador** (`backend/src/precios/fuentes/emparejador.ts`): decide si un producto de la tienda es el mismo modelo del catálogo. Revisa números de modelo, sufijos (Ti, XT, Super, X3D…), palabras excluidas (laptop, PC armado…), la marca y que el precio sea razonable. Así "RX 9070" no se confunde con "RX 9070 XT".
-- **IVA**: si la tienda publica precios "+ IVA" se suma el 15 % para comparar lo mismo.
-- Si una tienda no responde, se registra el error en el panel de administración y el sitio sigue funcionando con los precios anteriores o el de referencia.
-- Las consultas se hacen de una en una por tienda, con pausa (`PRECIOS_ESPERA_MS`), para no sobrecargarlas.
-
-## Imágenes
-
-No se usan emojis: cada componente tiene una **foto real**.
-
-1. Si alguna tienda publica la foto del producto, se usa esa (aparece el crédito de la tienda).
-2. Si no, se muestra una **foto de referencia** de Wikimedia Commons de un modelo parecido, con su autor y licencia (CC BY / CC BY-SA) en la ficha. Las tarjetas lo indican con la etiqueta "Foto de referencia".
-3. Si una foto no carga, se muestra un dibujo genérico (`frontend/public/sin-imagen.svg`).
-
-El logo (`frontend/public/logo-icono.svg`) es original del proyecto.
+Comprobación: `https://TU-SERVICIO.onrender.com/api/inicio` debe responder JSON.
 
 ## Variables de entorno (`backend/.env`)
 
-| Variable | Valor por defecto | Para qué |
-|---|---|---|
+| Variable | Por defecto | Para qué |
+|----------|-------------|----------|
 | `PORT` | 3000 | Puerto de la API |
-| `JWT_SECRETO` | — | Firma de las sesiones. **Obligatoria en producción**: si `NODE_ENV=production` y no existe, la API no arranca |
+| `JWT_SECRETO` | — | Firma de las sesiones (obligatoria en producción) |
 | `BASE_DATOS` | armadorpc.db | Archivo SQLite |
-| `PRECIOS_MODO` | real | `real` o `demo` |
-| `PRECIOS_AUTOMATICOS` | si | `no` desactiva la actualización programada |
+| `PRECIOS_MODO` | real | `real` consulta tiendas de Ecuador; `demo` usa precios simulados |
 | `PRECIOS_AL_INICIAR` | si | `no` evita consultar tiendas al arrancar |
-| `PRECIOS_ESPERA_MS` | 400 | Pausa entre consultas a una misma tienda |
-| `ALIEXPRESS_*`, `MERCADOLIBRE_*` | vacío | Claves opcionales |
-| `FRONTEND_ORIGEN` | vacío | Solo si el frontend se publica en otro dominio (activa CORS) |
 | `NODE_ENV` | — | `production` en el servidor publicado |
 
-## Administración (panel de `/admin.html`)
-
-Solo entran cuentas con rol **Administrador**. El panel alimenta el core del sistema (catálogo, precios, usuarios y reglas) y tiene estas secciones:
-
-| Sección | Qué permite |
-|---|---|
-| Tablero | Cifras generales del sistema y estado de los precios |
-| Tiendas y precios | Activar o desactivar tiendas, actualizar precios ahora y **cargar un precio manual** |
-| Procesadores | Crear, editar y eliminar procesadores (los puntajes se recalculan) |
-| Usuarios | Ver cuentas, cambiar su rol o activarlas, y **crear nuevos usuarios** |
-| Reportes | Revisar reportes de datos incorrectos enviados por los usuarios |
-| Reglas de compatibilidad | Consultar las reglas que usa el configurador |
-
-### Validación en el servidor (datos sensibles)
-
-El navegador valida los formularios para dar una respuesta rápida, pero **esa validación no basta**: cada dato sensible se vuelve a validar en el backend con DTOs (`class-validator`) antes de guardarse en la base de datos. Si la validación falla, la API responde `400` con los mensajes en español y no se graba nada.
-
-| Dato sensible | Dónde se valida | Regla |
-|---|---|---|
-| Correo de la cuenta nueva | `backend/src/admin/dto/usuario-admin.dto.ts` | Formato de correo válido, máximo 120 caracteres; se guarda en minúsculas y sin espacios |
-| Contraseña de la cuenta nueva | `usuario-admin.dto.ts` | 8 a 72 caracteres con letras y números; se cifra con bcrypt antes de guardarla |
-| Rol de la cuenta | `usuario-admin.dto.ts` | Solo `admin` o `usuario`; cualquier otro valor se rechaza |
-| Enlace de una oferta | `backend/src/admin/dto/oferta-admin.dto.ts` | Solo `http` o `https` con dominio válido. Evita enlaces `javascript:` o de otros protocolos |
-| Precio de una oferta | `oferta-admin.dto.ts` | Número entre 0,01 y 100 000 |
-
-Ejemplo: en el navegador se escribe `javascript:alert(1)` como enlace. El formulario lo envía igual, y el servidor responde `400 El enlace debe empezar con https://…` sin tocar la base de datos. Se puede comprobar con la documentación de Swagger en `/api/docs`.
-
-### Menús desplegables dependientes (relaciones entre tablas)
-
-Al cargar un **precio manual** la base de datos tiene relaciones: una oferta pertenece a un componente y a una tienda, y un componente pertenece a una categoría. Por eso el formulario no pide escribir ningún identificador a mano:
-
-1. **Categoría** (desplegable con las categorías de la tabla `categorias`).
-2. **Componente** (desplegable que se carga *solo* con los componentes de esa categoría. Mientras no se elija categoría, aparece deshabilitado).
-3. **Tienda** (desplegable con las tiendas de la tabla `tiendas`).
-
-Los datos salen de `GET /api/admin/componentes?categoria=CPU` y `GET /api/admin/tiendas`. El servidor también comprueba que el componente y la tienda existan antes de guardar (`404` si no existen). Si ya existe un precio para ese componente y esa tienda, se **actualiza** en lugar de duplicarse.
-
-Para crear un usuario, el formulario usa solo campos de texto y un desplegable de rol, porque el rol es un valor fijo y no una relación con otra tabla.
-
-## Despliegue
-
-El proyecto se publica como **un solo servicio**: el backend compila y sirve también el frontend (`frontend/dist`). El archivo `render.yaml` describe el servicio para Render.
-
-1. Sube el repositorio a GitHub.
-2. En [render.com](https://render.com): **New → Blueprint** y elige el repositorio. Render lee `render.yaml`.
-3. La primera publicación instala, compila y arranca el servidor. La base de datos se crea sola en el disco persistente `/var/data`.
-4. Entra al panel con la cuenta de administrador de prueba y **cambia la contraseña** (o crea otra cuenta de administrador y desactiva la de prueba).
-
-Notas:
-- SQLite necesita disco persistente. Sin el disco, los datos se borran en cada reinicio.
-- El secreto `JWT_SECRETO` lo genera Render. Si lo cambias, todas las sesiones se cierran.
-- Con `PRECIOS_MODO=demo` no se consulta ninguna tienda real. Cambia a `real` cuando quieras precios de Ecuador.
-- Comprobación rápida después del despliegue: `https://TU-SERVICIO.onrender.com/api/inicio` debe responder JSON.
-
-## Control de versiones
-
-El historial está en Git. `node_modules`, `dist`, la base de datos SQLite y el archivo `.env` quedan fuera del repositorio (ver `.gitignore`). Para empezar desde cero: `npm run instalar`, copiar `backend/.env.example` a `backend/.env` y ejecutar `npm run dev`.
+`node_modules`, `dist`, la base de datos y `.env` no se suben al repositorio (ver `.gitignore`).
