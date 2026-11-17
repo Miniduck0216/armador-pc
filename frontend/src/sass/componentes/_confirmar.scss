@@ -1,0 +1,61 @@
+// ---------- Bloque BEM: confirmar (ventana de confirmación propia) ----------
+@use '../abstractos/variables' as *;
+@use '../abstractos/mixins' as *;
+
+@keyframes aparecer-icono {
+  from { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+  to { opacity: 1; transform: none; }
+}
+
+.confirmar {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 6px 4px 2px;
+
+  &__icono {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    @include fuente(800, 26px);
+    @include estado-color($violeta-claro, $violeta-2);
+    animation: aparecer-icono 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+
+    &--peligro {
+      @include estado-color($rojo-claro, $rojo);
+    }
+  }
+
+  &__mensaje {
+    color: $tenue;
+    max-width: 340px;
+  }
+
+  &__botones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  &__aceptar--peligro {
+    background: $rojo;
+    border-color: $rojo;
+    color: #fff;
+
+    &:hover {
+      background: #be123c;
+    }
+  }
+}
+
+// Texto para copiar a mano
+.texto-copiar {
+  width: 100%;
+  font: 13px/1.5 ui-monospace, Consolas, monospace;
+  resize: vertical;
+}

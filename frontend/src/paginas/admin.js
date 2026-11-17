@@ -1,7 +1,7 @@
 import { montar } from '../js/layout.js';
 import { actualizar, api, borrar, enviar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, dinero, errorEn, esc, fecha, hace, modal } from '../js/util.js';
+import { $, aviso, confirmar, dinero, errorEn, esc, fecha, hace, modal } from '../js/util.js';
 
 const FUENTES = { woocommerce: 'WooCommerce (tienda en línea)', aliexpress: 'API de afiliados', mercadolibre: 'API pública', simulada: 'Simulada (demo)' };
 
@@ -543,7 +543,7 @@ document.addEventListener('click', async (e) => {
   }
   const cb = t.closest('[data-componente-borrar]');
   if (cb) {
-    if (!confirm('¿Eliminar este componente? También se borran sus precios y reseñas.')) return;
+    if (!(await confirmar({ titulo: '¿Eliminar este componente?', mensaje: 'También se borran sus precios y reseñas. No se puede deshacer.' }))) return;
     try {
       await borrar(`/admin/catalogo/${cb.dataset.componenteBorrar}`);
       aviso('Componente eliminado');
@@ -557,7 +557,7 @@ document.addEventListener('click', async (e) => {
   if (vp) return verPermisosDe(vp.dataset.verPermisos).catch((er) => aviso(er.message, 'error'));
   const br = t.closest('[data-rol-borrar]');
   if (br) {
-    if (!confirm('¿Eliminar este rol?')) return;
+    if (!(await confirmar({ titulo: '¿Eliminar este rol?', mensaje: 'Solo se puede eliminar si ningún usuario lo tiene.' }))) return;
     try {
       await borrar(`/admin/roles/${br.dataset.rolBorrar}`);
       aviso('Rol eliminado');
@@ -572,7 +572,7 @@ document.addEventListener('click', async (e) => {
     return formularioCpu(lista.find((p) => p.id === Number(ed.dataset.cpuEditar)));
   }
   const bo = t.closest('[data-cpu-borrar]');
-  if (bo && confirm('¿Eliminar este procesador? También se borran sus precios y reseñas.')) {
+  if (bo && (await confirmar({ titulo: '¿Eliminar este procesador?', mensaje: 'También se borran sus precios y reseñas. No se puede deshacer.' }))) {
     await borrar(`/admin/procesadores/${bo.dataset.cpuBorrar}`).catch((er) => aviso(er.message, 'error'));
     return mostrar('procesadores');
   }

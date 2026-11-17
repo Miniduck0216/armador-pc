@@ -195,6 +195,8 @@ function bandejaComparar() {
 export function montar(activo = '') {
   document.body.insertAdjacentHTML('afterbegin', `<header>${encabezado(activo)}</header>`);
   // La barra ya existe: ahora el contenido puede entrar sin empujar nada (ver _movimiento.scss)
+  // En este punto los estilos ya están cargados (se importan arriba): se muestra la página
+  document.documentElement.classList.add('listo');
   requestAnimationFrame(() => document.body.classList.add('listo'));
   const footer = document.createElement('footer');
   footer.className = 'pie';

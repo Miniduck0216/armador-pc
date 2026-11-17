@@ -1,7 +1,7 @@
 import { montar } from '../js/layout.js';
 import { api, borrar, enviar, irAIngresar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, dinero, errorEn, esc, estrellas, fecha, imagen } from '../js/util.js';
+import { $, aviso, confirmar, dinero, errorEn, esc, estrellas, fecha, imagen } from '../js/util.js';
 import { activarTarjetas, tarjetaProducto } from '../js/tarjetas.js';
 
 montar('');
@@ -115,7 +115,7 @@ document.addEventListener('click', async (e) => {
   const s = e.target.closest('[data-seccion]');
   if (s) return mostrar(s.dataset.seccion);
   const b = e.target.closest('[data-borrar]');
-  if (b && confirm('¿Eliminar?')) {
+  if (b && (await confirmar({ titulo: '¿Eliminar este elemento?' }))) {
     try {
       await borrar(`/${b.dataset.borrar}`);
       aviso('Eliminado');

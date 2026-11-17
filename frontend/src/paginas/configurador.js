@@ -1,7 +1,7 @@
 import { montar, usuario } from '../js/layout.js';
 import { actualizar as actualizarApi, api, consulta, enviar, irAIngresar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, copiar, dinero, esc, imagen, modal, param, retrasar } from '../js/util.js';
+import { $, aviso, confirmar, copiar, dinero, esc, imagen, modal, param, retrasar } from '../js/util.js';
 import { guardarPc, idsPc, leerPc, ponerEnPc, quitarDePc } from '../js/estado.js';
 import tiendaProductos from '../datos/nomada.json';
 import { armadoEnEdicion, terminarEdicion } from '../js/edicion.js';
@@ -324,8 +324,8 @@ document.addEventListener('click', (e) => {
     actualizar();
   }
 });
-$('#vaciar').addEventListener('click', () => {
-  if (!idsPc().length || !confirm('¿Quitar todas las piezas?')) return;
+$('#vaciar').addEventListener('click', async () => {
+  if (!idsPc().length || !(await confirmar({ titulo: '¿Quitar todas las piezas?', mensaje: 'Tu armado actual quedará vacío.', boton: 'Vaciar' }))) return;
   guardarPc({});
   actualizar();
 });

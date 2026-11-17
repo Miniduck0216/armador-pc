@@ -95,7 +95,7 @@ export function retrasar(fn, ms = 250) {
 }
 
 // Abre un panel modal; devuelve funciones para cerrarlo y su cuerpo
-export function modal({ titulo, contenido = '', ancho = 760 }) {
+export function modal({ titulo, contenido = '', ancho = 760, alCerrar = null }) {
   const fondo = document.createElement('div');
   fondo.className = 'modal-fondo';
   fondo.innerHTML = `
@@ -107,6 +107,7 @@ export function modal({ titulo, contenido = '', ancho = 760 }) {
   const cerrar = () => {
     if (fondo.classList.contains('cerrando')) return;
     fondo.classList.add('cerrando');
+    alCerrar?.();
     setTimeout(() => fondo.remove(), 180);
     document.removeEventListener('keydown', alTeclear);
     document.body.style.overflow = '';
@@ -121,9 +122,47 @@ export function modal({ titulo, contenido = '', ancho = 760 }) {
   return { cerrar, cuerpo: fondo.querySelector('.modal-cuerpo'), raiz: fondo };
 }
 
+// Confirmación con el diseño de la página (reemplaza al confirm() del navegador).
+// Devuelve una promesa: true si la persona acepta, false si cancela o cierra.
+export function confirmar({ titulo = '¿Estás seguro?', mensaje = 'Esta acción no se puede deshacer.', boton = 'Eliminar', peligro = true } = {}) {
+  return new Promise((resolver) => {
+    let respuesta = false;
+    const m = modal({
+      titulo,
+      ancho: 440,
+      alCerrar: () => resolver(respuesta),
+      contenido: `<div class="confirmar">
+        <span class="confirmar__icono ${peligro ? 'confirmar__icono--peligro' : ''}">${peligro ? '!' : '?'}</span>
+        <p class="confirmar__mensaje">${esc(mensaje)}</p>
+        <div class="confirmar__botones">
+          <button type="button" class="boton secundario" data-respuesta="no">Cancelar</button>
+          <button type="button" class="boton ${peligro ? 'confirmar__aceptar--peligro' : 'violeta'}" data-respuesta="si">${esc(boton)}</button>
+        </div></div>`,
+    });
+    m.cuerpo.querySelector('[data-respuesta="si"]').focus();
+    m.cuerpo.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-respuesta]');
+      if (!b) return;
+      respuesta = b.dataset.respuesta === 'si';
+      m.cerrar();
+    });
+  });
+}
+
+// Muestra un texto para copiarlo a mano (si el navegador no deja usar el portapapeles)
+export function mostrarTexto(titulo, texto) {
+  const m = modal({
+    titulo,
+    ancho: 560,
+    contenido: `<textarea class="texto-copiar" readonly rows="${Math.min(12, texto.split('\n').length + 1)}">${esc(texto)}</textarea>
+      <p class="tenue pequeno" style="margin-top:8px">Selecciona el texto y cópialo con Ctrl + C.</p>`,
+  });
+  m.cuerpo.querySelector('textarea').select();
+}
+
 export function copiar(texto) {
   return navigator.clipboard?.writeText(texto).then(
     () => aviso('Enlace copiado'),
-    () => prompt('Copia este enlace:', texto),
+    () => mostrarTexto('Copia este enlace', texto),
   );
 }

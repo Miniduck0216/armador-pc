@@ -1,7 +1,7 @@
 import { montar } from '../js/layout.js';
 import { api, borrar, enviar, irAIngresar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, copiar, dinero, errorEn, esc, fecha, modal, param } from '../js/util.js';
+import { $, aviso, confirmar, copiar, dinero, errorEn, esc, fecha, modal, param } from '../js/util.js';
 import { guardarPc } from '../js/estado.js';
 import { empezarEdicion } from '../js/edicion.js';
 import { listaPiezas } from './comun-configuraciones.js';
@@ -104,7 +104,7 @@ async function iniciar() {
     }
   });
   $('#eliminar')?.addEventListener('click', async () => {
-    if (!confirm('¿Eliminar este armado?')) return;
+    if (!(await confirmar({ titulo: '¿Eliminar este armado?', mensaje: `Se borrará «${a.nombre}» y su historial de revisión. No se puede deshacer.` }))) return;
     try {
       await borrar(`/armados/${a.id}`);
       location.href = '/cuenta.html#armados';

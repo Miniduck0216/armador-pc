@@ -1,7 +1,7 @@
 import { montar, usuario } from '../js/layout.js';
 import { api, conSesion, enviar, borrar, irAIngresar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, dinero, errorEn, esc, estrellas, fecha, hace, imagen, insigniaGama, modal, param, variacion } from '../js/util.js';
+import { $, aviso, confirmar, dinero, errorEn, esc, estrellas, fecha, hace, imagen, insigniaGama, modal, param, variacion } from '../js/util.js';
 import { activarTarjetas, tarjetaProducto } from '../js/tarjetas.js';
 import { alternarComparar, enComparar, leerPc, ponerEnPc } from '../js/estado.js';
 import { graficoHistorial } from '../js/grafico.js';
@@ -229,7 +229,7 @@ function conectar(d) {
   });
   document.querySelectorAll('[data-borrar-resena]').forEach((b) =>
     b.addEventListener('click', async () => {
-      if (!confirm('¿Eliminar esta reseña?')) return;
+      if (!(await confirmar({ titulo: '¿Eliminar esta reseña?' }))) return;
       await borrar(`/resenas/${b.dataset.borrarResena}`);
       location.reload();
     }),

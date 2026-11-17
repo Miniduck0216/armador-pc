@@ -1,7 +1,7 @@
 import { montar } from '../js/layout.js';
 import { api } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, copiar, dinero, errorEn, esc, param } from '../js/util.js';
+import { $, aviso, copiar, dinero, errorEn, esc, mostrarTexto, param } from '../js/util.js';
 import { idsPc } from '../js/estado.js';
 
 montar('armar');
@@ -103,7 +103,7 @@ function pintar(d) {
       await navigator.clipboard.writeText(texto);
       aviso('Lista copiada');
     } catch {
-      alert(texto);
+      mostrarTexto('Copia tu lista de compra', texto);
     }
   });
   $('#copiar-enlace').addEventListener('click', () => copiar(location.href));
