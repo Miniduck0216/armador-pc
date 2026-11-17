@@ -1,5 +1,5 @@
-import { Transform } from 'class-transformer';
-import { IsEmail, IsIn, IsString, Length, Matches, MaxLength } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsEmail, IsInt, IsString, Length, Matches, MaxLength, Min } from 'class-validator';
 
 // Cuenta creada por el administrador. Correo, contraseña y rol son datos sensibles:
 // se validan aquí, en el servidor, antes de cifrar la contraseña y guardar el usuario.
@@ -18,6 +18,7 @@ export class UsuarioAdminDto {
   @Matches(/^(?=.*[A-Za-z])(?=.*\d).{8,72}$/, { message: 'La contraseña debe tener entre 8 y 72 caracteres, con letras y números' })
   contrasena: string;
 
-  @IsIn(['admin', 'usuario'], { message: 'El rol debe ser Administrador o Usuario' })
-  rol: 'admin' | 'usuario';
+  // Llave foránea a la tabla roles: se elige en un desplegable y el servidor comprueba que exista
+  @Type(() => Number) @IsInt({ message: 'Elige un rol válido' }) @Min(1, { message: 'Elige un rol válido' })
+  rolId: number;
 }

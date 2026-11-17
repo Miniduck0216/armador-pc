@@ -17,14 +17,20 @@ const CAMPOS_CPU = [
   ['graficosIntegrados', 'Tiene gráficos integrados', 'casilla'], ['desbloqueado', 'Multiplicador desbloqueado', 'casilla'],
 ];
 
+// Cada sección indica el permiso que necesita. El menú solo muestra las que el rol
+// puede usar; aun así, el backend vuelve a comprobar el permiso en cada petición.
 const SECCIONES = {
-  tablero: ['Tablero', 'grafica', tablero],
-  precios: ['Tiendas y precios', 'tienda', precios],
-  procesadores: ['Procesadores', 'chip', procesadores],
-  usuarios: ['Usuarios', 'usuario', usuarios],
-  reportes: ['Reportes', 'bandera', reportes],
-  reglas: ['Reglas de compatibilidad', 'escudo', reglas],
+  tablero: ['Tablero', 'grafica', tablero, 'panel.ver'],
+  precios: ['Tiendas y precios', 'tienda', precios, 'precios.gestionar'],
+  procesadores: ['Procesadores', 'chip', procesadores, 'componentes.gestionar'],
+  usuarios: ['Usuarios', 'usuario', usuarios, 'usuarios.gestionar'],
+  roles: ['Roles y permisos', 'escudo', roles, 'roles.gestionar'],
+  reportes: ['Reportes', 'bandera', reportes, 'reportes.gestionar'],
+  reglas: ['Reglas de compatibilidad', 'escudo', reglas, 'reglas.ver'],
 };
+
+let permisos = [];
+const puede = (clave) => permisos.includes(SECCIONES[clave][3]);
 
 const contenido = () => $('#contenido');
 
@@ -121,7 +127,9 @@ function formularioCpu(p = {}) {
 }
 
 async function usuarios() {
-  const lista = await api('/admin/usuarios');
+  const [lista, rolesLista] = await Promise.all([api('/admin/usuarios'), api('/admin/roles-lista')]);
+  // El rol es una llave foránea: se elige de la tabla roles, nunca se escribe a mano
+  const opcionesRol = (u) => rolesLista.map((r) => `<option value="${r.id}" ${u.rol?.id === r.id ? 'selected' : ''}>${esc(r.nombre)}</option>`).join('');
   return `<div class="fila" style="justify-content:flex-end;margin-bottom:12px"><button class="boton violeta" data-usuario-nuevo>${icono('mas', 16)} Nuevo usuario</button></div>
   <div class="tabla-envoltura"><table class="tabla">
     <thead><tr><th>Usuario</th><th>Registro</th><th>Último ingreso</th><th>Rol</th><th>Activo</th></tr></thead>
@@ -129,7 +137,7 @@ async function usuarios() {
       .map(
         (u) => `<tr><td><b>${esc(u.nombre)}</b>${u.esYo ? ' <span class="insignia">Tú</span>' : ''}<div class="pequeno tenue">${esc(u.correo)}</div></td>
           <td class="pequeno">${fecha(u.fechaRegistro)}</td><td class="pequeno">${u.ultimoIngreso ? hace(u.ultimoIngreso) : 'nunca'}</td>
-          <td><select data-rol="${u.id}" ${u.esYo ? 'disabled' : ''} style="width:auto"><option value="usuario" ${u.rol === 'usuario' ? 'selected' : ''}>Usuario</option><option value="admin" ${u.rol === 'admin' ? 'selected' : ''}>Administrador</option></select></td>
+          <td><select data-rol="${u.id}" ${u.esYo ? 'disabled' : ''} style="width:auto">${opcionesRol(u)}</select></td>
           <td><label class="interruptor"><input type="checkbox" data-activo="${u.id}" ${u.activo ? 'checked' : ''} ${u.esYo ? 'disabled' : ''}><span></span></label></td></tr>`,
       )
       .join('')}</tbody></table></div>`;
@@ -198,7 +206,8 @@ async function formularioOferta() {
 }
 
 // Crear cuenta: la validación real (correo, contraseña, rol) la hace el servidor
-function formularioUsuario() {
+async function formularioUsuario() {
+  const rolesLista = await api('/admin/roles-lista');
   const m = modal({
     titulo: 'Nuevo usuario',
     ancho: 520,
@@ -207,7 +216,7 @@ function formularioUsuario() {
       <label class="campo"><span>Nombre</span><input name="nombre" required minlength="2" maxlength="60"></label>
       <label class="campo"><span>Correo</span><input name="correo" type="email" required maxlength="120"></label>
       <label class="campo"><span>Contraseña (8 o más caracteres, con letras y números)</span><input name="contrasena" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label>
-      <label class="campo"><span>Rol</span><select name="rol"><option value="usuario">Usuario</option><option value="admin">Administrador</option></select></label>
+      <label class="campo"><span>Rol</span><select name="rolId" required><option value="">Elige un rol…</option>${rolesLista.map((r) => `<option value="${r.id}">${esc(r.nombre)}</option>`).join('')}</select></label>
       <button class="boton violeta">Crear cuenta</button>
     </form>`,
   });
@@ -219,13 +228,79 @@ function formularioUsuario() {
         nombre: f.nombre.value.trim(),
         correo: f.correo.value.trim(),
         contrasena: f.contrasena.value,
-        rol: f.rol.value,
+        rolId: Number(f.rolId.value),
       });
       m.cerrar();
       aviso('Cuenta creada');
       mostrar('usuarios');
     } catch (er) {
       const el = m.cuerpo.querySelector('#err-usuario');
+      el.textContent = er.message;
+      el.classList.remove('oculto');
+    }
+  });
+}
+
+// Matriz de roles y permisos: una fila por permiso, una columna por rol
+async function roles() {
+  const d = await api('/admin/roles');
+  const modulos = [...new Set(d.permisos.map((p) => p.modulo))];
+  return `
+    <div class="fila entre" style="margin-bottom:12px">
+      <p class="tenue pequeno">Marca qué puede hacer cada rol. El Administrador siempre tiene todos los permisos.</p>
+      <button class="boton violeta" data-rol-nuevo>${icono('mas', 16)} Nuevo rol</button>
+    </div>
+    <div class="tabla-envoltura"><table class="tabla matriz-permisos">
+      <thead><tr><th class="matriz-permisos__permiso">Permiso</th>${d.roles
+        .map((r) => `<th class="matriz-permisos__rol"><b>${esc(r.nombre)}</b>
+          <small class="matriz-permisos__detalle">${r.usuarios} usuario(s)</small>
+          ${r.sistema ? '' : `<button class="enlace peligro matriz-permisos__borrar" data-rol-borrar="${r.id}" title="Eliminar rol">${icono('basura', 14)}</button>`}</th>`)
+        .join('')}</tr></thead>
+      <tbody>${modulos
+        .map((m) => `<tr class="matriz-permisos__modulo"><td colspan="${d.roles.length + 1}">${esc(m)}</td></tr>${d.permisos
+          .filter((p) => p.modulo === m)
+          .map((p) => `<tr><td class="matriz-permisos__permiso">${esc(p.nombre)}<small class="matriz-permisos__detalle">${esc(p.codigo)}</small></td>${d.roles
+            .map((r) => `<td class="matriz-permisos__celda"><input type="checkbox" class="matriz-permisos__casilla" data-permiso-rol="${r.id}" value="${esc(p.codigo)}"
+              ${r.permisos.includes(p.codigo) ? 'checked' : ''} ${r.bloqueado ? 'disabled' : ''} aria-label="${esc(p.nombre)} para ${esc(r.nombre)}"></td>`)
+            .join('')}</tr>`)
+          .join('')}`)
+        .join('')}</tbody>
+    </table></div>`;
+}
+
+// Crear un rol: el código y el nombre se validan otra vez en el servidor
+async function formularioRol() {
+  const d = await api('/admin/roles');
+  const m = modal({
+    titulo: 'Nuevo rol',
+    ancho: 560,
+    contenido: `<form class="formulario" id="form-rol">
+      <div class="aviso error oculto" id="err-rol"></div>
+      <div class="dos-campos">
+        <label class="campo"><span>Código</span><input name="codigo" required pattern="[a-z][a-z_]{2,29}" placeholder="vendedor"></label>
+        <label class="campo"><span>Nombre</span><input name="nombre" required minlength="3" maxlength="40" placeholder="Vendedor"></label>
+      </div>
+      <label class="campo"><span>Descripción</span><input name="descripcion" maxlength="160"></label>
+      <div class="campo"><span>Permisos</span>
+        <div class="apilado">${d.permisos.map((p) => `<label class="casilla"><input type="checkbox" name="permisos" value="${esc(p.codigo)}"> ${esc(p.nombre)}</label>`).join('')}</div></div>
+      <button class="boton violeta">Crear rol</button>
+    </form>`,
+  });
+  m.cuerpo.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    try {
+      await enviar('/admin/roles', {
+        codigo: f.codigo.value.trim(),
+        nombre: f.nombre.value.trim(),
+        descripcion: f.descripcion.value.trim(),
+        permisos: [...f.querySelectorAll('[name=permisos]:checked')].map((c) => c.value),
+      });
+      m.cerrar();
+      aviso('Rol creado');
+      mostrar('roles');
+    } catch (er) {
+      const el = m.cuerpo.querySelector('#err-rol');
       el.textContent = er.message;
       el.classList.remove('oculto');
     }
@@ -261,7 +336,8 @@ async function reglas() {
 
 let actual = 'tablero';
 async function mostrar(clave) {
-  actual = SECCIONES[clave] ? clave : 'tablero';
+  // Si la sección no existe o el rol no tiene permiso, se abre la primera permitida
+  actual = SECCIONES[clave] && puede(clave) ? clave : Object.keys(SECCIONES).find(puede);
   document.querySelectorAll('#menu [data-ir]').forEach((b) => b.classList.toggle('activa', b.dataset.ir === actual));
   history.replaceState(null, '', `#${actual}`);
   const [titulo, , fn] = SECCIONES[actual];
@@ -279,6 +355,18 @@ document.addEventListener('click', async (e) => {
   if (t.closest('[data-cpu-nuevo]')) return formularioCpu();
   if (t.closest('[data-oferta-nueva]')) return formularioOferta();
   if (t.closest('[data-usuario-nuevo]')) return formularioUsuario();
+  if (t.closest('[data-rol-nuevo]')) return formularioRol();
+  const br = t.closest('[data-rol-borrar]');
+  if (br) {
+    if (!confirm('¿Eliminar este rol?')) return;
+    try {
+      await borrar(`/admin/roles/${br.dataset.rolBorrar}`);
+      aviso('Rol eliminado');
+    } catch (er) {
+      aviso(er.message, 'error');
+    }
+    return mostrar('roles');
+  }
   const ed = t.closest('[data-cpu-editar]');
   if (ed) {
     const lista = await api('/admin/procesadores');
@@ -308,8 +396,18 @@ document.addEventListener('change', async (e) => {
       await actualizar(`/admin/tiendas/${t.dataset.tienda}/alternar`);
       aviso(t.checked ? 'Tienda activada' : 'Tienda desactivada');
     } else if (t.dataset.rol) {
-      await actualizar(`/admin/usuarios/${t.dataset.rol}`, { rol: t.value });
+      await actualizar(`/admin/usuarios/${t.dataset.rol}`, { rolId: Number(t.value) });
       aviso('Rol actualizado');
+    } else if (t.dataset.permisoRol) {
+      // Al marcar o desmarcar una casilla se envía la lista completa de permisos de ese rol
+      const marcadas = [...document.querySelectorAll(`[data-permiso-rol="${t.dataset.permisoRol}"]:checked`)].map((c) => c.value);
+      try {
+        await actualizar(`/admin/roles/${t.dataset.permisoRol}/permisos`, { permisos: marcadas }, 'PUT');
+        aviso('Permisos actualizados');
+      } catch (er) {
+        t.checked = !t.checked;
+        throw er;
+      }
     } else if (t.dataset.activo) {
       await actualizar(`/admin/usuarios/${t.dataset.activo}`, { activo: t.checked });
       aviso(t.checked ? 'Cuenta activada' : 'Cuenta desactivada');
@@ -322,10 +420,12 @@ document.addEventListener('change', async (e) => {
 montar('').then((u) => {
   if (!u) return (location.href = `/ingresar.html?volver=${encodeURIComponent('/admin.html')}`);
   if (!u.esAdmin) {
-    contenido().innerHTML = '<div class="aviso error">Esta zona es solo para administradores.</div>';
+    contenido().innerHTML = '<div class="aviso error">Tu rol no tiene acceso al panel de administración.</div>';
     return;
   }
+  permisos = u.permisos ?? [];
   $('#menu').innerHTML = Object.entries(SECCIONES)
+    .filter(([k]) => puede(k))
     .map(([k, [t, i]]) => `<button data-ir="${k}">${icono(i, 17)} ${t}</button>`)
     .join('');
   mostrar(location.hash.slice(1));

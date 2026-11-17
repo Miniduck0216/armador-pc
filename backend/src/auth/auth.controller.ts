@@ -8,9 +8,22 @@ import { IngresoDto, RegistroDto } from './dto/auth.dto';
 import { validarFormulario } from '../comun/validar';
 import { Usuario } from '../usuarios/usuario.entity';
 import { AlertasService } from '../precios/alertas.service';
+import { permisosDe } from '../usuarios/permisos';
 
-// Datos públicos del usuario (nunca se devuelve el resumen de la contraseña)
-export const publico = (u: Usuario) => ({ id: u.id, nombre: u.nombre, correo: u.correo, rol: u.rol, esAdmin: u.rol === 'admin' });
+// Datos públicos del usuario (nunca se devuelve el resumen de la contraseña).
+// "permisos" le dice al frontend qué menús y botones mostrar; la seguridad real
+// la aplica el backend con PermisosGuard.
+export const publico = (u: Usuario) => {
+  const permisos = permisosDe(u);
+  return {
+    id: u.id,
+    nombre: u.nombre,
+    correo: u.correo,
+    rol: u.rol ? { id: u.rol.id, codigo: u.rol.codigo, nombre: u.rol.nombre } : null,
+    permisos,
+    esAdmin: permisos.includes('panel.ver'),
+  };
+};
 
 @ApiTags('Autenticación')
 @Controller('api/auth')

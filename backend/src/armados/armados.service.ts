@@ -1,3 +1,4 @@
+import { tienePermiso } from '../usuarios/permisos';
 import { randomBytes } from 'crypto';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -36,7 +37,7 @@ export class ArmadosService {
   private async propio(id: number, usuario: Usuario) {
     const armado = await this.repo.findOne({ where: { id } });
     if (!armado) throw new NotFoundException('El armado no existe');
-    if (armado.usuario?.id !== usuario.id && usuario.rol !== 'admin') {
+    if (armado.usuario?.id !== usuario.id && !tienePermiso(usuario, 'armados.revisar')) {
       throw new ForbiddenException('Este armado pertenece a otro usuario');
     }
     return armado;

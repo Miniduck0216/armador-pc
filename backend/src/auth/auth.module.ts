@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { LimiteIntentosService } from './limite-intentos.service';
 import { UsuariosModule } from '../usuarios/usuarios.module';
-import { AutenticadoGuard, RolesGuard } from './guardias';
+import { AutenticadoGuard, PermisosGuard } from './guardias';
 import { PreciosModule } from '../precios/precios.module';
 
 const SECRETO = process.env.JWT_SECRETO || 'cambia-este-secreto-en-produccion';
@@ -20,8 +20,8 @@ if (!process.env.JWT_SECRETO) {
     PreciosModule,
     JwtModule.register({ secret: SECRETO, signOptions: { expiresIn: '8h' } }),
   ],
-  providers: [AuthService, LimiteIntentosService, AutenticadoGuard, RolesGuard],
+  providers: [AuthService, LimiteIntentosService, AutenticadoGuard, PermisosGuard],
   controllers: [AuthController],
-  exports: [AuthService, AutenticadoGuard, RolesGuard, UsuariosModule],
+  exports: [AuthService, AutenticadoGuard, PermisosGuard, UsuariosModule],
 })
 export class AuthModule {}

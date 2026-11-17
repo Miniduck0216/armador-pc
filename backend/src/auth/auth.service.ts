@@ -17,7 +17,7 @@ export class AuthService {
 
   // Crea el token y lo guarda en una cookie que JavaScript del navegador no puede leer
   iniciarSesion(res: Response, usuario: Usuario) {
-    const token = this.jwt.sign({ sub: usuario.id, rol: usuario.rol } as DatosToken);
+    const token = this.jwt.sign({ sub: usuario.id, rol: usuario.rol?.codigo ?? '' } as DatosToken);
     res.cookie(COOKIE_SESION, token, {
       httpOnly: true,
       sameSite: 'lax',

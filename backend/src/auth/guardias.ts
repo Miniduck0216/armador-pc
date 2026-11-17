@@ -8,12 +8,14 @@ import {
   createParamDecorator,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Rol, Usuario } from '../usuarios/usuario.entity';
+import { Usuario } from '../usuarios/usuario.entity';
+import { permisosDe } from '../usuarios/permisos';
 
-const CLAVE_ROLES = 'roles';
+const CLAVE_PERMISOS = 'permisos';
 
-// Decorador para indicar qué roles pueden entrar: @Roles('admin')
-export const Roles = (...roles: Rol[]) => SetMetadata(CLAVE_ROLES, roles);
+// Decorador para indicar qué permisos exige una ruta: @Permisos('precios.gestionar').
+// Si se pone en la clase y en el método, se exigen los dos.
+export const Permisos = (...codigos: string[]) => SetMetadata(CLAVE_PERMISOS, codigos);
 
 // Decorador para recibir al usuario que ingresó: metodo(@UsuarioActual() u: Usuario)
 export const UsuarioActual = createParamDecorator(
@@ -31,18 +33,20 @@ export class AutenticadoGuard implements CanActivate {
   }
 }
 
-// Exige un rol específico (se usa junto con AutenticadoGuard)
+// Exige que el rol del usuario tenga TODOS los permisos pedidos (se usa junto con AutenticadoGuard).
+// Los permisos se leen de la base de datos en cada petición, así que un cambio de rol se aplica al instante.
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class PermisosGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(ctx: ExecutionContext): boolean {
-    const roles = this.reflector.getAllAndOverride<Rol[]>(CLAVE_ROLES, [ctx.getHandler(), ctx.getClass()]);
-    if (!roles?.length) return true;
+    const pedidos = this.reflector.getAllAndMerge<string[]>(CLAVE_PERMISOS, [ctx.getHandler(), ctx.getClass()]);
+    if (!pedidos?.length) return true;
     const usuario: Usuario = ctx.switchToHttp().getRequest().usuario;
     if (!usuario) throw new UnauthorizedException('Debes iniciar sesión para continuar');
-    if (!roles.includes(usuario.rol)) {
-      throw new ForbiddenException('No tienes permisos para ver esta sección');
+    const tiene = permisosDe(usuario);
+    if (!pedidos.every((p) => tiene.includes(p))) {
+      throw new ForbiddenException('Tu rol no tiene permiso para esta acción');
     }
     return true;
   }

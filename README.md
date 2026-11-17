@@ -9,7 +9,7 @@ Aplicación web para armar una computadora pieza por pieza: revisa que las pieza
 
 - Node.js 22 o superior + NestJS 10 (API REST)
 - TypeORM + SQLite (better-sqlite3); los datos de prueba se cargan solos al iniciar
-- HTML, CSS y JavaScript con Vite para las vistas
+- HTML, Sass (con metodología BEM) y JavaScript con Vite para las vistas
 - class-validator para validar los datos en el servidor
 - bcrypt y JWT en cookie HttpOnly para las sesiones
 - Render para el despliegue
@@ -24,16 +24,18 @@ armador-pc/
 │       ├── componentes/             # MODELO: entidad Componente y su servicio
 │       ├── categorias/              # MODELO: entidad Categoria
 │       ├── precios/                 # MODELO: Tienda, Oferta, historial y sincronización de precios
-│       ├── usuarios/                # MODELO: entidad Usuario (contraseña con bcrypt)
+│       ├── usuarios/                # MODELO: Usuario, Rol y Permiso; catálogo de permisos
 │       ├── configurador/            # core: compatibilidad, rendimiento y armado automático
 │       ├── admin/                   # CONTROLADOR del panel de administración
-│       │   ├── admin.controller.ts  # rutas /api/admin (solo rol administrador)
+│       │   ├── admin.controller.ts  # rutas /api/admin, cada una protegida por un permiso
 │       │   └── dto/                 # validación en el servidor de los datos sensibles
-│       ├── auth/                    # ingreso, sesiones, guardias de roles
+│       ├── auth/                    # ingreso, sesiones y PermisosGuard
 │       └── semilla/                 # datos de prueba (componentes, tiendas, cuentas)
 ├── frontend/                        # VISTA (puerto 5173 en desarrollo)
 │   ├── *.html                       # una página por pantalla
-│   └── src/paginas/                 # JS de cada página (admin.js = panel)
+│   └── src/
+│       ├── paginas/                 # JS de cada página (admin.js = panel)
+│       └── sass/                    # estilos: abstractos, base, componentes y páginas
 ├── docs/                            # especificación funcional, diagramas y guion del video
 ├── package.json                     # scripts para correr backend y frontend a la vez
 └── render.yaml                      # configuración del despliegue
@@ -47,7 +49,7 @@ armador-pc/
 
 ## Panel de administración
 
-Ruta: `/admin.html`. Solo entran cuentas con rol **Administrador**; el servidor rechaza a cualquier otro usuario aunque conozca las rutas.
+Ruta: `/admin.html`. Cada rol ve solo las secciones que tiene permitidas, y el servidor vuelve a comprobar el permiso en cada petición aunque alguien conozca las rutas.
 
 | Sección | Qué permite |
 |---------|-------------|
@@ -55,8 +57,23 @@ Ruta: `/admin.html`. Solo entran cuentas con rol **Administrador**; el servidor 
 | Tiendas y precios | Activar o desactivar tiendas, actualizar precios y **cargar un precio manual** |
 | Procesadores | Crear, editar y eliminar procesadores (los puntajes se recalculan) |
 | Usuarios | Cambiar rol o estado de una cuenta y **crear usuarios** |
+| Roles y permisos | Matriz de casillas rol × permiso y creación de roles nuevos |
 | Reportes | Resolver reportes de datos incorrectos enviados por usuarios |
 | Reglas | Ver las reglas de compatibilidad que usa el configurador |
+
+### Roles y permisos
+
+Los roles y permisos son tablas: `roles`, `permisos` y la tabla intermedia `roles_permisos` (muchos a muchos). Cada usuario tiene una llave foránea `rolId` hacia `roles`.
+
+| Rol | Permisos iniciales |
+|-----|--------------------|
+| Administrador | Todos (no se pueden quitar, para no perder el acceso al sistema) |
+| Técnico | Panel, componentes, reglas, precios, revisar armados y reportes |
+| Usuario | Ninguno del panel: arma su PC, guarda armados y escribe reseñas |
+
+- **Backend:** cada ruta declara el permiso que necesita con `@Permisos('precios.gestionar')`. `PermisosGuard` compara contra los permisos del rol, leídos de la base en cada petición, así que un cambio se aplica al instante. Si falta el permiso, responde `403`.
+- **Frontend:** `/api/auth/yo` devuelve los permisos del usuario. El panel muestra solo las secciones permitidas y, si se abre una sección prohibida por la dirección, salta a la primera permitida.
+- **Gestión:** desde *Roles y permisos* se marcan casillas o se crean roles nuevos (por ejemplo, Vendedor solo con precios). Los roles del sistema no se pueden eliminar, ni tampoco un rol que tenga usuarios.
 
 ### Validación en el backend de datos sensibles
 
@@ -66,7 +83,7 @@ El navegador revisa los formularios, pero eso no basta: cada dato sensible se va
 |------|---------|-------|
 | Contraseña | `backend/src/admin/dto/usuario-admin.dto.ts` | 8 a 72 caracteres, con letras y números. Se cifra con bcrypt |
 | Correo | `usuario-admin.dto.ts` | Formato válido, máximo 120 caracteres, no repetido |
-| Rol | `usuario-admin.dto.ts` | Solo `admin` o `usuario` |
+| Rol | `usuario-admin.dto.ts` | Número de un rol que exista en la tabla `roles` |
 | Enlace de la oferta | `backend/src/admin/dto/oferta-admin.dto.ts` | Solo `http` o `https`; bloquea enlaces `javascript:` |
 | Precio de la oferta | `oferta-admin.dto.ts` | Entre 0,01 y 100 000 |
 
@@ -79,6 +96,8 @@ Una oferta (precio) tiene dos llaves foráneas: el componente y la tienda. Y cad
 3. **Tienda:** desplegable con la tabla `tiendas`.
 
 Antes de guardar, el servidor comprueba que el componente y la tienda existan. Si ya hay un precio para ese par, lo actualiza en vez de duplicarlo.
+
+Lo mismo al crear un usuario o cambiar su rol: el rol se elige en un desplegable que se carga desde la tabla `roles`, y el servidor comprueba que exista.
 
 ## Reglas de compatibilidad (core)
 
@@ -110,6 +129,10 @@ Las reglas están en la tabla `reglas_compatibilidad`.
 | `POST /api/admin/ofertas` | Guarda un precio manual (validado en el servidor) |
 | `POST /api/admin/usuarios` | Crea una cuenta (validada en el servidor) |
 | `GET /api/admin/tablero` | Cifras del panel |
+| `GET /api/admin/roles` | Roles con sus permisos y catálogo de permisos |
+| `POST /api/admin/roles` | Crea un rol (código y permisos validados en el servidor) |
+| `PUT /api/admin/roles/:id/permisos` | Cambia los permisos de un rol |
+| `DELETE /api/admin/roles/:id` | Elimina un rol sin usuarios |
 
 ## Ejecutar en local
 
@@ -130,6 +153,7 @@ Abrir http://localhost:5173
 | Rol | Correo | Contraseña |
 |-----|--------|------------|
 | Administrador | admin@armadorpc.com | Admin12345 |
+| Técnico | tecnico@armadorpc.com | Tecnico12345 |
 | Usuario | demo@armadorpc.com | Demo12345 |
 
 ## Casos de prueba
@@ -141,9 +165,14 @@ Abrir http://localhost:5173
 | Cargar precio | Tienda que no existe (`tiendaId: 999`) | `404` Esa tienda no existe |
 | Cargar precio | Datos correctos | Precio guardado; si se repite, se actualiza |
 | Nuevo usuario | Contraseña `solotexto` | `400` La contraseña debe tener letras y números |
-| Nuevo usuario | Rol `superadmin` | `400` El rol debe ser Administrador o Usuario |
+| Nuevo usuario | Rol que no existe (`rolId: 99`) | `404` Ese rol no existe |
 | Nuevo usuario | Correo ya registrado | `409` Ya existe una cuenta con ese correo |
 | Cualquier ruta `/api/admin` | Sin sesión | `401` |
+| `/api/admin/usuarios` | Sesión de Técnico | `403` Tu rol no tiene permiso para esta acción |
+| Nuevo rol | Código `X Y` | `400` El código debe tener de 3 a 30 letras minúsculas o guiones bajos |
+| Permisos de un rol | Permiso `hackear.todo` | `400` Hay permisos que no existen |
+| Permisos del Administrador | Lista vacía | `400` Los permisos del Administrador no se pueden cambiar |
+| Eliminar rol | Técnico (rol del sistema) | `400` Los roles del sistema no se pueden eliminar |
 
 ## Despliegue en Render
 

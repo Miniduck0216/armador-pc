@@ -1,0 +1,55 @@
+// ---------- Bloque BEM: matriz-permisos ----------
+// Tabla del panel con un permiso por fila y un rol por columna.
+@use '../abstractos/variables' as *;
+@use '../abstractos/mixins' as *;
+@use '../abstractos/placeholders' as *;
+
+.matriz-permisos {
+  &__permiso {
+    min-width: 230px;
+    text-align: left;
+  }
+
+  &__rol {
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+
+  &__detalle {
+    @extend %texto-secundario;
+    font-weight: 400;
+  }
+
+  &__borrar {
+    margin-top: 4px;
+  }
+
+  &__modulo td {
+    @extend %antetitulo-mini;
+    background: $panel-2;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  &__celda {
+    text-align: center;
+  }
+
+  &__casilla {
+    width: 18px;
+    height: 18px;
+    accent-color: $violeta;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  @include movil {
+    &__permiso {
+      min-width: 160px;
+    }
+  }
+}

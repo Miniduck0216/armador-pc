@@ -2,14 +2,27 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Rol, Usuario } from './usuario.entity';
+import { Usuario } from './usuario.entity';
+import { Rol } from './rol.entity';
+import { ROL_POR_DEFECTO } from './permisos';
 import { Componente } from '../componentes/componente.entity';
 
 @Injectable()
 export class UsuariosService {
-  constructor(@InjectRepository(Usuario) private readonly repo: Repository<Usuario>) {}
+  constructor(
+    @InjectRepository(Usuario) private readonly repo: Repository<Usuario>,
+    @InjectRepository(Rol) private readonly roles: Repository<Rol>,
+  ) {}
 
-  async crear(nombre: string, correo: string, contrasena: string, rol: Rol = 'usuario') {
+  // Busca el rol por su código; si no existe, la cuenta no se crea
+  private async rol(codigo: string) {
+    const rol = await this.roles.findOneBy({ codigo });
+    if (!rol) throw new NotFoundException('Ese rol no existe');
+    return rol;
+  }
+
+  async crear(nombre: string, correo: string, contrasena: string, codigoRol: string = ROL_POR_DEFECTO) {
+    const rol = await this.rol(codigoRol);
     correo = correo.trim().toLowerCase();
     if (await this.repo.exist({ where: { correo } })) {
       throw new ConflictException('Ya existe una cuenta con ese correo');
@@ -29,7 +42,8 @@ export class UsuariosService {
     const valida = await bcrypt.compare(contrasena, usuario.contrasenaHash);
     if (!valida) return null;
     await this.repo.update(usuario.id, { ultimoIngreso: new Date() });
-    return usuario;
+    // Se vuelve a leer con find para traer el rol y sus permisos (el QueryBuilder no carga relaciones eager)
+    return this.buscarPorId(usuario.id);
   }
 
   buscarPorId(id: number) {
@@ -44,8 +58,14 @@ export class UsuariosService {
     return this.repo.count();
   }
 
-  async cambiarRol(id: number, rol: Rol) {
+  async cambiarRol(id: number, rolId: number) {
+    const rol = await this.roles.findOneBy({ id: rolId });
+    if (!rol) throw new NotFoundException('Ese rol no existe');
     await this.repo.update(id, { rol });
+  }
+
+  existe(correo: string) {
+    return this.repo.exist({ where: { correo } });
   }
 
   async cambiarEstado(id: number, activo: boolean) {

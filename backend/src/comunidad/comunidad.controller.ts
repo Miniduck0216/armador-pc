@@ -1,3 +1,4 @@
+import { tienePermiso } from '../usuarios/permisos';
 import { Body, Controller, Delete, HttpCode, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ComunidadService } from './comunidad.service';
@@ -32,7 +33,7 @@ export class ComunidadController {
   @HttpCode(204)
   @ApiOperation({ summary: 'Elimina una reseña propia (o cualquiera si es administrador)' })
   async eliminarResena(@Param('resenaId', ParseIntPipe) resenaId: number, @UsuarioActual() usuario: Usuario) {
-    await this.comunidad.eliminarResena(resenaId, usuario.id, usuario.rol === 'admin');
+    await this.comunidad.eliminarResena(resenaId, usuario.id, tienePermiso(usuario, 'resenas.moderar'));
   }
 
   @Post('componentes/:id/reportes')

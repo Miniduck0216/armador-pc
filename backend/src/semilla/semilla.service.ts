@@ -7,6 +7,7 @@ import { ReglaCompatibilidad } from '../reglas/regla-compatibilidad.entity';
 import { Tienda } from '../precios/entidades/tienda.entity';
 import { ProcesadoresService } from '../procesadores/procesadores.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
+import { RolesService } from '../usuarios/roles.service';
 import { PROVEEDOR_PRECIOS, ProveedorPrecios } from '../precios/proveedor-precios';
 import { MODO_PRECIOS, TareaPreciosService } from '../precios/tarea-precios.service';
 import { ConfiguracionesService } from '../configuraciones/configuraciones.service';
@@ -19,6 +20,7 @@ import { FOTOS, FOTO_CATEGORIA } from './imagenes';
 
 export const ADMIN = { correo: 'admin@armadorpc.com', contrasena: 'Admin12345' };
 export const DEMO = { correo: 'demo@armadorpc.com', contrasena: 'Demo12345' };
+export const TECNICO = { correo: 'tecnico@armadorpc.com', contrasena: 'Tecnico12345' };
 
 // Configuraciones recomendadas: se arman con el modo automático del configurador
 const CONFIGURACIONES = [
@@ -57,10 +59,14 @@ export class SemillaService implements OnApplicationBootstrap {
     private readonly tarea: TareaPreciosService,
     private readonly configuraciones: ConfiguracionesService,
     private readonly guias: GuiasService,
+    private readonly roles: RolesService,
   ) {}
 
   async onApplicationBootstrap() {
+    // Primero roles y permisos: las cuentas de prueba se crean con un rol de esa tabla
+    await this.roles.asegurar();
     if ((await this.categorias.count()) === 0) await this.sembrar();
+    await this.asegurarTecnico();
     await this.asegurarTiendas();
     await this.tarea.aplicarModo();
 
@@ -74,6 +80,13 @@ export class SemillaService implements OnApplicationBootstrap {
   private async asegurarTiendas() {
     for (const t of TIENDAS) {
       if (!(await this.tiendas.findOne({ where: { nombre: t.nombre } }))) await this.tiendas.save(this.tiendas.create(t));
+    }
+  }
+
+  // Cuenta de prueba con el rol Técnico (también se agrega a bases que ya existían)
+  private async asegurarTecnico() {
+    if (!(await this.usuarios.existe(TECNICO.correo))) {
+      await this.usuarios.crear('Técnico de prueba', TECNICO.correo, TECNICO.contrasena, 'tecnico');
     }
   }
 

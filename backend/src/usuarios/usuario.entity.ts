@@ -1,7 +1,6 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Componente } from '../componentes/componente.entity';
-
-export type Rol = 'usuario' | 'admin';
+import { Rol } from './rol.entity';
 
 @Entity('usuarios')
 export class Usuario {
@@ -18,8 +17,15 @@ export class Usuario {
   @Column({ select: false })
   contrasenaHash: string;
 
-  @Column({ default: 'usuario' })
-  rol: Rol;
+  // Llave foránea hacia la tabla roles (el rol trae sus permisos)
+  @ManyToOne(() => Rol, { eager: true, nullable: true })
+  @JoinColumn({ name: 'rolId' })
+  rol: Rol | null;
+
+  // Columna antigua donde el rol se guardaba como texto. Solo se lee una vez al
+  // arrancar para pasar esos usuarios a la tabla roles (ver RolesService.asegurar).
+  @Column({ name: 'rol', type: 'varchar', nullable: true, select: false })
+  rolAnterior: string | null;
 
   @Column({ default: true })
   activo: boolean;
