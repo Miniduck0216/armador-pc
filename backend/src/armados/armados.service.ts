@@ -2,8 +2,11 @@ import { tienePermiso } from '../usuarios/permisos';
 import { randomBytes } from 'crypto';
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Armado } from './armado.entity';
+import { HistorialArmado } from './historial-armado.entity';
+import { Accion, EDITABLES, ESTADOS, EstadoArmado, PENDIENTES_REVISION, TRANSICIONES } from './flujo-armado';
+import { NotificacionesService } from '../notificaciones/notificaciones.service';
 import { Usuario } from '../usuarios/usuario.entity';
 import { ConfiguradorService } from '../configurador/configurador.service';
 
@@ -11,7 +14,9 @@ import { ConfiguradorService } from '../configurador/configurador.service';
 export class ArmadosService {
   constructor(
     @InjectRepository(Armado) private readonly repo: Repository<Armado>,
+    @InjectRepository(HistorialArmado) private readonly historial: Repository<HistorialArmado>,
     private readonly configurador: ConfiguradorService,
+    private readonly notificaciones: NotificacionesService,
   ) {}
 
   async crear(usuario: Usuario, nombre: string, ids: number[]) {
@@ -90,7 +95,92 @@ export class ArmadosService {
   }
 
   async eliminar(id: number, usuario: Usuario) {
-    await this.propio(id, usuario);
+    const armado = await this.propio(id, usuario);
+    if (PENDIENTES_REVISION.includes(armado.estado as EstadoArmado) && armado.usuario?.id === usuario.id) {
+      throw new BadRequestException('No puedes eliminar un armado mientras está en revisión');
+    }
     await this.repo.delete(id);
+  }
+
+  // ---------- Flujo de revisión ----------
+
+  historialDe(armadoId: number) {
+    return this.historial.find({ where: { armado: { id: armadoId } }, order: { fecha: 'ASC', id: 'ASC' } });
+  }
+
+  // Bandeja del técnico: armados enviados o en revisión, los más antiguos primero
+  pendientes() {
+    return this.repo.find({ where: { estado: In(PENDIENTES_REVISION) }, order: { fechaEstado: 'ASC' } });
+  }
+
+  // Aplica una acción del flujo. Todas las reglas se comprueban aquí, en el servidor:
+  // quién puede hacerla, desde qué estado, si exige motivo y si el armado es compatible.
+  async aplicarAccion(id: number, usuario: Usuario, accion: Accion, comentario?: string) {
+    const regla = TRANSICIONES[accion];
+    const armado = await this.repo.findOne({ where: { id } });
+    if (!armado) throw new NotFoundException('El armado no existe');
+
+    const esDueno = armado.usuario?.id === usuario.id;
+    if (regla.quien === 'dueno' && !esDueno) throw new ForbiddenException('Solo el dueño puede enviar su armado');
+    if (regla.quien === 'revisor') {
+      if (!tienePermiso(usuario, 'armados.revisar')) throw new ForbiddenException('Tu rol no puede revisar armados');
+      if (esDueno) throw new ForbiddenException('No puedes revisar tu propio armado');
+      if (accion !== 'tomar' && armado.revisor?.id !== usuario.id) throw new ForbiddenException('Este armado lo está revisando otro técnico');
+    }
+    const actual = armado.estado as EstadoArmado;
+    if (!regla.desde.includes(actual)) {
+      throw new BadRequestException(`No se puede ${accion} un armado en estado "${ESTADOS[actual] ?? actual}"`);
+    }
+    const texto = comentario?.trim() || null;
+    if (regla.pideMotivo && (!texto || texto.length < 5)) throw new BadRequestException('Escribe el motivo (mínimo 5 caracteres)');
+
+    // Regla del negocio: solo se revisan armados compatibles con los precios y reglas de hoy
+    if (accion === 'enviar') {
+      const r = await this.configurador.resumen(armado.componentes.map((c) => c.id));
+      if (!r.compatibilidad.esCompatible) throw new BadRequestException('Corrige los problemas de compatibilidad antes de enviarlo');
+      armado.esCompatible = true;
+    }
+
+    armado.estado = regla.hacia;
+    armado.fechaEstado = new Date();
+    if (accion === 'tomar') armado.revisor = usuario;
+    if (regla.pideMotivo) armado.motivo = texto;
+    if (accion === 'enviar' || accion === 'aprobar') armado.motivo = null;
+    await this.repo.save(armado);
+    await this.historial.save(this.historial.create({ armado, usuario, estadoAnterior: actual, estadoNuevo: regla.hacia, comentario: texto }));
+
+    // Notificaciones en la campana
+    const enlace = `/armado.html?id=${armado.id}`;
+    if (accion === 'enviar') {
+      await this.notificaciones.avisarAPermiso('armados.revisar', `Nuevo armado para revisar: "${armado.nombre}"`, enlace, usuario.id);
+    } else if (armado.usuario) {
+      const mensajes: Record<string, string> = {
+        tomar: `Tu armado "${armado.nombre}" está en revisión`,
+        aprobar: `Tu armado "${armado.nombre}" fue aprobado`,
+        devolver: `Tu armado "${armado.nombre}" necesita cambios: ${texto}`,
+        rechazar: `Tu armado "${armado.nombre}" fue rechazado: ${texto}`,
+      };
+      await this.notificaciones.avisar(armado.usuario.id, mensajes[accion], enlace);
+    }
+    return { estado: armado.estado, nombreEstado: ESTADOS[armado.estado as EstadoArmado] };
+  }
+
+  // El dueño cambia las piezas mientras el armado está en borrador o por corregir
+  async actualizarPiezas(id: number, usuario: Usuario, ids: number[]) {
+    const armado = await this.repo.findOne({ where: { id } });
+    if (!armado) throw new NotFoundException('El armado no existe');
+    if (armado.usuario?.id !== usuario.id) throw new ForbiddenException('Este armado pertenece a otro usuario');
+    if (!EDITABLES.includes(armado.estado as EstadoArmado)) {
+      throw new BadRequestException(`Un armado en estado "${ESTADOS[armado.estado as EstadoArmado]}" no se puede editar`);
+    }
+    if (!ids.length) throw new BadRequestException('Debes elegir al menos un componente');
+    const resumen = await this.configurador.resumen(ids);
+    armado.componentes = await this.configurador.cargarPiezas(ids);
+    armado.precioTotal = resumen.total;
+    armado.consumoTotal = resumen.consumo;
+    armado.puntajeTotal = resumen.rendimiento.puntaje;
+    armado.esCompatible = resumen.compatibilidad.esCompatible;
+    await this.repo.save(armado);
+    return { id: armado.id };
   }
 }

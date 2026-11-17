@@ -17,6 +17,7 @@ import { PedidoModule } from './pedido/pedido.module';
 import { ConfiguracionesModule } from './configuraciones/configuraciones.module';
 import { GuiasModule } from './guias/guias.module';
 import { HerramientasModule } from './herramientas/herramientas.module';
+import { NotificacionesModule } from './notificaciones/notificaciones.module';
 import { UsuarioActualMiddleware } from './auth/usuario-actual.middleware';
 import { CuentaController } from './cuenta/cuenta.controller';
 import { AdminController } from './admin/admin.controller';
@@ -46,6 +47,7 @@ import { InicioController } from './inicio.controller';
     ConfiguracionesModule,
     GuiasModule,
     HerramientasModule,
+    NotificacionesModule,
     ArmadosModule,
     SemillaModule,
   ],

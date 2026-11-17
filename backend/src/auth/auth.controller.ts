@@ -8,6 +8,7 @@ import { IngresoDto, RegistroDto } from './dto/auth.dto';
 import { validarFormulario } from '../comun/validar';
 import { Usuario } from '../usuarios/usuario.entity';
 import { AlertasService } from '../precios/alertas.service';
+import { NotificacionesService } from '../notificaciones/notificaciones.service';
 import { permisosDe } from '../usuarios/permisos';
 
 // Datos públicos del usuario (nunca se devuelve el resumen de la contraseña).
@@ -33,6 +34,7 @@ export class AuthController {
     private readonly usuarios: UsuariosService,
     private readonly limite: LimiteIntentosService,
     private readonly alertas: AlertasService,
+    private readonly notificaciones: NotificacionesService,
   ) {}
 
   @Get('yo')
@@ -40,7 +42,9 @@ export class AuthController {
   async yo(@Req() req: Request) {
     const u: Usuario = req['usuario'];
     if (!u) return { usuario: null };
-    return { usuario: { ...publico(u), alertasNuevas: await this.alertas.contarSinVer(u.id) } };
+    // La campana suma las alertas de precio y los avisos del flujo de revisión
+    const nuevas = (await this.alertas.contarSinVer(u.id)) + (await this.notificaciones.contarSinVer(u.id));
+    return { usuario: { ...publico(u), alertasNuevas: nuevas } };
   }
 
   @Post('ingresar')

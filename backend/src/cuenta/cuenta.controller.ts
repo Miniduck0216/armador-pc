@@ -6,6 +6,8 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { ComunidadService } from '../comunidad/comunidad.service';
 import { ArmadosService } from '../armados/armados.service';
 import { AlertasService } from '../precios/alertas.service';
+import { NotificacionesService } from '../notificaciones/notificaciones.service';
+import { ESTADOS, EstadoArmado } from '../armados/flujo-armado';
 import { PreciosService } from '../precios/precios.service';
 import { ProductosService } from '../productos/productos.service';
 import { publico } from '../auth/auth.controller';
@@ -23,6 +25,7 @@ export class CuentaController {
     private readonly alertas: AlertasService,
     private readonly precios: PreciosService,
     private readonly productos: ProductosService,
+    private readonly notificaciones: NotificacionesService,
   ) {}
 
   @Get()
@@ -46,16 +49,21 @@ export class CuentaController {
       };
     });
     await this.alertas.marcarVistas(usuario.id); // al abrir la cuenta se dan por vistas
+    const avisos = (await this.notificaciones.listar(usuario.id)).map((n) => ({ id: n.id, mensaje: n.mensaje, enlace: n.enlace, fecha: n.fecha, nueva: !n.vista }));
+    await this.notificaciones.marcarVistas(usuario.id);
 
     return {
       perfil: { ...publico(usuario), fechaRegistro: usuario.fechaRegistro },
       alertas: vistaAlertas,
+      notificaciones: avisos,
       favoritos: await this.productos.tarjetas(await this.usuarios.favoritos(usuario.id)),
       armados: (await this.armados.listarDe(usuario.id)).map((a) => ({
         id: a.id,
         nombre: a.nombre,
         fechaCreacion: a.fechaCreacion,
         esCompatible: a.esCompatible,
+        estado: a.estado,
+        nombreEstado: ESTADOS[a.estado as EstadoArmado],
         puntajeTotal: a.puntajeTotal,
         precioTotal: a.precioTotal,
         precioHoy: (a as any).precioHoy,

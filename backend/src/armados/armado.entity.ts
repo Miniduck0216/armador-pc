@@ -29,6 +29,21 @@ export class Armado {
   @Column({ type: 'varchar', nullable: true, unique: true })
   tokenPublico: string | null;
 
+  // Estado dentro del flujo de revisión (ver flujo-armado.ts)
+  @Column({ default: 'borrador' })
+  estado: string;
+
+  // Último motivo dado por el técnico al devolver o rechazar
+  @Column({ type: 'varchar', nullable: true })
+  motivo: string | null;
+
+  // Técnico que tomó la revisión
+  @ManyToOne(() => Usuario, { eager: true, nullable: true, onDelete: 'SET NULL' })
+  revisor: Usuario | null;
+
+  @Column({ type: 'datetime', nullable: true })
+  fechaEstado: Date | null;
+
   // Dueño del armado: cada usuario solo ve los suyos
   @ManyToOne(() => Usuario, { onDelete: 'CASCADE', eager: true })
   usuario: Usuario;

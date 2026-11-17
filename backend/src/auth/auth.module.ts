@@ -6,6 +6,7 @@ import { LimiteIntentosService } from './limite-intentos.service';
 import { UsuariosModule } from '../usuarios/usuarios.module';
 import { AutenticadoGuard, PermisosGuard } from './guardias';
 import { PreciosModule } from '../precios/precios.module';
+import { NotificacionesModule } from '../notificaciones/notificaciones.module';
 
 const SECRETO = process.env.JWT_SECRETO || 'cambia-este-secreto-en-produccion';
 if (!process.env.JWT_SECRETO) {
@@ -18,6 +19,7 @@ if (!process.env.JWT_SECRETO) {
   imports: [
     UsuariosModule,
     PreciosModule,
+    NotificacionesModule,
     JwtModule.register({ secret: SECRETO, signOptions: { expiresIn: '8h' } }),
   ],
   providers: [AuthService, LimiteIntentosService, AutenticadoGuard, PermisosGuard],
