@@ -1,3 +1,6 @@
+@use '../abstractos/variables' as *;
+@use '../abstractos/mixins' as *;
+
 /* ==========================================================================
    Estilos propios de cada página
    ========================================================================== */
@@ -131,49 +134,6 @@
 .razones { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 22px; }
 .solo-diferencias { margin-left: auto; }
 
-/* ---------- Configurador ---------- */
-.configurador { display: grid; grid-template-columns: 1fr 370px; gap: 26px; align-items: start; }
-.lista-categorias { display: grid; gap: 10px; }
-.fila-config { display: grid; grid-template-columns: 170px 1fr auto; gap: 16px; align-items: center; background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; padding: 12px 14px; }
-.fila-config.conflicto { border-color: #f6c0cc; background: #fff8fa; }
-.fila-config .cat { display: flex; align-items: center; gap: 10px; font: 700 14.5px var(--titulos); }
-.fila-config .cat img { width: 44px; height: 44px; object-fit: cover; border-radius: 10px; }
-.fila-config .cat small { display: block; font: 400 12px 'Inter', sans-serif; color: var(--tenue); }
-.fila-config .elegida { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; }
-.fila-config .elegida img { width: 56px; height: 56px; object-fit: contain; background: #fff; border-radius: 8px; border: 1px solid var(--borde); }
-.fila-config .elegida b { display: block; line-height: 1.25; }
-.fila-config .elegida small { color: var(--tenue); font-size: 12.5px; }
-.fila-config .elegida strong { font-family: var(--titulos); font-size: 17px; }
-.fila-config .vacia { color: var(--tenue); font-size: 14px; }
-.fila-config .botones { display: flex; gap: 6px; }
-.resumen-config { position: sticky; top: 94px; display: grid; gap: 14px; }
-.resumen-config .total { font: 800 36px var(--titulos); }
-.resumen-config .medidor { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.asistente { background: linear-gradient(135deg, var(--marino), #2a1f6e); color: #fff; border-radius: 18px; padding: 26px; margin-bottom: 22px; display: grid; gap: 18px; }
-.asistente .tenue { color: #b7bbdc; }
-.asistente-grilla { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 22px; align-items: end; }
-.asistente .presupuesto-valor { font: 800 34px var(--titulos); color: var(--amarillo); }
-.asistente input[type='range'] { width: 100%; }
-.asistente .casilla { color: #dfe2ff; }
-.selector-uso { display: flex; gap: 8px; flex-wrap: wrap; }
-.selector-uso label { cursor: pointer; }
-.selector-uso input { position: absolute; opacity: 0; pointer-events: none; }
-.selector-uso span { display: inline-block; padding: 9px 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.25); font-weight: 600; font-size: 14px; }
-.selector-uso input:checked + span { background: var(--amarillo); color: var(--marino); border-color: var(--amarillo); }
-.selector-uso input:focus-visible + span { outline: 2px solid #fff; }
-.opcion-lista { display: grid; gap: 8px; }
-.opcion { display: grid; grid-template-columns: 64px 1fr auto auto; gap: 14px; align-items: center; padding: 10px 12px; border: 1px solid var(--borde); border-radius: 12px; }
-.opcion.incompatible { opacity: 0.6; background: #fafafa; }
-.opcion.elegida { border-color: var(--violeta); background: var(--violeta-claro); }
-.opcion img { width: 64px; height: 64px; object-fit: contain; background: #fff; border-radius: 8px; }
-.opcion b { display: block; line-height: 1.25; }
-.opcion .motivo { color: var(--rojo); font-size: 12.5px; }
-.opcion .precio-op { text-align: right; font: 800 17px var(--titulos); }
-.opcion .precio-op small { display: block; font: 400 12px 'Inter', sans-serif; color: var(--tenue); }
-.herramientas-modal { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-.herramientas-modal input { flex: 1 1 200px; }
-.herramientas-modal select { width: auto; }
-
 /* ---------- Configuraciones ---------- */
 .barra-pestanas { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
 
@@ -238,26 +198,22 @@
 .no-encontrado { text-align: center; padding: 90px 20px; }
 .no-encontrado .codigo { font: 800 120px/1 var(--titulos); color: var(--violeta); }
 
-@media (max-width: 1080px) {
-  .heroe-grilla, .dos-columnas, .ficha-cabecera, .configurador, .herramienta-grilla, .acceso, .panel { grid-template-columns: 1fr; }
-  .resumen-config, .panel-menu { position: static; }
+@include tablet {
+  .heroe-grilla, .dos-columnas, .ficha-cabecera, .herramienta-grilla, .acceso, .panel { grid-template-columns: 1fr; }
+  .panel-menu { position: static; }
   .biblioteca { grid-template-columns: 1fr; }
   .filtros { position: static; display: none; }
   .filtros.abiertos { display: grid; }
   .boton-filtros { display: inline-flex; }
   .acceso-arte { display: none; }
   .galeria { max-width: 460px; }
-  .asistente-grilla { grid-template-columns: 1fr; }
 }
-@media (max-width: 720px) {
+@include movil {
   .cifras { gap: 22px; }
   .banda-cta { flex-direction: column; align-items: flex-start; padding: 28px 24px; }
   .especificaciones, .pros-contras, .razones, .dos-campos { grid-template-columns: 1fr; }
   .resumen-historial { grid-template-columns: 1fr 1fr; }
   .ranuras { grid-template-columns: 1fr; }
-  .fila-config { grid-template-columns: 1fr; gap: 10px; }
-  .opcion { grid-template-columns: 52px 1fr; }
-  .opcion .precio-op, .opcion .boton { grid-column: 2; text-align: left; }
   .precio-grande strong { font-size: 32px; }
 }
 #favorito.activo { background: var(--rojo-claro); color: var(--rojo); border-color: #f6c0cc; }
@@ -300,7 +256,7 @@ main.acceso ~ .pie { margin-top: 0; }
 }
 .pedido-acciones { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 6px; }
 .pedido-acciones .boton { justify-content: center; text-align: center; }
-@media (max-width: 640px) {
+@include movil-chico {
   .opciones-pedido { grid-template-columns: 1fr; }
 }
 

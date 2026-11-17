@@ -83,10 +83,10 @@ function pintar(d) {
       ${alertas}
       ${grupos || '<div class="vacio">No encontramos precios para estas piezas.</div>'}
     </div>
-    <aside class="resumen-config">
+    <aside class="resumen-armado">
       <div class="caja sombra apilado">
         <span class="antetitulo" style="margin:0">Total recomendado</span>
-        <div class="total">${dinero(d.total)}</div>
+        <div class="resumen-armado__total">${dinero(d.total)}</div>
         ${d.ahorro > 0 ? `<div class="variacion baja" style="font-size:15px">Comprar todo en ${esc(d.unaTienda.tienda.nombre)} te ahorra ${dinero(d.ahorro)}</div>` : '<div class="tenue pequeno">Comprar por separado es lo más barato hoy.</div>'}
         <div class="pedido-acciones">
           <button class="boton violeta" id="copiar-lista">${icono('copiar', 16)} Copiar lista</button>

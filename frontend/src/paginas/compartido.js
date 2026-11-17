@@ -26,13 +26,13 @@ async function iniciar() {
   const c = r.compatibilidad;
   $('#cuerpo').innerHTML = `
     <div>${listaPiezas(r.piezas)}</div>
-    <aside class="resumen-config">
+    <aside class="resumen-armado">
       <div class="caja sombra apilado">
         <span class="antetitulo" style="margin:0">Precio de hoy</span>
-        <div class="total">${dinero(r.total)}</div>
+        <div class="resumen-armado__total">${dinero(r.total)}</div>
         ${diferencia ? `<div class="variacion ${diferencia < 0 ? 'baja' : 'sube'}" style="font-size:15px">${diferencia < 0 ? '▼ Bajó' : '▲ Subió'} ${dinero(Math.abs(diferencia))} desde que se guardó</div>` : '<div class="tenue pequeno">Mismo precio que cuando se guardó</div>'}
-        <div class="estado-compat ${c.esCompatible ? 'ok' : 'mal'}">${icono(c.esCompatible ? 'escudo' : 'alerta', 20)} ${c.esCompatible ? 'Compatible' : `${c.errores.length} problema(s)`}</div>
-        <div class="medidor"><div class="dato"><small>Consumo</small><b>${r.consumo} W</b></div><div class="dato"><small>Rendimiento</small><b>${r.rendimiento?.puntaje ?? 0}/100</b></div></div>
+        <div class="compatibilidad__estado compatibilidad__estado--${c.esCompatible ? 'ok' : 'mal'}">${icono(c.esCompatible ? 'escudo' : 'alerta', 20)} ${c.esCompatible ? 'Compatible' : `${c.errores.length} problema(s)`}</div>
+        <div class="resumen-armado__medidor"><div class="dato"><small>Consumo</small><b>${r.consumo} W</b></div><div class="dato"><small>Rendimiento</small><b>${r.rendimiento?.puntaje ?? 0}/100</b></div></div>
         <div class="pedido-acciones">
           <a class="boton violeta" href="/pedido.html?ids=${ids.join(',')}">${icono('lista', 16)} Ver lista de compra</a>
           <a class="boton secundario" href="/configurador.html" id="abrir-config">${icono('pc', 16)} Editar en mi configurador</a>

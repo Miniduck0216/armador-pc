@@ -1,3 +1,6 @@
+@use '../abstractos/variables' as *;
+@use '../abstractos/mixins' as *;
+
 /* ==========================================================================
    Piezas reutilizables: tarjetas, mosaicos, pestañas, modal, bandeja, gráficos
    ========================================================================== */
@@ -125,18 +128,6 @@
 .barra-h .pista i { display: block; height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--violeta), #9b84ff); }
 .barra-h b { font-family: var(--titulos); min-width: 54px; text-align: right; }
 
-/* ---------- Estado de compatibilidad ---------- */
-.estado-compat { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; font-weight: 700; }
-.estado-compat.ok { background: var(--verde-claro); color: #0d6b37; }
-.estado-compat.mal { background: var(--rojo-claro); color: #a3133a; }
-.estado-compat.pendiente { background: var(--panel-2); color: var(--tenue); }
-.reglas { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 13.5px; }
-.reglas li { display: grid; grid-template-columns: 20px 1fr; gap: 8px; align-items: start; }
-.reglas li small { display: block; color: var(--tenue); }
-.reglas .ok { color: var(--verde); }
-.reglas .mal { color: var(--rojo); }
-.reglas .omitida { color: #b5b8cc; }
-
 /* ---------- Paginación ---------- */
 .paginacion { display: flex; gap: 6px; justify-content: center; margin-top: 26px; flex-wrap: wrap; }
 .paginacion button { min-width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--borde); background: #fff; font-weight: 700; cursor: pointer; color: var(--texto); }
@@ -150,11 +141,11 @@
 .tarjeta-accion p { font-size: 13.5px; color: var(--tenue); line-height: 1.45; }
 .tarjeta-accion .ir { margin-left: auto; color: var(--violeta); align-self: center; }
 
-@media (max-width: 1080px) {
+@include tablet {
   .grilla.g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .grilla.g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 720px) {
+@include movil {
   .grilla.g2, .grilla.g3, .grilla.g4 { grid-template-columns: 1fr; }
   .bandeja-comparar .contenedor { flex-wrap: wrap; gap: 8px; }
   .bandeja-items em { max-width: 110px; }

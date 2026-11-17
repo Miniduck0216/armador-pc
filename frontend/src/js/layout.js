@@ -1,7 +1,5 @@
 // Encabezado, pie de página, buscador y bandeja de comparación comunes a todas las páginas
-import '../estilos/base.css';
-import '../estilos/componentes.css';
-import '../estilos/paginas.css';
+import '../sass/main.scss';
 import { api, enviar } from './api.js';
 import { icono } from './iconos.js';
 import { $, dinero, esc, imagen, retrasar } from './util.js';

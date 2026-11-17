@@ -1,0 +1,14 @@
+// Variables CSS generadas desde el mapa $colores con un bucle @each
+@use '../abstractos/variables' as *;
+
+:root {
+  @each $nombre, $valor in $colores {
+    --#{$nombre}: #{$valor};
+  }
+  --radio: #{$radio};
+  --radio-ch: #{$radio-chico};
+  --sombra: #{$sombra};
+  --sombra-fuerte: #{$sombra-fuerte};
+  --ancho: #{$ancho-maximo};
+  --titulos: #{$fuente-titulos};
+}

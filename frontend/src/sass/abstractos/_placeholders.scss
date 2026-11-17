@@ -1,0 +1,23 @@
+// ---------- 3. Placeholders (estilos que se reutilizan con @extend) ----------
+@use 'variables' as *;
+
+// Texto pequeño y apagado debajo de un título
+%texto-secundario {
+  display: block;
+  font-size: 12.5px;
+  color: $tenue;
+}
+
+// Etiqueta en mayúsculas sobre un dato
+%antetitulo-mini {
+  font: 800 10.5px $fuente-titulos;
+  color: $violeta;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// Precio grande alineado a la derecha
+%precio {
+  font: 800 17px $fuente-titulos;
+  text-align: right;
+}

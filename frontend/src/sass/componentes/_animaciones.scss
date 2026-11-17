@@ -1,0 +1,34 @@
+// ---------- Animaciones CSS3 ----------
+// Se usan en el configurador: las filas aparecen suavemente y el estado
+// "incompatible" llama la atención con un pulso corto.
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulso {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(225, 29, 72, 0);
+  }
+}
+
+// Quien prefiera menos movimiento (accesibilidad) no ve animaciones
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,14 @@
+// ==========================================================================
+// ArmadorPC · hoja de estilos principal
+// Se compila con Vite (sass). Orden: abstractos → base → componentes → páginas.
+// Los abstractos (variables, mixins, placeholders) no generan CSS por sí solos:
+// cada parcial los importa con @use.
+// ==========================================================================
+
+@use 'base/raiz';
+@use 'base/base';
+@use 'componentes/animaciones';
+@use 'componentes/generales';
+@use 'componentes/compatibilidad';
+@use 'paginas/paginas';
+@use 'paginas/configurador';

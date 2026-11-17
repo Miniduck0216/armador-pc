@@ -46,11 +46,11 @@ async function comprobar() {
     const evaluadas = r.compatibilidad.resultados.filter((x) => !x.omitida);
     const ok = r.compatibilidad.esCompatible;
     res.innerHTML = `
-      <div class="estado-compat ${ok ? 'ok' : 'mal'}" style="margin-bottom:14px">${icono(ok ? 'escudo' : 'alerta', 20)} ${ok ? `Compatibles (${evaluadas.length} reglas comprobadas)` : `${r.compatibilidad.errores.length} problema(s) encontrados`}</div>
-      <ul class="reglas">${r.compatibilidad.resultados
-        .map((x) => `<li><span class="${x.omitida ? 'omitida' : x.cumple ? 'ok' : 'mal'}">${icono(x.omitida ? 'menos' : x.cumple ? 'check' : 'x', 17)}</span><span>${esc(x.regla)}<small>${esc(x.detalle)}</small></span></li>`)
+      <div class="compatibilidad__estado compatibilidad__estado--${ok ? 'ok' : 'mal'}" style="margin-bottom:14px">${icono(ok ? 'escudo' : 'alerta', 20)} ${ok ? `Compatibles (${evaluadas.length} reglas comprobadas)` : `${r.compatibilidad.errores.length} problema(s) encontrados`}</div>
+      <ul class="compatibilidad__reglas">${r.compatibilidad.resultados
+        .map((x) => `<li class="compatibilidad__regla"><span class="compatibilidad__icono--${x.omitida ? 'omitida' : x.cumple ? 'ok' : 'mal'}">${icono(x.omitida ? 'menos' : x.cumple ? 'check' : 'x', 17)}</span><span>${esc(x.regla)}<small class="compatibilidad__detalle">${esc(x.detalle)}</small></span></li>`)
         .join('')}</ul>
-      <div class="medidor dos-campos" style="margin-top:16px">
+      <div class="dos-campos" style="margin-top:16px">
         <div class="dato"><small>Consumo estimado</small><b>${r.consumo} W</b></div>
         <div class="dato"><small>Total de hoy</small><b>${dinero(r.total)}</b></div>
       </div>

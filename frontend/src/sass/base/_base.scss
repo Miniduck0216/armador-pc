@@ -1,34 +1,10 @@
+@use '../abstractos/variables' as *;
+@use '../abstractos/mixins' as *;
+
 /* ==========================================================================
    ArmadorPC · estilos base
    Paleta: azul marino (encabezado y pie), violeta (marca) y amarillo (acciones)
    ========================================================================== */
-:root {
-  --marino: #12163a;
-  --marino-2: #1c2152;
-  --violeta: #6b4bff;
-  --violeta-2: #5333ea;
-  --violeta-claro: #efebff;
-  --violeta-borde: #d9d1ff;
-  --amarillo: #ffd23f;
-  --amarillo-2: #f5c400;
-  --texto: #14172e;
-  --tenue: #5f6582;
-  --fondo: #f6f6fb;
-  --panel: #ffffff;
-  --panel-2: #f1f1f8;
-  --borde: #e5e5ef;
-  --verde: #12a150;
-  --verde-claro: #e6f6ec;
-  --rojo: #e11d48;
-  --rojo-claro: #fde8ed;
-  --naranja: #d97706;
-  --radio: 14px;
-  --radio-ch: 10px;
-  --sombra: 0 10px 30px rgba(20, 23, 60, 0.08);
-  --sombra-fuerte: 0 20px 50px rgba(20, 23, 60, 0.16);
-  --ancho: 1240px;
-  --titulos: 'Outfit', system-ui, sans-serif;
-}
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -217,7 +193,7 @@ input[type='range'] { padding: 0; accent-color: var(--violeta); border: 0; }
 .pie-final { border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 36px; padding-top: 20px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: 13px; color: #9ea4cc; }
 
 /* ---------- Pantallas medianas y pequeñas ---------- */
-@media (max-width: 1080px) {
+@include tablet {
   .menu { display: none; position: absolute; top: 74px; left: 0; right: 0; flex-direction: column; background: var(--marino); padding: 10px 16px 18px; gap: 4px; }
   .menu.abierto { display: flex; }
   .menu .submenu { position: static; display: grid; box-shadow: none; background: rgba(255, 255, 255, 0.05); border: 0; margin: 2px 0 6px; }
@@ -227,7 +203,7 @@ input[type='range'] { padding: 0; accent-color: var(--violeta); border: 0; }
   .buscador { flex: 1 1 auto; }
   .pie-columnas { grid-template-columns: 1fr 1fr; }
 }
-@media (max-width: 720px) {
+@include movil {
   .barra .contenedor { gap: 12px; height: 66px; }
   .menu { top: 66px; }
   .barra .logo > span { display: none; }

@@ -52,20 +52,20 @@ function fila(c) {
   const p = resumen?.piezas.find((x) => x.categoria === c.codigo);
   const conflicto = p?.conflicto;
   return `
-    <div class="fila-config ${conflicto ? 'conflicto' : ''}" data-cat="${c.codigo}">
-      <div class="cat">${imagen(c.imagenUrl, '')}<div>${esc(c.nombre)}<small>${c.obligatoria ? 'Necesaria' : 'Opcional'}</small></div></div>
+    <div class="pieza-config ${conflicto ? 'pieza-config--conflicto' : ''}" data-cat="${c.codigo}">
+      <div class="pieza-config__categoria">${imagen(c.imagenUrl, '', 'pieza-config__icono')}<div>${esc(c.nombre)}<small class="pieza-config__requisito">${c.obligatoria ? 'Necesaria' : 'Opcional'}</small></div></div>
       ${
         p
-          ? `<div class="elegida">
-              <a href="/producto.html?id=${p.id}">${imagen(p.imagen, p.nombre)}</a>
-              <div><b><a href="/producto.html?id=${p.id}" style="color:inherit">${esc(p.nombre)}</a></b>
-                <small>${p.tieneOfertas && p.tienda ? `en <b style="color:${esc(p.tienda.color)};display:inline">${esc(p.tienda.nombre)}</b>${p.enStock ? '' : ' · sin stock'}` : 'Precio de referencia'}${p.consumoW ? ` · ${p.consumoW} W` : ''}</small>
-                ${conflicto ? `<small style="color:var(--rojo);display:block">${icono('alerta', 13)} Revisa la compatibilidad</small>` : ''}</div>
-              <strong>${dinero(p.precio)}</strong>
+          ? `<div class="pieza-config__elegida">
+              <a href="/producto.html?id=${p.id}">${imagen(p.imagen, p.nombre, 'pieza-config__foto')}</a>
+              <div><a class="pieza-config__modelo" href="/producto.html?id=${p.id}"><b>${esc(p.nombre)}</b></a>
+                <small class="pieza-config__detalle">${p.tieneOfertas && p.tienda ? `en <b style="color:${esc(p.tienda.color)};display:inline">${esc(p.tienda.nombre)}</b>${p.enStock ? '' : ' · sin stock'}` : 'Precio de referencia'}${p.consumoW ? ` · ${p.consumoW} W` : ''}</small>
+                ${conflicto ? `<small class="pieza-config__aviso">${icono('alerta', 13)} Revisa la compatibilidad</small>` : ''}</div>
+              <strong class="pieza-config__precio">${dinero(p.precio)}</strong>
             </div>`
-          : `<div class="vacia">Aún no elegiste ${esc(c.nombre.toLowerCase())}</div>`
+          : `<div class="pieza-config__vacia">Aún no elegiste ${esc(c.nombre.toLowerCase())}</div>`
       }
-      <div class="botones">
+      <div class="pieza-config__acciones">
         ${
           p
             ? `<button class="icono-boton" data-elegir="${c.codigo}" title="Cambiar">${icono('actualizar', 17)}</button><button class="icono-boton" data-quitar="${c.codigo}" title="Quitar">${icono('basura', 17)}</button>`
@@ -96,10 +96,10 @@ function pintarResumen() {
   el.innerHTML = `
     <div class="caja sombra apilado">
       <div class="fila entre"><span class="antetitulo" style="margin:0">Total de hoy</span><span class="tenue pequeno">${r.piezas.length} pieza(s)</span></div>
-      <div class="total">${dinero(r.total)}</div>
-      ${r.ahorro > 0 ? `<div class="pequeno" style="color:var(--verde);font-weight:600">Ahorras ${dinero(r.ahorro)} frente al precio de referencia</div>` : ''}
-      <div class="estado-compat ${estado}">${icono(estado === 'mal' ? 'alerta' : estado === 'ok' ? 'escudo' : 'info', 20)} ${textoEstado}</div>
-      <div class="medidor">
+      <div class="resumen-armado__total">${dinero(r.total)}</div>
+      ${r.ahorro > 0 ? `<div class="resumen-armado__ahorro">Ahorras ${dinero(r.ahorro)} frente al precio de referencia</div>` : ''}
+      <div class="compatibilidad__estado compatibilidad__estado--${estado}">${icono(estado === 'mal' ? 'alerta' : estado === 'ok' ? 'escudo' : 'info', 20)} ${textoEstado}</div>
+      <div class="resumen-armado__medidor">
         <div class="dato"><small>Consumo estimado</small><b>${r.consumo} W</b></div>
         <div class="dato"><small>Rendimiento</small><b>${r.rendimiento?.puntaje ?? 0}/100</b></div>
       </div>
@@ -115,10 +115,10 @@ function pintarResumen() {
     </div>
     <div class="caja">
       <h4 style="margin-bottom:10px">Compatibilidad</h4>
-      <ul class="reglas">${c.resultados
+      <ul class="compatibilidad__reglas">${c.resultados
         .map(
-          (x) => `<li><span class="${x.omitida ? 'omitida' : x.cumple ? 'ok' : 'mal'}">${icono(x.omitida ? 'menos' : x.cumple ? 'check' : 'x', 17)}</span>
-            <span>${esc(x.regla)}<small>${esc(x.detalle)}</small></span></li>`,
+          (x) => `<li class="compatibilidad__regla"><span class="compatibilidad__icono--${x.omitida ? 'omitida' : x.cumple ? 'ok' : 'mal'}">${icono(x.omitida ? 'menos' : x.cumple ? 'check' : 'x', 17)}</span>
+            <span>${esc(x.regla)}<small class="compatibilidad__detalle">${esc(x.detalle)}</small></span></li>`,
         )
         .join('')}</ul>
     </div>
@@ -193,15 +193,15 @@ function htmlProductosTienda(codigo, texto) {
   const productos = productosTiendaDe(codigo, texto);
   if (!productos.length) return '';
   return `
-    <div class="tienda-seccion" style="grid-column:1/-1;margin-top:14px;border-top:1px solid var(--borde,#e5e5e5);padding-top:12px">
-      <p class="pequeno tenue" style="margin-bottom:10px">${icono('tienda', 14)} Productos de NomadaWare (${productos.length}). Se compran en la tienda, no se agregan al armado.</p>
+    <div class="selector-piezas__tienda">
+      <p class="pequeno tenue">${icono('tienda', 14)} Productos de NomadaWare (${productos.length}). Se compran en la tienda, no se agregan al armado.</p>
       ${productos
         .map(
-          (p) => `<div class="opcion">
-            ${imagen(p.imagen, p.nombre)}
-            <div><b>${esc(p.nombre)}</b><div class="pequeno tenue">${esc(p.grupo)}</div></div>
-            <div class="precio-op">${dinero(p.precioEfectivo)}<small>NomadaWare</small></div>
-            <a class="boton pequeno secundario" href="${enlaceTienda(p.url)}" target="_blank" rel="noopener">Ver en tienda</a>
+          (p) => `<div class="opcion-pieza">
+            ${imagen(p.imagen, p.nombre, 'opcion-pieza__foto')}
+            <div><b class="opcion-pieza__nombre">${esc(p.nombre)}</b><div class="pequeno tenue">${esc(p.grupo)}</div></div>
+            <div class="opcion-pieza__precio">${dinero(p.precioEfectivo)}<small class="opcion-pieza__tienda">NomadaWare</small></div>
+            <a class="boton pequeno secundario opcion-pieza__boton" href="${enlaceTienda(p.url)}" target="_blank" rel="noopener">Ver en tienda</a>
           </div>`,
         )
         .join('')}
@@ -215,13 +215,13 @@ async function elegir(codigo) {
     titulo: `Elige ${c.nombre.toLowerCase()}`,
     ancho: 860,
     contenido: `
-      <div class="herramientas-modal">
-        <input type="search" placeholder="Buscar modelo…" id="m-buscar">
-        <select id="m-orden"><option value="precio">Menor precio</option><option value="precio_desc">Mayor precio</option><option value="rendimiento">Más rendimiento</option><option value="nombre">Nombre</option></select>
+      <div class="selector-piezas__herramientas">
+        <input class="selector-piezas__buscar" type="search" placeholder="Buscar modelo…" id="m-buscar">
+        <select class="selector-piezas__orden" id="m-orden"><option value="precio">Menor precio</option><option value="precio_desc">Mayor precio</option><option value="rendimiento">Más rendimiento</option><option value="nombre">Nombre</option></select>
         <label class="casilla"><input type="checkbox" id="m-compat" checked> Solo compatibles</label>
       </div>
       ${c.queMirar ? `<p class="pequeno tenue" style="margin-bottom:12px">${icono('info', 14)} ${esc(c.queMirar)}</p>` : ''}
-      <div class="opcion-lista" id="m-lista"><div class="esqueleto" style="height:300px"></div></div>`,
+      <div class="selector-piezas__lista" id="m-lista"><div class="esqueleto" style="height:300px"></div></div>`,
   });
   const lista = m.cuerpo.querySelector('#m-lista');
   const cargar = async () => {
@@ -236,13 +236,13 @@ async function elegir(codigo) {
       lista.innerHTML = (visibles.length
         ? visibles
             .map(
-              (o) => `<div class="opcion ${o.compatible ? '' : 'incompatible'} ${o.id === leerPc()[codigo] ? 'elegida' : ''}">
-                ${imagen(o.imagen, o.nombre)}
-                <div><b>${esc(o.nombre)}</b>
+              (o) => `<div class="opcion-pieza ${o.compatible ? '' : 'opcion-pieza--incompatible'} ${o.id === leerPc()[codigo] ? 'opcion-pieza--elegida' : ''}">
+                ${imagen(o.imagen, o.nombre, 'opcion-pieza__foto')}
+                <div><b class="opcion-pieza__nombre">${esc(o.nombre)}</b>
                   <div class="chips" style="margin-top:4px">${(o.destacados ?? []).slice(0, 3).map((x) => `<span>${esc(x)}</span>`).join('')}</div>
-                  ${o.motivo ? `<div class="motivo">${icono('alerta', 13)} ${esc(o.motivo)}</div>` : ''}</div>
-                <div class="precio-op">${dinero(o.precio)}<small>${o.tieneOfertas && o.tienda ? esc(o.tienda.nombre) : 'referencia'}</small></div>
-                <button class="boton pequeno ${o.compatible ? '' : 'secundario'}" data-id="${o.id}">${o.id === leerPc()[codigo] ? 'Elegida' : 'Elegir'}</button>
+                  ${o.motivo ? `<div class="opcion-pieza__motivo">${icono('alerta', 13)} ${esc(o.motivo)}</div>` : ''}</div>
+                <div class="opcion-pieza__precio">${dinero(o.precio)}<small class="opcion-pieza__tienda">${o.tieneOfertas && o.tienda ? esc(o.tienda.nombre) : 'referencia'}</small></div>
+                <button class="boton pequeno opcion-pieza__boton ${o.compatible ? '' : 'secundario'}" data-id="${o.id}">${o.id === leerPc()[codigo] ? 'Elegida' : 'Elegir'}</button>
               </div>`,
             )
             .join('')
