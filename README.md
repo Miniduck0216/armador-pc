@@ -58,7 +58,7 @@ Ruta: `/admin.html`. Cada rol ve solo las secciones que tiene permitidas, y el s
 | Procesadores | Crear, editar y eliminar procesadores (los puntajes se recalculan) |
 | Componentes | CRUD del resto de categorías: la categoría se elige en un desplegable y el formulario muestra solo sus datos técnicos |
 | Usuarios | Cambiar rol o estado de una cuenta y **crear usuarios** |
-| Roles y permisos | Matriz de casillas rol × permiso, creación de roles y **permisos por usuario** |
+| Roles y permisos | Pestañas *Por rol* y *Por usuario*: contexto de asignación, árbol de permisos por módulo y resumen de cambios pendientes antes de guardar |
 | Revisión de armados | Bandeja del técnico con los armados enviados o en revisión |
 | Reportes | Resolver reportes de datos incorrectos enviados por usuarios |
 | Reglas | Ver las reglas de compatibilidad que usa el configurador |
@@ -75,7 +75,7 @@ Los roles y permisos son tablas: `roles`, `permisos` y la tabla intermedia `role
 
 - **Backend:** cada ruta declara el permiso que necesita con `@Permisos('precios.gestionar')`. `PermisosGuard` compara contra los permisos del rol, leídos de la base en cada petición, así que un cambio se aplica al instante. Si falta el permiso, responde `403`.
 - **Frontend:** `/api/auth/yo` devuelve los permisos del usuario. El panel muestra solo las secciones permitidas y, si se abre una sección prohibida por la dirección, salta a la primera permitida.
-- **Gestión:** desde *Roles y permisos* se marcan casillas o se crean roles nuevos (por ejemplo, Vendedor solo con precios). Los roles del sistema no se pueden eliminar, ni tampoco un rol que tenga usuarios.
+- **Gestión:** desde *Roles y permisos* se elige un rol o una persona, se marcan módulos completos o permisos sueltos en el árbol (la casilla del módulo queda a medias si solo hay algunos) y los cambios se revisan en el resumen antes de guardar. También se crean roles nuevos (por ejemplo, Vendedor solo con precios). Los roles del sistema no se pueden eliminar, ni tampoco un rol que tenga usuarios.
 - **Permisos por usuario:** en la misma sección se busca a una persona por nombre o correo y se marca qué puede hacer. Se parte de los permisos de su rol, y solo se guardan las diferencias en la tabla `usuarios_permisos` (permiso agregado o quitado). Permisos efectivos = rol + agregados − quitados. A un Administrador no se le cambian permisos, y nadie puede cambiar los suyos.
 
 ## Flujo de revisión del armado (core)

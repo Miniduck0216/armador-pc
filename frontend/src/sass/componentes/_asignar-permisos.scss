@@ -1,0 +1,559 @@
+// ---------- Roles y permisos (diseño tomado de Omnium 3 · Privilegios) ----------
+// Pantalla en tres partes: contexto de asignación (a quién se le asigna),
+// árbol de permisos agrupado por módulo y un resumen lateral con los cambios
+// pendientes, que solo se guardan al pulsar «Guardar cambios».
+@use 'sass:list';
+@use '../abstractos/variables' as *;
+@use '../abstractos/mixins' as *;
+@use '../abstractos/placeholders' as *;
+
+// Colores de las etiquetas de estado: [fondo, texto]
+$estados-permiso: (
+  'completo': ($verde-claro, #0d6b37),
+  'parcial': (#fff4dc, #9a5b00),
+  'vacio': ($panel-2, $tenue),
+  'rol': ($violeta-claro, $violeta-2),
+  'agregado': ($verde-claro, #0d6b37),
+  'quitado': ($rojo-claro, $rojo),
+);
+
+%pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 5px 12px;
+  @include fuente(600, 12px, $fuente-texto);
+  white-space: nowrap;
+}
+
+// ---------- Pestañas: por rol / por usuario ----------
+.pestanas {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  background: $panel-2;
+  border-radius: 12px;
+
+  &__boton {
+    border: 0;
+    background: transparent;
+    padding: 9px 18px;
+    border-radius: 9px;
+    @include fuente(700, 14px);
+    color: $tenue;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+
+    &:hover {
+      color: $texto;
+    }
+
+    &--activa {
+      background: $panel;
+      color: $violeta-2;
+      box-shadow: 0 2px 8px rgba(20, 23, 60, 0.08);
+    }
+  }
+}
+
+// ---------- Contexto de asignación ----------
+.contexto-permisos {
+  @include panel(20px 22px);
+  margin-bottom: 16px;
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  &__titulo {
+    @include fuente(800, 17px);
+    margin: 0;
+  }
+
+  &__ayuda {
+    @extend %texto-secundario;
+    margin: 4px 0 0;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__chip {
+    @extend %pastilla;
+    border: 1px solid $borde;
+    background: $panel-2;
+    color: $tenue;
+
+    b {
+      color: $texto;
+    }
+  }
+
+  &__campos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid $borde;
+    align-items: end;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  // Campo de solo lectura (usuario elegido, correo, rol)
+  // Usa la etiqueta de .campo para verse igual que el desplegable de al lado
+  &__dato {
+    min-width: 0;
+
+    output {
+      display: block;
+      padding: 11px 14px;
+      border: 1px solid $borde;
+      border-radius: $radio-chico;
+      background: $panel-2;
+      font-size: 14px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  @include movil {
+    &__campos {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ---------- Buscador de usuario con lista desplegable ----------
+.buscador-usuario {
+  position: relative;
+
+  &__caja {
+    position: relative;
+
+    svg {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $tenue;
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      padding-left: 38px;
+    }
+  }
+
+  &__lista {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    max-height: 280px;
+    overflow: auto;
+    @include panel(6px, $radio-chico);
+    box-shadow: $sombra-fuerte;
+    animation: aparecer 0.18s ease-out;
+  }
+
+  &__opcion {
+    display: grid;
+    width: 100%;
+    gap: 2px;
+    text-align: left;
+    border: 0;
+    background: transparent;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    color: $texto;
+
+    small {
+      @extend %texto-secundario;
+    }
+
+    &:hover,
+    &--activa {
+      background: $violeta-claro;
+    }
+  }
+
+  &__vacio {
+    @extend %texto-secundario;
+    padding: 10px 12px;
+  }
+}
+
+// ---------- Distribución: árbol + resumen ----------
+.asignar-permisos {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.75fr);
+  gap: 16px;
+  align-items: start;
+
+  &__vacio {
+    @include panel(36px 22px);
+    text-align: center;
+    color: $tenue;
+
+    svg {
+      color: $violeta;
+      margin-bottom: 8px;
+    }
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ---------- Árbol de permisos ----------
+.arbol-permisos {
+  @include panel(18px 20px);
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__titulo {
+    @include fuente(800, 17px);
+    margin: 0;
+  }
+
+  &__ayuda {
+    @extend %texto-secundario;
+    margin: 4px 0 0;
+  }
+
+  &__herramientas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  &__total {
+    @extend %pastilla;
+    background: $violeta-claro;
+    color: $violeta-2;
+  }
+
+  &__enlace {
+    @extend %pastilla;
+    border: 1px solid $borde;
+    background: $panel;
+    color: $texto;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: $panel-2;
+    }
+  }
+
+  &__leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  &__buscar {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid $borde;
+    border-radius: 12px;
+    background: rgba($panel-2, 0.6);
+
+    label {
+      @extend %antetitulo-mini;
+      display: block;
+      margin-bottom: 8px;
+    }
+  }
+
+  &__lista {
+    margin-top: 14px;
+    padding: 8px;
+    border: 1px solid $borde;
+    border-radius: 12px;
+    background: $panel-2;
+  }
+
+  &__rama + &__rama {
+    margin-top: 4px;
+  }
+
+  &__fila {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    transition: background 0.15s;
+    cursor: pointer;
+
+    &:hover {
+      background: $panel;
+    }
+
+    input[type='checkbox'] {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+      accent-color: $violeta;
+      cursor: pointer;
+
+      &:disabled {
+        cursor: not-allowed;
+      }
+    }
+
+    &--modulo {
+      @include fuente(700, 14.5px);
+    }
+
+    &--permiso {
+      padding-left: 46px;
+      font-size: 14px;
+
+      @include movil {
+        padding-left: 30px;
+      }
+    }
+
+    // Permiso que cambió y aún no se guarda
+    &--cambiado {
+      background: $panel;
+      box-shadow: inset 3px 0 0 $amarillo;
+    }
+  }
+
+  &__flecha {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: $tenue;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: transform 0.2s, background 0.15s;
+    transform: rotate(-90deg);
+
+    &:hover {
+      background: $borde;
+    }
+  }
+
+  &__rama--abierta &__flecha {
+    transform: rotate(0);
+  }
+
+  &__hijos {
+    display: none;
+    margin-top: 2px;
+  }
+
+  &__rama--abierta &__hijos {
+    display: block;
+    animation: aparecer 0.2s ease-out;
+  }
+
+  &__nombre {
+    flex: 1;
+    min-width: 0;
+
+    small {
+      @extend %texto-secundario;
+      display: block;
+      font-weight: 400;
+    }
+  }
+
+  &__marca {
+    @extend %pastilla;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  // Modificadores de color generados desde el mapa: contador y etiquetas
+  @each $nombre, $par in $estados-permiso {
+    &__marca--#{$nombre} {
+      @include estado-color(list.nth($par, 1), list.nth($par, 2));
+    }
+  }
+
+  &__sin-resultados {
+    @extend %texto-secundario;
+    padding: 16px;
+    text-align: center;
+  }
+}
+
+// ---------- Resumen lateral con los cambios pendientes ----------
+.resumen-permisos {
+  @include panel(18px 20px);
+  position: sticky;
+  top: 90px;
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__titulo {
+    @include fuente(800, 17px);
+    margin: 0;
+  }
+
+  &__sujeto {
+    @extend %texto-secundario;
+    margin: 4px 0 0;
+  }
+
+  &__estado {
+    @extend %pastilla;
+    border: 1px solid $borde;
+    color: $tenue;
+
+    &--pendiente {
+      border-color: transparent;
+      background: #fff4dc;
+      color: #9a5b00;
+    }
+  }
+
+  &__grupo {
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid $borde;
+    border-radius: 12px;
+    background: $panel-2;
+
+    h4 {
+      @extend %antetitulo-mini;
+      margin: 0 0 8px;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    li {
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+      font-size: 13.5px;
+      animation: aparecer 0.2s ease-out;
+    }
+  }
+
+  &__signo {
+    @include fuente(800, 14px);
+
+    &--mas {
+      color: $verde;
+    }
+
+    &--menos {
+      color: $rojo;
+    }
+  }
+
+  &__vacio {
+    @extend %texto-secundario;
+    margin: 0;
+  }
+
+  &__pie {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid $borde;
+  }
+
+  &__cuenta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: $tenue;
+    margin-bottom: 10px;
+
+    b {
+      color: $texto;
+    }
+  }
+
+  &__botones {
+    display: grid;
+    gap: 8px;
+
+    .boton {
+      justify-content: center;
+    }
+  }
+
+  @include tablet {
+    position: static;
+  }
+}
+
+// ---------- Tabla de reglas de compatibilidad ----------
+.tabla-reglas {
+  &__compara {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+
+    code {
+      background: $panel-2;
+      border: 1px solid $borde;
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+  }
+
+  &__corta {
+    width: 1%;
+    white-space: nowrap;
+  }
+}

@@ -243,7 +243,9 @@ main.acceso ~ .pie { margin-top: 0; }
 .opciones-pedido .caja { position: relative; display: flex; flex-direction: column; gap: 4px; }
 .opciones-pedido b { font-family: var(--titulos); font-size: 24px; color: var(--marino); }
 .opciones-pedido .recomendada { border: 2px solid var(--violeta); }
-.insignia {
+// Solo la insignia «Recomendada» de las opciones de compra va flotando en la esquina;
+// sin el prefijo, esta regla movía todas las insignias del sitio (tablas del panel).
+.opciones-pedido .insignia {
   position: absolute;
   top: 10px;
   right: 10px;

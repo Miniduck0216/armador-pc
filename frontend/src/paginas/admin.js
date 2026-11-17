@@ -2,6 +2,7 @@ import { montar } from '../js/layout.js';
 import { actualizar, api, borrar, enviar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
 import { $, aviso, confirmar, dinero, errorEn, esc, fecha, hace, modal } from '../js/util.js';
+import { confirmarSalidaPermisos, elegirRol, hayCambiosPendientes, htmlRolesPermisos, montarRolesPermisos } from './admin-permisos.js';
 
 const FUENTES = { woocommerce: 'WooCommerce (tienda en línea)', aliexpress: 'API de afiliados', mercadolibre: 'API pública', simulada: 'Simulada (demo)' };
 
@@ -32,6 +33,7 @@ const SECCIONES = {
 };
 
 let permisos = [];
+let usuarioActual = null;
 const puede = (clave) => permisos.includes(SECCIONES[clave][3]);
 
 const contenido = () => $('#contenido');
@@ -243,82 +245,11 @@ async function formularioUsuario() {
   });
 }
 
-// Matriz de roles y permisos: una fila por permiso, una columna por rol
+// Roles y permisos: la pantalla vive en admin-permisos.js (contexto, árbol y resumen)
 async function roles() {
-  const d = await api('/admin/roles');
-  const modulos = [...new Set(d.permisos.map((p) => p.modulo))];
-  return `
-    <div class="fila entre" style="margin-bottom:12px">
-      <p class="tenue pequeno">Marca qué puede hacer cada rol. El Administrador siempre tiene todos los permisos.</p>
-      <button class="boton violeta" data-rol-nuevo>${icono('mas', 16)} Nuevo rol</button>
-    </div>
-    <div class="tabla-envoltura"><table class="tabla matriz-permisos">
-      <thead><tr><th class="matriz-permisos__permiso">Permiso</th>${d.roles
-        .map((r) => `<th class="matriz-permisos__rol"><b>${esc(r.nombre)}</b>
-          <small class="matriz-permisos__detalle">${r.usuarios} usuario(s)</small>
-          ${r.sistema ? '' : `<button class="enlace peligro matriz-permisos__borrar" data-rol-borrar="${r.id}" title="Eliminar rol">${icono('basura', 14)}</button>`}</th>`)
-        .join('')}</tr></thead>
-      <tbody>${modulos
-        .map((m) => `<tr class="matriz-permisos__modulo"><td colspan="${d.roles.length + 1}">${esc(m)}</td></tr>${d.permisos
-          .filter((p) => p.modulo === m)
-          .map((p) => `<tr><td class="matriz-permisos__permiso">${esc(p.nombre)}<small class="matriz-permisos__detalle">${esc(p.codigo)}</small></td>${d.roles
-            .map((r) => `<td class="matriz-permisos__celda"><input type="checkbox" class="matriz-permisos__casilla" data-permiso-rol="${r.id}" value="${esc(p.codigo)}"
-              ${r.permisos.includes(p.codigo) ? 'checked' : ''} ${r.bloqueado ? 'disabled' : ''} aria-label="${esc(p.nombre)} para ${esc(r.nombre)}"></td>`)
-            .join('')}</tr>`)
-          .join('')}`)
-        .join('')}</tbody>
-    </table></div>
-
-    <div class="caja permisos-usuario">
-      <h3>Permisos por usuario</h3>
-      <p class="tenue pequeno">Busca a una persona y marca qué puede hacer. Se parte de los permisos de su rol; lo que marques o desmarques solo cambia para ella.</p>
-      <input class="permisos-usuario__buscar" type="search" id="buscar-usuario" placeholder="Nombre o correo…" autocomplete="off">
-      <div class="permisos-usuario__resultados" id="resultados-usuario"></div>
-      <div id="permisos-de-usuario"></div>
-    </div>`;
+  return htmlRolesPermisos({ yo: usuarioActual, alCambiar: () => mostrar('roles', true) });
 }
-
-// ---- Permisos de una persona ----
-async function buscarUsuariosPermisos(texto) {
-  const lista = await api(`/admin/permisos-usuarios?buscar=${encodeURIComponent(texto)}`);
-  $('#resultados-usuario').innerHTML = lista.length
-    ? lista.map((u) => `<button class="permisos-usuario__persona" data-ver-permisos="${u.id}"><b>${esc(u.nombre)}</b> <span class="tenue pequeno">${esc(u.correo)} · ${esc(u.rol)}</span></button>`).join('')
-    : '<p class="tenue pequeno">Sin resultados.</p>';
-}
-
-async function verPermisosDe(id) {
-  const d = await api(`/admin/permisos-usuarios/${id}`);
-  const u = d.usuario;
-  const bloqueado = u.esAdmin;
-  const etiqueta = (p) =>
-    p.ajuste === 'agregado' ? '<span class="permisos-usuario__marca permisos-usuario__marca--agregado">Agregado</span>'
-      : p.ajuste === 'quitado' ? '<span class="permisos-usuario__marca permisos-usuario__marca--quitado">Quitado</span>'
-        : p.delRol ? '<span class="permisos-usuario__marca">Por su rol</span>' : '';
-  $('#permisos-de-usuario').innerHTML = `
-    <form class="permisos-usuario__ficha" id="form-permisos-usuario" data-usuario="${u.id}">
-      <div class="fila entre"><div><b>${esc(u.nombre)}</b> <span class="tenue pequeno">${esc(u.correo)}</span><div class="pequeno">Rol: <b>${esc(u.rol)}</b></div></div>
-        ${bloqueado ? '' : '<button class="boton violeta pequeno">Guardar permisos</button>'}</div>
-      ${bloqueado ? '<div class="aviso alerta pequeno">Un Administrador siempre tiene todos los permisos.</div>' : ''}
-      <div class="aviso error oculto" id="err-permisos-usuario"></div>
-      <div class="permisos-usuario__lista">${d.permisos
-        .map((p) => `<label class="permisos-usuario__permiso"><input type="checkbox" name="permisos" value="${esc(p.codigo)}" ${p.efectivo ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}>
-          <span>${esc(p.nombre)}<small class="permisos-usuario__modulo">${esc(p.modulo)} · ${esc(p.codigo)}</small></span>${etiqueta(p)}</label>`)
-        .join('')}</div>
-    </form>`;
-  $('#form-permisos-usuario')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const f = e.target;
-    try {
-      const r = await actualizar(`/admin/permisos-usuarios/${f.dataset.usuario}`, { permisos: [...f.querySelectorAll('[name=permisos]:checked')].map((c) => c.value) }, 'PUT');
-      aviso(`Permisos guardados (${r.agregados} agregado(s), ${r.quitados} quitado(s) respecto a su rol)`);
-      verPermisosDe(f.dataset.usuario);
-    } catch (er) {
-      const el = $('#err-permisos-usuario');
-      el.textContent = er.message;
-      el.classList.remove('oculto');
-    }
-  });
-}
+roles.alMontar = montarRolesPermisos;
 
 // Bandeja del técnico: armados enviados o en revisión
 async function revisiones() {
@@ -469,7 +400,7 @@ async function formularioRol() {
     e.preventDefault();
     const f = e.target;
     try {
-      await enviar('/admin/roles', {
+      const nuevo = await enviar('/admin/roles', {
         codigo: f.codigo.value.trim(),
         nombre: f.nombre.value.trim(),
         descripcion: f.descripcion.value.trim(),
@@ -477,7 +408,8 @@ async function formularioRol() {
       });
       m.cerrar();
       aviso('Rol creado');
-      mostrar('roles');
+      elegirRol(nuevo.id);
+      mostrar('roles', true);
     } catch (er) {
       const el = m.cuerpo.querySelector('#err-rol');
       el.textContent = er.message;
@@ -500,21 +432,28 @@ async function reportes() {
     : '<div class="vacio">No hay reportes.</div>';
 }
 
+// Nombre legible de cada tipo de comparación del motor de compatibilidad
+const TIPOS_REGLA = { igual: 'Igual', contiene: 'Contiene', menor_igual: 'Menor o igual', suma_consumo: 'Suma de consumo' };
+
 async function reglas() {
   const lista = await api('/admin/reglas');
+  const lado = (categoria, atributo) => (categoria ? `<code>${esc(categoria)}${atributo ? `.${esc(atributo)}` : ''}</code>` : '<code>Consumo total</code>');
   return `<p class="tenue" style="margin-bottom:14px">Reglas que usa el motor de compatibilidad del configurador.</p>
-    <div class="tabla-envoltura"><table class="tabla"><thead><tr><th>Regla</th><th>Compara</th><th>Tipo</th><th>Activa</th></tr></thead>
+    <div class="tabla-envoltura"><table class="tabla tabla-reglas"><thead><tr><th>Regla</th><th>Compara</th><th class="tabla-reglas__corta">Tipo</th><th class="tabla-reglas__corta">Activa</th></tr></thead>
     <tbody>${lista
       .map(
         (r) => `<tr><td><b>${esc(r.nombre)}</b><div class="pequeno tenue">${esc(r.mensajeError)}</div></td>
-          <td class="pequeno">${esc(r.categoriaOrigen)}.${esc(r.atributoOrigen)} → ${esc(r.categoriaDestino ?? '')}${r.atributoDestino ? `.${esc(r.atributoDestino)}` : ''}</td>
-          <td><span class="insignia gris">${esc(r.tipo)}</span></td><td>${r.activa ? '<span class="insignia verde">Sí</span>' : '<span class="insignia gris">No</span>'}</td></tr>`,
+          <td><div class="tabla-reglas__compara">${lado(r.categoriaOrigen, r.atributoOrigen)} ${icono('flecha', 14)} ${lado(r.categoriaDestino, r.atributoDestino)}</div></td>
+          <td class="tabla-reglas__corta"><span class="insignia gris">${esc(TIPOS_REGLA[r.tipo] ?? r.tipo)}</span></td>
+          <td class="tabla-reglas__corta">${r.activa ? '<span class="insignia verde">Sí</span>' : '<span class="insignia gris">No</span>'}</td></tr>`,
       )
       .join('')}</tbody></table></div>`;
 }
 
 let actual = 'tablero';
-async function mostrar(clave) {
+async function mostrar(clave, forzar = false) {
+  // Si quedan permisos marcados sin guardar, se pregunta antes de salir de la sección
+  if (!forzar && hayCambiosPendientes() && !(await confirmarSalidaPermisos())) return;
   // Si la sección no existe o el rol no tiene permiso, se abre la primera permitida
   actual = SECCIONES[clave] && puede(clave) ? clave : Object.keys(SECCIONES).find(puede);
   document.querySelectorAll('#menu [data-ir]').forEach((b) => b.classList.toggle('activa', b.dataset.ir === actual));
@@ -522,6 +461,7 @@ async function mostrar(clave) {
   const [titulo, , fn] = SECCIONES[actual];
   try {
     contenido().innerHTML = `<h2 style="margin-bottom:18px">${titulo}</h2>${await fn()}`;
+    fn.alMontar?.();
   } catch (e) {
     errorEn(contenido(), e);
   }
@@ -552,19 +492,6 @@ document.addEventListener('click', async (e) => {
       aviso(er.message, 'error');
     }
     return;
-  }
-  const vp = t.closest('[data-ver-permisos]');
-  if (vp) return verPermisosDe(vp.dataset.verPermisos).catch((er) => aviso(er.message, 'error'));
-  const br = t.closest('[data-rol-borrar]');
-  if (br) {
-    if (!(await confirmar({ titulo: '¿Eliminar este rol?', mensaje: 'Solo se puede eliminar si ningún usuario lo tiene.' }))) return;
-    try {
-      await borrar(`/admin/roles/${br.dataset.rolBorrar}`);
-      aviso('Rol eliminado');
-    } catch (er) {
-      aviso(er.message, 'error');
-    }
-    return mostrar('roles');
   }
   const ed = t.closest('[data-cpu-editar]');
   if (ed) {
@@ -600,16 +527,6 @@ document.addEventListener('change', async (e) => {
     } else if (t.id === 'filtro-categoria') {
       filtroCategoria = t.value;
       return mostrar('componentes');
-    } else if (t.dataset.permisoRol) {
-      // Al marcar o desmarcar una casilla se envía la lista completa de permisos de ese rol
-      const marcadas = [...document.querySelectorAll(`[data-permiso-rol="${t.dataset.permisoRol}"]:checked`)].map((c) => c.value);
-      try {
-        await actualizar(`/admin/roles/${t.dataset.permisoRol}/permisos`, { permisos: marcadas }, 'PUT');
-        aviso('Permisos actualizados');
-      } catch (er) {
-        t.checked = !t.checked;
-        throw er;
-      }
     } else if (t.dataset.activo) {
       await actualizar(`/admin/usuarios/${t.dataset.activo}`, { activo: t.checked });
       aviso(t.checked ? 'Cuenta activada' : 'Cuenta desactivada');
@@ -619,10 +536,9 @@ document.addEventListener('change', async (e) => {
   }
 });
 
-document.addEventListener('input', (e) => {
-  if (e.target.id !== 'buscar-usuario') return;
-  clearTimeout(e.target._espera);
-  e.target._espera = setTimeout(() => buscarUsuariosPermisos(e.target.value.trim()).catch((er) => aviso(er.message, 'error')), 250);
+// Si se cierra o recarga la página con permisos sin guardar, el navegador pregunta antes
+window.addEventListener('beforeunload', (e) => {
+  if (hayCambiosPendientes()) e.preventDefault();
 });
 
 montar('').then((u) => {
@@ -632,6 +548,7 @@ montar('').then((u) => {
     return;
   }
   permisos = u.permisos ?? [];
+  usuarioActual = u;
   $('#menu').innerHTML = Object.entries(SECCIONES)
     .filter(([k]) => puede(k))
     .map(([k, [t, i]]) => `<button data-ir="${k}">${icono(i, 17)} ${t}</button>`)
