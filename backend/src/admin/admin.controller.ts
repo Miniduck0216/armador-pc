@@ -258,6 +258,28 @@ export class AdminController {
     return { ok: true };
   }
 
+  // Permisos de una persona en particular (además de los de su rol)
+  @Get('permisos-usuarios')
+  @Permisos('roles.gestionar')
+  @ApiOperation({ summary: 'Busca usuarios por nombre o correo para ajustar sus permisos' })
+  async buscarUsuarios(@Query('buscar') buscar = '') {
+    return (await this.roles.buscarUsuarios(buscar)).map((u) => ({ id: u.id, nombre: u.nombre, correo: u.correo, rol: u.rol?.nombre ?? 'Sin rol' }));
+  }
+
+  @Get('permisos-usuarios/:id')
+  @Permisos('roles.gestionar')
+  permisosDeUsuario(@Param('id', ParseIntPipe) id: number) {
+    return this.roles.permisosDeUsuario(id);
+  }
+
+  @Put('permisos-usuarios/:id')
+  @Permisos('roles.gestionar')
+  async guardarPermisosDeUsuario(@Param('id', ParseIntPipe) id: number, @Body() cuerpo: any, @UsuarioActual() actual: Usuario) {
+    const { dto, errores } = await validarFormulario(RolPermisosDto, cuerpo);
+    if (errores.length) throw new BadRequestException(errores);
+    return this.roles.guardarPermisosDeUsuario(id, dto.permisos, actual);
+  }
+
   @Delete('roles/:id')
   @Permisos('roles.gestionar')
   @HttpCode(204)

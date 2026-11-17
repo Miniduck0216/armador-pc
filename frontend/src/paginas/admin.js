@@ -25,6 +25,7 @@ const SECCIONES = {
   procesadores: ['Procesadores', 'chip', procesadores, 'componentes.gestionar'],
   usuarios: ['Usuarios', 'usuario', usuarios, 'usuarios.gestionar'],
   roles: ['Roles y permisos', 'escudo', roles, 'roles.gestionar'],
+  revisiones: ['Revisión de armados', 'check', revisiones, 'armados.revisar'],
   reportes: ['Reportes', 'bandera', reportes, 'reportes.gestionar'],
   reglas: ['Reglas de compatibilidad', 'escudo', reglas, 'reglas.ver'],
 };
@@ -265,7 +266,72 @@ async function roles() {
             .join('')}</tr>`)
           .join('')}`)
         .join('')}</tbody>
-    </table></div>`;
+    </table></div>
+
+    <div class="caja permisos-usuario">
+      <h3>Permisos por usuario</h3>
+      <p class="tenue pequeno">Busca a una persona y marca qué puede hacer. Se parte de los permisos de su rol; lo que marques o desmarques solo cambia para ella.</p>
+      <input class="permisos-usuario__buscar" type="search" id="buscar-usuario" placeholder="Nombre o correo…" autocomplete="off">
+      <div class="permisos-usuario__resultados" id="resultados-usuario"></div>
+      <div id="permisos-de-usuario"></div>
+    </div>`;
+}
+
+// ---- Permisos de una persona ----
+async function buscarUsuariosPermisos(texto) {
+  const lista = await api(`/admin/permisos-usuarios?buscar=${encodeURIComponent(texto)}`);
+  $('#resultados-usuario').innerHTML = lista.length
+    ? lista.map((u) => `<button class="permisos-usuario__persona" data-ver-permisos="${u.id}"><b>${esc(u.nombre)}</b> <span class="tenue pequeno">${esc(u.correo)} · ${esc(u.rol)}</span></button>`).join('')
+    : '<p class="tenue pequeno">Sin resultados.</p>';
+}
+
+async function verPermisosDe(id) {
+  const d = await api(`/admin/permisos-usuarios/${id}`);
+  const u = d.usuario;
+  const bloqueado = u.esAdmin;
+  const etiqueta = (p) =>
+    p.ajuste === 'agregado' ? '<span class="permisos-usuario__marca permisos-usuario__marca--agregado">Agregado</span>'
+      : p.ajuste === 'quitado' ? '<span class="permisos-usuario__marca permisos-usuario__marca--quitado">Quitado</span>'
+        : p.delRol ? '<span class="permisos-usuario__marca">Por su rol</span>' : '';
+  $('#permisos-de-usuario').innerHTML = `
+    <form class="permisos-usuario__ficha" id="form-permisos-usuario" data-usuario="${u.id}">
+      <div class="fila entre"><div><b>${esc(u.nombre)}</b> <span class="tenue pequeno">${esc(u.correo)}</span><div class="pequeno">Rol: <b>${esc(u.rol)}</b></div></div>
+        ${bloqueado ? '' : '<button class="boton violeta pequeno">Guardar permisos</button>'}</div>
+      ${bloqueado ? '<div class="aviso alerta pequeno">Un Administrador siempre tiene todos los permisos.</div>' : ''}
+      <div class="aviso error oculto" id="err-permisos-usuario"></div>
+      <div class="permisos-usuario__lista">${d.permisos
+        .map((p) => `<label class="permisos-usuario__permiso"><input type="checkbox" name="permisos" value="${esc(p.codigo)}" ${p.efectivo ? 'checked' : ''} ${bloqueado ? 'disabled' : ''}>
+          <span>${esc(p.nombre)}<small class="permisos-usuario__modulo">${esc(p.modulo)} · ${esc(p.codigo)}</small></span>${etiqueta(p)}</label>`)
+        .join('')}</div>
+    </form>`;
+  $('#form-permisos-usuario')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    try {
+      const r = await actualizar(`/admin/permisos-usuarios/${f.dataset.usuario}`, { permisos: [...f.querySelectorAll('[name=permisos]:checked')].map((c) => c.value) }, 'PUT');
+      aviso(`Permisos guardados (${r.agregados} agregado(s), ${r.quitados} quitado(s) respecto a su rol)`);
+      verPermisosDe(f.dataset.usuario);
+    } catch (er) {
+      const el = $('#err-permisos-usuario');
+      el.textContent = er.message;
+      el.classList.remove('oculto');
+    }
+  });
+}
+
+// Bandeja del técnico: armados enviados o en revisión
+async function revisiones() {
+  const lista = await api('/revisiones');
+  if (!lista.length) return '<div class="vacio">No hay armados esperando revisión.</div>';
+  return `<div class="tabla-envoltura"><table class="tabla">
+    <thead><tr><th>Armado</th><th>Usuario</th><th class="der">Total</th><th>Estado</th><th>Revisor</th><th></th></tr></thead>
+    <tbody>${lista
+      .map((a) => `<tr><td><b>${esc(a.nombre)}</b><div class="pequeno tenue">${a.piezas} pieza(s) · ${hace(a.fechaEstado)}</div></td>
+        <td>${esc(a.dueno ?? '')}</td><td class="der">${dinero(a.precioTotal)}</td>
+        <td><span class="estado-armado estado-armado--${a.estado}">${esc(a.nombreEstado)}</span></td>
+        <td class="pequeno">${a.revisor ? esc(a.revisor) + (a.esMio ? ' (tú)' : '') : '—'}</td>
+        <td class="der"><a class="boton pequeno" href="/armado.html?id=${a.id}">${a.estado === 'enviado' ? 'Revisar' : 'Abrir'}</a></td></tr>`)
+      .join('')}</tbody></table></div>`;
 }
 
 // Crear un rol: el código y el nombre se validan otra vez en el servidor
@@ -356,6 +422,8 @@ document.addEventListener('click', async (e) => {
   if (t.closest('[data-oferta-nueva]')) return formularioOferta();
   if (t.closest('[data-usuario-nuevo]')) return formularioUsuario();
   if (t.closest('[data-rol-nuevo]')) return formularioRol();
+  const vp = t.closest('[data-ver-permisos]');
+  if (vp) return verPermisosDe(vp.dataset.verPermisos).catch((er) => aviso(er.message, 'error'));
   const br = t.closest('[data-rol-borrar]');
   if (br) {
     if (!confirm('¿Eliminar este rol?')) return;
@@ -415,6 +483,12 @@ document.addEventListener('change', async (e) => {
   } catch (er) {
     aviso(er.message, 'error');
   }
+});
+
+document.addEventListener('input', (e) => {
+  if (e.target.id !== 'buscar-usuario') return;
+  clearTimeout(e.target._espera);
+  e.target._espera = setTimeout(() => buscarUsuariosPermisos(e.target.value.trim()).catch((er) => aviso(er.message, 'error')), 250);
 });
 
 montar('').then((u) => {

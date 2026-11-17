@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notificacion } from './notificacion.entity';
 import { Usuario } from '../usuarios/usuario.entity';
+import { tienePermiso } from '../usuarios/permisos';
 
 @Injectable()
 export class NotificacionesService {
@@ -17,12 +18,8 @@ export class NotificacionesService {
 
   // Avisa a todas las cuentas activas cuyo rol tiene un permiso (por ejemplo, a los técnicos)
   async avisarAPermiso(codigoPermiso: string, mensaje: string, enlace = '', excepto?: number) {
-    const destino = await this.usuarios
-      .createQueryBuilder('u')
-      .innerJoin('u.rol', 'r')
-      .innerJoin('r.permisos', 'p', 'p.codigo = :codigo', { codigo: codigoPermiso })
-      .where('u.activo = 1')
-      .getMany();
+    // Se usan los permisos efectivos: los del rol más los ajustes propios de cada persona
+    const destino = (await this.usuarios.find({ where: { activo: true } })).filter((u) => tienePermiso(u, codigoPermiso));
     for (const u of destino) if (u.id !== excepto) await this.avisar(u.id, mensaje, enlace);
   }
 

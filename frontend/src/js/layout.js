@@ -115,7 +115,7 @@ function pintarSesion(u) {
   const inicial = esc(u.nombre?.[0]?.toUpperCase() ?? '?');
   el.innerHTML = `
     ${u.esAdmin ? `<a class="campana" href="/admin.html" title="Administración">${icono('admin', 19)}</a>` : ''}
-    <a class="campana" href="/cuenta.html#alertas" title="Alertas de precio">${icono('campana', 19)}${u.alertasNuevas ? `<span class="globo">${u.alertasNuevas}</span>` : ''}</a>
+    <a class="campana" href="/cuenta.html#notificaciones" title="Notificaciones y alertas">${icono('campana', 19)}${u.alertasNuevas ? `<span class="globo">${u.alertasNuevas}</span>` : ''}</a>
     <div class="menu-usuario">
       <button type="button" class="chip-usuario"><span class="avatar">${inicial}</span><span class="nombre">${esc(u.nombre.split(' ')[0])}</span></button>
       <div class="submenu derecha">

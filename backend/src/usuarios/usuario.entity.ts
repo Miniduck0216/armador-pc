@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Componente } from '../componentes/componente.entity';
 import { Rol } from './rol.entity';
+import { PermisoUsuario } from './permiso-usuario.entity';
 
 @Entity('usuarios')
 export class Usuario {
@@ -21,6 +22,10 @@ export class Usuario {
   @ManyToOne(() => Rol, { eager: true, nullable: true })
   @JoinColumn({ name: 'rolId' })
   rol: Rol | null;
+
+  // Permisos agregados o quitados solo a esta persona (además de su rol)
+  @OneToMany(() => PermisoUsuario, (a) => a.usuario, { eager: true })
+  ajustesPermisos: PermisoUsuario[];
 
   // Columna antigua donde el rol se guardaba como texto. Solo se lee una vez al
   // arrancar para pasar esos usuarios a la tabla roles (ver RolesService.asegurar).

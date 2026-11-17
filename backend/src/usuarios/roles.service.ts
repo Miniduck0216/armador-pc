@@ -1,10 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { Rol } from './rol.entity';
 import { Permiso } from './permiso.entity';
 import { Usuario } from './usuario.entity';
-import { PERMISOS, ROLES_INICIALES } from './permisos';
+import { PermisoUsuario } from './permiso-usuario.entity';
+import { PERMISOS, ROLES_INICIALES, permisosDe } from './permisos';
 
 @Injectable()
 export class RolesService {
@@ -14,6 +15,7 @@ export class RolesService {
     @InjectRepository(Rol) private readonly roles: Repository<Rol>,
     @InjectRepository(Permiso) private readonly permisos: Repository<Permiso>,
     @InjectRepository(Usuario) private readonly usuarios: Repository<Usuario>,
+    @InjectRepository(PermisoUsuario) private readonly ajustes: Repository<PermisoUsuario>,
   ) {}
 
   // Se ejecuta al arrancar: crea los permisos y roles que falten y pasa a la tabla
@@ -89,6 +91,53 @@ export class RolesService {
     if (datos.nombre) rol.nombre = datos.nombre;
     if (datos.descripcion !== undefined) rol.descripcion = datos.descripcion;
     return this.roles.save(rol);
+  }
+
+  // ---------- Permisos por usuario ----------
+
+  // Buscador del panel: por nombre o correo (máximo 20 resultados)
+  buscarUsuarios(texto: string) {
+    const t = `%${texto.trim().slice(0, 60)}%`;
+    return this.usuarios.find({ where: [{ nombre: Like(t) }, { correo: Like(t) }], order: { nombre: 'ASC' }, take: 20 });
+  }
+
+  // Catálogo completo marcando, para esa persona, qué viene del rol y qué se ajustó
+  async permisosDeUsuario(usuarioId: number) {
+    const u = await this.usuarios.findOneBy({ id: usuarioId });
+    if (!u) throw new NotFoundException('Ese usuario no existe');
+    const delRol = new Set(u.rol?.permisos.map((p) => p.codigo) ?? []);
+    const efectivos = new Set(permisosDe(u));
+    const catalogo = await this.catalogo();
+    return {
+      usuario: { id: u.id, nombre: u.nombre, correo: u.correo, rol: u.rol?.nombre ?? 'Sin rol', esAdmin: u.rol?.codigo === 'admin' },
+      permisos: catalogo.map((p) => ({
+        codigo: p.codigo,
+        nombre: p.nombre,
+        modulo: p.modulo,
+        delRol: delRol.has(p.codigo),
+        efectivo: efectivos.has(p.codigo),
+        ajuste: delRol.has(p.codigo) === efectivos.has(p.codigo) ? null : efectivos.has(p.codigo) ? 'agregado' : 'quitado',
+      })),
+    };
+  }
+
+  // Recibe la lista de permisos que la persona debe tener y guarda solo las diferencias con su rol
+  async guardarPermisosDeUsuario(usuarioId: number, deseados: string[], quienEdita: Usuario) {
+    if (usuarioId === quienEdita.id) throw new BadRequestException('No puedes cambiar tus propios permisos');
+    const u = await this.usuarios.findOneBy({ id: usuarioId });
+    if (!u) throw new NotFoundException('Ese usuario no existe');
+    if (u.rol?.codigo === 'admin') throw new BadRequestException('Un Administrador siempre tiene todos los permisos');
+    const validos = await this.permisosValidos(deseados);
+    const quiere = new Set(validos.map((p) => p.codigo));
+    const delRol = new Set(u.rol?.permisos.map((p) => p.codigo) ?? []);
+
+    await this.ajustes.delete({ usuario: { id: u.id } });
+    const catalogo = await this.catalogo();
+    const nuevos = catalogo
+      .filter((p) => quiere.has(p.codigo) !== delRol.has(p.codigo))
+      .map((p) => this.ajustes.create({ usuario: u, permiso: p, concedido: quiere.has(p.codigo) }));
+    if (nuevos.length) await this.ajustes.save(nuevos);
+    return { agregados: nuevos.filter((n) => n.concedido).length, quitados: nuevos.filter((n) => !n.concedido).length };
   }
 
   async eliminar(id: number) {

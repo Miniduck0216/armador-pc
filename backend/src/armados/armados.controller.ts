@@ -59,6 +59,7 @@ export class ArmadosController {
         tomar: !esDueno && tienePermiso(usuario, 'armados.revisar') && armado.estado === 'enviado',
         decidir: !esDueno && armado.estado === 'en_revision' && armado.revisor?.id === usuario.id,
         eliminar: esDueno && !['enviado', 'en_revision'].includes(armado.estado),
+        compartir: esDueno,
       },
       historial: historial.map((h) => ({
         fecha: h.fecha,

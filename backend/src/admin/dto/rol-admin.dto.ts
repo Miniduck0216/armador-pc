@@ -28,3 +28,4 @@ export class RolPermisosDto {
   @IsString({ each: true })
   permisos: string[];
 }
+

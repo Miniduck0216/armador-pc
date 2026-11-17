@@ -24,6 +24,16 @@ export const ROLES_INICIALES: [string, string, string, string[]][] = [
 // Rol que reciben las cuentas nuevas creadas desde el registro
 export const ROL_POR_DEFECTO = 'usuario';
 
-export const permisosDe = (u?: Usuario | null): string[] => u?.rol?.permisos?.map((p) => p.codigo) ?? [];
+// Permisos efectivos = los del rol + los agregados a la persona − los quitados a la persona.
+// El Administrador siempre conserva todos los de su rol.
+export const permisosDe = (u?: Usuario | null): string[] => {
+  const delRol = new Set(u?.rol?.permisos?.map((p) => p.codigo) ?? []);
+  if (u?.rol?.codigo === 'admin') return [...delRol];
+  for (const a of u?.ajustesPermisos ?? []) {
+    if (a.concedido) delRol.add(a.permiso.codigo);
+    else delRol.delete(a.permiso.codigo);
+  }
+  return [...delRol];
+};
 
 export const tienePermiso = (u: Usuario | null | undefined, codigo: string) => permisosDe(u).includes(codigo);

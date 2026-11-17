@@ -1,9 +1,24 @@
 import { montar, usuario } from '../js/layout.js';
-import { api, consulta, enviar, irAIngresar } from '../js/api.js';
+import { actualizar as actualizarApi, api, consulta, enviar, irAIngresar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
 import { $, aviso, copiar, dinero, esc, imagen, modal, param, retrasar } from '../js/util.js';
 import { guardarPc, idsPc, leerPc, ponerEnPc, quitarDePc } from '../js/estado.js';
 import tiendaProductos from '../datos/nomada.json';
+import { armadoEnEdicion, terminarEdicion } from '../js/edicion.js';
+
+// Aviso visible cuando se están editando las piezas de un armado guardado
+const edicion = armadoEnEdicion();
+if (edicion) {
+  document.querySelector('.configurador').insertAdjacentHTML(
+    'beforebegin',
+    `<div class="aviso alerta edicion-armado">Editando las piezas de <b>${esc(edicion.nombre)}</b>: al pulsar «Guardar» se actualiza ese armado.
+      <button class="enlace" id="cancelar-edicion" type="button">Cancelar edición</button></div>`,
+  );
+  document.querySelector('#cancelar-edicion').addEventListener('click', () => {
+    terminarEdicion();
+    location.href = `/armado.html?id=${edicion.id}`;
+  });
+}
 
 montar('armar');
 
@@ -108,7 +123,7 @@ function pintarResumen() {
       <label class="campo"><span>Uso principal</span>
         <select id="uso"><option value="juegos" ${uso === 'juegos' ? 'selected' : ''}>Juegos</option><option value="trabajo" ${uso === 'trabajo' ? 'selected' : ''}>Trabajo y creación</option></select></label>
       <div class="fila">
-        <button class="boton violeta" id="guardar" style="flex:1">${icono('guardar', 16)} Guardar</button>
+        <button class="boton violeta" id="guardar" style="flex:1">${icono('guardar', 16)} ${armadoEnEdicion() ? 'Guardar cambios' : 'Guardar'}</button>
         <button class="boton secundario" id="compartir" title="Copiar enlace">${icono('compartir', 16)}</button>
       </div>
       <a class="boton secundario ancho" href="/pedido.html" style="margin-top:10px">${icono('lista', 16)} Lista de compra</a>
@@ -265,8 +280,21 @@ async function elegir(codigo) {
 }
 
 // ---------- Guardar en la cuenta ----------
-function guardar() {
+async function guardar() {
   if (!usuario()) return irAIngresar();
+  // Si se está editando un armado (Borrador o Por corregir), se actualizan sus piezas
+  const editando = armadoEnEdicion();
+  if (editando) {
+    try {
+      await actualizarApi(`/armados/${editando.id}/piezas`, { piezas: idsPc() }, 'PUT');
+      terminarEdicion();
+      aviso('Cambios guardados en el armado');
+      setTimeout(() => (location.href = `/armado.html?id=${editando.id}`), 700);
+    } catch (er) {
+      aviso(er.message, 'error');
+    }
+    return;
+  }
   const m = modal({
     titulo: 'Guardar armado',
     ancho: 480,

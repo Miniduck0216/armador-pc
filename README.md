@@ -57,7 +57,8 @@ Ruta: `/admin.html`. Cada rol ve solo las secciones que tiene permitidas, y el s
 | Tiendas y precios | Activar o desactivar tiendas, actualizar precios y **cargar un precio manual** |
 | Procesadores | Crear, editar y eliminar procesadores (los puntajes se recalculan) |
 | Usuarios | Cambiar rol o estado de una cuenta y **crear usuarios** |
-| Roles y permisos | Matriz de casillas rol × permiso y creación de roles nuevos |
+| Roles y permisos | Matriz de casillas rol × permiso, creación de roles y **permisos por usuario** |
+| Revisión de armados | Bandeja del técnico con los armados enviados o en revisión |
 | Reportes | Resolver reportes de datos incorrectos enviados por usuarios |
 | Reglas | Ver las reglas de compatibilidad que usa el configurador |
 
@@ -74,6 +75,27 @@ Los roles y permisos son tablas: `roles`, `permisos` y la tabla intermedia `role
 - **Backend:** cada ruta declara el permiso que necesita con `@Permisos('precios.gestionar')`. `PermisosGuard` compara contra los permisos del rol, leídos de la base en cada petición, así que un cambio se aplica al instante. Si falta el permiso, responde `403`.
 - **Frontend:** `/api/auth/yo` devuelve los permisos del usuario. El panel muestra solo las secciones permitidas y, si se abre una sección prohibida por la dirección, salta a la primera permitida.
 - **Gestión:** desde *Roles y permisos* se marcan casillas o se crean roles nuevos (por ejemplo, Vendedor solo con precios). Los roles del sistema no se pueden eliminar, ni tampoco un rol que tenga usuarios.
+- **Permisos por usuario:** en la misma sección se busca a una persona por nombre o correo y se marca qué puede hacer. Se parte de los permisos de su rol, y solo se guardan las diferencias en la tabla `usuarios_permisos` (permiso agregado o quitado). Permisos efectivos = rol + agregados − quitados. A un Administrador no se le cambian permisos, y nadie puede cambiar los suyos.
+
+## Flujo de revisión del armado (core)
+
+Inspirado en el flujo de solicitudes del ejemplo ARF: el usuario arma su PC, la envía y un técnico la revisa.
+
+| Estado | Quién actúa | Acciones posibles |
+|--------|-------------|-------------------|
+| Borrador | Dueño | Editar piezas, **enviar a revisión** |
+| Enviado a revisión | Técnico | **Tomar revisión** |
+| En revisión | Técnico que la tomó | **Aprobar**, **devolver para corregir** o **rechazar** |
+| Por corregir | Dueño | Editar piezas y **reenviar** |
+| Aprobado / Rechazado | — | Estado final (el aprobado lleva a la lista de compra) |
+
+Reglas que valida el servidor (`backend/src/armados/flujo-armado.ts` y `armados.service.ts`):
+
+- Cada acción solo se permite desde ciertos estados y por cierto actor: el dueño envía, y un técnico con el permiso `armados.revisar` toma y decide. Nadie revisa su propio armado.
+- Solo se envían armados **compatibles**, revisados con los precios y reglas de ese momento.
+- Devolver o rechazar exige un **motivo** de al menos 5 caracteres.
+- Las piezas solo se editan en *Borrador* o *Por corregir*, y un armado no se elimina mientras está en revisión.
+- Cada cambio se guarda en `historial_armados` (quién, cuándo, de qué estado a cuál y comentario). Además se crea una notificación en la campana: a los técnicos cuando llega un armado, y al dueño en cada decisión.
 
 ### Validación en el backend de datos sensibles
 
@@ -133,6 +155,11 @@ Las reglas están en la tabla `reglas_compatibilidad`.
 | `POST /api/admin/roles` | Crea un rol (código y permisos validados en el servidor) |
 | `PUT /api/admin/roles/:id/permisos` | Cambia los permisos de un rol |
 | `DELETE /api/admin/roles/:id` | Elimina un rol sin usuarios |
+| `GET /api/admin/permisos-usuarios?buscar=` | Busca usuarios para ajustar sus permisos |
+| `PUT /api/admin/permisos-usuarios/:id` | Guarda los permisos de una persona |
+| `POST /api/armados/:id/flujo` | Acción del flujo: `enviar`, `tomar`, `aprobar`, `devolver` o `rechazar` |
+| `PUT /api/armados/:id/piezas` | Cambia las piezas (solo en Borrador o Por corregir) |
+| `GET /api/revisiones` | Bandeja del técnico |
 
 ## Ejecutar en local
 
@@ -173,6 +200,12 @@ Abrir http://localhost:5173
 | Permisos de un rol | Permiso `hackear.todo` | `400` Hay permisos que no existen |
 | Permisos del Administrador | Lista vacía | `400` Los permisos del Administrador no se pueden cambiar |
 | Eliminar rol | Técnico (rol del sistema) | `400` Los roles del sistema no se pueden eliminar |
+| Permisos por usuario | Quitar *reportes* y dar *usuarios* al Técnico | El Técnico ya no entra a Reportes (`403`) y sí a Usuarios |
+| Flujo | El técnico intenta tomar un borrador | `400` No se puede tomar un armado en estado "Borrador" |
+| Flujo | El dueño intenta aprobar su armado | `403` |
+| Flujo | Devolver sin motivo | `400` Escribe el motivo (mínimo 5 caracteres) |
+| Flujo | Editar piezas mientras está enviado | `400` no se puede editar |
+| Flujo | Enviar → tomar → devolver → editar → reenviar → aprobar | Aprobado, 6 pasos en el historial y avisos en la campana |
 
 ## Despliegue en Render
 

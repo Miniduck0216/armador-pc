@@ -8,6 +8,7 @@ montar('');
 
 let datos = null;
 const SECCIONES = [
+  ['notificaciones', 'Notificaciones', 'campana'],
   ['armados', 'Mis armados', 'pc'],
   ['alertas', 'Alertas de precio', 'campana'],
   ['favoritos', 'Favoritos', 'corazon'],
@@ -25,11 +26,20 @@ const vista = {
               (a) => `<tr><td><a href="/armado.html?id=${a.id}"><b>${esc(a.nombre)}</b></a><div class="pequeno tenue">${fecha(a.fechaCreacion)}</div></td>
                 <td>${a.piezas}</td><td class="der">${dinero(a.precioTotal)}</td>
                 <td class="der"><b>${dinero(a.precioHoy)}</b>${a.diferencia ? `<div class="variacion ${a.diferencia < 0 ? 'baja' : 'sube'}">${a.diferencia < 0 ? '▼' : '▲'} ${dinero(Math.abs(a.diferencia))}</div>` : ''}</td>
-                <td>${a.esCompatible ? '<span class="insignia verde">Compatible</span>' : '<span class="insignia roja">Revisar</span>'}</td>
+                <td><span class="estado-armado estado-armado--${a.estado}">${esc(a.nombreEstado)}</span></td>
                 <td class="der"><button class="enlace peligro" data-borrar="armados/${a.id}">Eliminar</button></td></tr>`,
             )
             .join('')}</tbody></table></div>`
       : `<div class="vacio">Todavía no guardas armados. <a href="/configurador.html">Abre el configurador</a> y pulsa «Guardar».</div>`,
+
+  notificaciones: (d) =>
+    d.notificaciones.length
+      ? `<ul class="avisos">${d.notificaciones
+          .map((n) => `<li class="avisos__item ${n.nueva ? 'avisos__item--nueva' : ''}">
+            ${n.enlace.startsWith('/') ? `<a class="avisos__texto" href="${esc(n.enlace)}">${esc(n.mensaje)}</a>` : `<span class="avisos__texto">${esc(n.mensaje)}</span>`}
+            <span class="avisos__fecha">${fecha(n.fecha, true)}</span></li>`)
+          .join('')}</ul>`
+      : '<div class="vacio">No tienes notificaciones. Aquí verás cuando un técnico revise tus armados.</div>',
 
   alertas: (d) =>
     d.alertas.length
@@ -72,7 +82,7 @@ const vista = {
 };
 
 function mostrar(clave) {
-  if (!vista[clave]) clave = 'armados';
+  if (!vista[clave]) clave = datos.notificaciones.some((n) => n.nueva) ? 'notificaciones' : 'armados';
   document.querySelectorAll('#menu [data-seccion]').forEach((b) => b.classList.toggle('activa', b.dataset.seccion === clave));
   const [, titulo] = SECCIONES.find(([k]) => k === clave);
   $('#contenido').innerHTML = `<h2 style="margin-bottom:18px">${titulo}</h2>${vista[clave](datos)}`;
