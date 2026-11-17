@@ -1,7 +1,7 @@
 import { montar } from '../js/layout.js';
 import { enviar } from '../js/api.js';
 import { $ } from '../js/util.js';
-import { destino, mostrarError, prepararAcceso } from './acceso.js';
+import { botonCargando, destino, mostrarError, prepararAcceso, salirConExito } from './acceso.js';
 
 montar('').then((u) => u && location.replace(destino()));
 prepararAcceso();
@@ -13,12 +13,12 @@ $('#formulario').addEventListener('submit', async (e) => {
   const boton = f.querySelector('button');
   mostrarError('');
   if (!f.correo.value || !f.contrasena.value) return mostrarError('Escribe tu correo y contraseña.');
-  boton.disabled = true;
+  botonCargando(boton, true);
   try {
-    await enviar('/auth/ingresar', { correo: f.correo.value.trim(), contrasena: f.contrasena.value });
-    location.href = destino();
+    const { usuario } = await enviar('/auth/ingresar', { correo: f.correo.value.trim(), contrasena: f.contrasena.value });
+    salirConExito(boton, `¡Hola, ${usuario.nombre.split(' ')[0]}!`, destino());
   } catch (er) {
     mostrarError(er.message);
-    boton.disabled = false;
+    botonCargando(boton, false);
   }
 });

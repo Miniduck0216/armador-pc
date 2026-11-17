@@ -23,6 +23,7 @@ const SECCIONES = {
   tablero: ['Tablero', 'grafica', tablero, 'panel.ver'],
   precios: ['Tiendas y precios', 'tienda', precios, 'precios.gestionar'],
   procesadores: ['Procesadores', 'chip', procesadores, 'componentes.gestionar'],
+  componentes: ['Componentes', 'pc', componentes, 'componentes.gestionar'],
   usuarios: ['Usuarios', 'usuario', usuarios, 'usuarios.gestionar'],
   roles: ['Roles y permisos', 'escudo', roles, 'roles.gestionar'],
   revisiones: ['Revisión de armados', 'check', revisiones, 'armados.revisar'],
@@ -334,6 +335,118 @@ async function revisiones() {
       .join('')}</tbody></table></div>`;
 }
 
+// ---- Componentes: CRUD de todas las categorías salvo procesadores ----
+let catalogoCampos = null;
+let filtroCategoria = '';
+const cargarCampos = async () => (catalogoCampos ??= await api('/admin/catalogo/campos'));
+
+async function componentes() {
+  const { categorias, campos } = await cargarCampos();
+  const lista = await api(`/admin/catalogo${filtroCategoria ? `?categoria=${filtroCategoria}` : ''}`);
+  const resumenTecnico = (c) =>
+    (campos[c.categoria.codigo] ?? []).map((f) => `<span class="datos-tecnicos__dato">${esc(f.etiqueta.split(' (')[0])}: <b>${esc(String(c.tecnicos[f.campo] ?? '—'))}</b></span>`).join('');
+  return `
+    <div class="fila entre" style="margin-bottom:12px">
+      <select id="filtro-categoria" style="width:auto">
+        <option value="">Todas las categorías</option>
+        ${categorias.map((c) => `<option value="${c.codigo}" ${c.codigo === filtroCategoria ? 'selected' : ''}>${esc(c.nombre)}</option>`).join('')}
+      </select>
+      <button class="boton violeta" data-componente-nuevo>${icono('mas', 16)} Nuevo componente</button>
+    </div>
+    <p class="tenue pequeno" style="margin-bottom:12px">${lista.length} componente(s). Los procesadores están en su propia sección.</p>
+    <div class="tabla-envoltura"><table class="tabla">
+      <thead><tr><th>Componente</th><th>Categoría</th><th class="der">Precio ref.</th><th>Datos técnicos</th><th></th></tr></thead>
+      <tbody>${lista
+        .map((c) => `<tr><td><b>${esc(c.marca)} ${esc(c.nombre)}</b><div class="pequeno tenue">${c.consumoW} W · puntaje ${c.puntajeRendimiento}</div></td>
+          <td>${esc(c.categoria.nombre)}</td><td class="der">${dinero(c.precio)}</td>
+          <td><div class="datos-tecnicos">${resumenTecnico(c) || '<span class="tenue pequeno">No aplica</span>'}</div></td>
+          <td class="der" style="white-space:nowrap"><button class="enlace" data-componente-editar="${c.id}">Editar</button> · <button class="enlace peligro" data-componente-borrar="${c.id}">Eliminar</button></td></tr>`)
+        .join('')}</tbody></table></div>`;
+}
+
+// Campo técnico según su tipo: número, opción única (desplegable) u opciones múltiples (casillas)
+function campoTecnico(f, valor, zocalos) {
+  const opciones = f.tipo === 'zocalo' || f.tipo === 'zocalos' ? zocalos : f.opciones ?? [];
+  if (f.tipo === 'numero') {
+    return `<label class="campo"><span>${esc(f.etiqueta)}</span><input type="number" data-tecnico="${f.campo}" min="${f.min}" max="${f.max}" step="1" required value="${valor ?? ''}"></label>`;
+  }
+  if (f.tipo === 'opcion' || f.tipo === 'zocalo') {
+    return `<label class="campo"><span>${esc(f.etiqueta)}</span><select data-tecnico="${f.campo}" required><option value="">Elige…</option>
+      ${opciones.map((o) => `<option ${o === valor ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`;
+  }
+  const marcados = String(valor ?? '').split(',');
+  return `<div class="campo"><span>${esc(f.etiqueta)}</span><div class="fila" style="flex-wrap:wrap;gap:12px">
+    ${opciones.map((o) => `<label class="casilla"><input type="checkbox" data-tecnico-multiple="${f.campo}" value="${esc(o)}" ${marcados.includes(o) ? 'checked' : ''}> ${esc(o)}</label>`).join('')}</div></div>`;
+}
+
+// Formulario de componente. La categoría es un desplegable (llave foránea) y al cambiarla
+// se dibujan solo los campos técnicos de esa categoría.
+async function formularioComponente(c = null) {
+  const { categorias, campos, zocalos } = await cargarCampos();
+  const m = modal({
+    titulo: c ? `Editar ${c.marca} ${c.nombre}` : 'Nuevo componente',
+    ancho: 640,
+    contenido: `<form class="formulario" id="form-componente">
+      <div class="aviso error oculto" id="err-componente"></div>
+      <label class="campo"><span>Categoría</span><select name="categoriaId" required>
+        <option value="">Elige una categoría…</option>
+        ${categorias.map((k) => `<option value="${k.id}" data-codigo="${k.codigo}" ${c?.categoria.id === k.id ? 'selected' : ''}>${esc(k.nombre)}</option>`).join('')}
+      </select></label>
+      <div class="dos-campos">
+        <label class="campo"><span>Marca</span><input name="marca" required maxlength="40" value="${esc(c?.marca ?? '')}"></label>
+        <label class="campo"><span>Modelo</span><input name="nombre" required minlength="2" maxlength="80" value="${esc(c?.nombre ?? '')}"></label>
+      </div>
+      <div class="dos-campos">
+        <label class="campo"><span>Precio de referencia ($)</span><input name="precio" type="number" step="0.01" min="0.01" max="100000" required value="${c?.precio ?? ''}"></label>
+        <label class="campo"><span>Consumo (W)</span><input name="consumoW" type="number" step="1" min="0" max="2000" required value="${c?.consumoW ?? 0}"></label>
+      </div>
+      <div class="dos-campos">
+        <label class="campo"><span>Puntaje de rendimiento (0 a 100)</span><input name="puntajeRendimiento" type="number" step="1" min="0" max="100" required value="${c?.puntajeRendimiento ?? 0}"></label>
+        <label class="campo"><span>Texto para buscar en tiendas</span><input name="busqueda" maxlength="80" placeholder="Opcional" value="${esc(c?.busqueda ?? '')}"></label>
+      </div>
+      <fieldset class="campos-tecnicos" id="campos-tecnicos"></fieldset>
+      <button class="boton violeta">${c ? 'Guardar cambios' : 'Crear componente'}</button>
+    </form>`,
+  });
+  const form = m.cuerpo.querySelector('form');
+  const pintarTecnicos = () => {
+    const codigo = form.categoriaId.selectedOptions[0]?.dataset.codigo;
+    const lista = campos[codigo] ?? [];
+    $('#campos-tecnicos').innerHTML = !codigo
+      ? '<p class="tenue pequeno">Elige la categoría para ver sus datos técnicos.</p>'
+      : lista.length
+        ? `<legend class="campos-tecnicos__titulo">Datos técnicos de compatibilidad</legend>${lista.map((f) => campoTecnico(f, c?.categoria.codigo === codigo ? c.tecnicos[f.campo] : null, zocalos)).join('')}`
+        : '<p class="tenue pequeno">Esta categoría no usa datos técnicos en las reglas de compatibilidad.</p>';
+  };
+  form.categoriaId.addEventListener('change', pintarTecnicos);
+  pintarTecnicos();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const tecnicos = {};
+    form.querySelectorAll('[data-tecnico]').forEach((el) => (tecnicos[el.dataset.tecnico] = el.type === 'number' ? Number(el.value) : el.value));
+    form.querySelectorAll('[data-tecnico-multiple]').forEach((el) => {
+      tecnicos[el.dataset.tecnicoMultiple] ??= [];
+      if (el.checked) tecnicos[el.dataset.tecnicoMultiple].push(el.value);
+    });
+    const cuerpo = {
+      categoriaId: Number(form.categoriaId.value), marca: form.marca.value.trim(), nombre: form.nombre.value.trim(),
+      precio: Number(form.precio.value), consumoW: Number(form.consumoW.value), puntajeRendimiento: Number(form.puntajeRendimiento.value),
+      busqueda: form.busqueda.value.trim(), tecnicos,
+    };
+    try {
+      if (c) await actualizar(`/admin/catalogo/${c.id}`, cuerpo, 'PUT');
+      else await enviar('/admin/catalogo', cuerpo);
+      m.cerrar();
+      aviso(c ? 'Componente actualizado' : 'Componente creado');
+      mostrar('componentes');
+    } catch (er) {
+      const el = m.cuerpo.querySelector('#err-componente');
+      el.textContent = er.message;
+      el.classList.remove('oculto');
+    }
+  });
+}
+
 // Crear un rol: el código y el nombre se validan otra vez en el servidor
 async function formularioRol() {
   const d = await api('/admin/roles');
@@ -422,6 +535,24 @@ document.addEventListener('click', async (e) => {
   if (t.closest('[data-oferta-nueva]')) return formularioOferta();
   if (t.closest('[data-usuario-nuevo]')) return formularioUsuario();
   if (t.closest('[data-rol-nuevo]')) return formularioRol();
+  if (t.closest('[data-componente-nuevo]')) return formularioComponente();
+  const ce = t.closest('[data-componente-editar]');
+  if (ce) {
+    const lista = await api(`/admin/catalogo${filtroCategoria ? `?categoria=${filtroCategoria}` : ''}`);
+    return formularioComponente(lista.find((x) => x.id === Number(ce.dataset.componenteEditar)));
+  }
+  const cb = t.closest('[data-componente-borrar]');
+  if (cb) {
+    if (!confirm('¿Eliminar este componente? También se borran sus precios y reseñas.')) return;
+    try {
+      await borrar(`/admin/catalogo/${cb.dataset.componenteBorrar}`);
+      aviso('Componente eliminado');
+      mostrar('componentes');
+    } catch (er) {
+      aviso(er.message, 'error');
+    }
+    return;
+  }
   const vp = t.closest('[data-ver-permisos]');
   if (vp) return verPermisosDe(vp.dataset.verPermisos).catch((er) => aviso(er.message, 'error'));
   const br = t.closest('[data-rol-borrar]');
@@ -466,6 +597,9 @@ document.addEventListener('change', async (e) => {
     } else if (t.dataset.rol) {
       await actualizar(`/admin/usuarios/${t.dataset.rol}`, { rolId: Number(t.value) });
       aviso('Rol actualizado');
+    } else if (t.id === 'filtro-categoria') {
+      filtroCategoria = t.value;
+      return mostrar('componentes');
     } else if (t.dataset.permisoRol) {
       // Al marcar o desmarcar una casilla se envía la lista completa de permisos de ese rol
       const marcadas = [...document.querySelectorAll(`[data-permiso-rol="${t.dataset.permisoRol}"]:checked`)].map((c) => c.value);

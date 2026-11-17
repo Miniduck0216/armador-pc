@@ -1,7 +1,7 @@
 import { montar } from '../js/layout.js';
 import { enviar } from '../js/api.js';
 import { $ } from '../js/util.js';
-import { destino, mostrarError, prepararAcceso } from './acceso.js';
+import { botonCargando, destino, mostrarError, prepararAcceso, salirConExito } from './acceso.js';
 
 montar('').then((u) => u && location.replace(destino()));
 prepararAcceso();
@@ -26,12 +26,12 @@ f.addEventListener('submit', async (e) => {
   if (datos.contrasena.length < 8 || !/[a-z]/i.test(datos.contrasena) || !/\d/.test(datos.contrasena)) return mostrarError('La contraseña debe tener al menos 8 caracteres, con letras y números.');
   if (datos.contrasena !== datos.confirmar) return mostrarError('Las contraseñas no coinciden.');
   const boton = f.querySelector('button');
-  boton.disabled = true;
+  botonCargando(boton, true);
   try {
     await enviar('/auth/registro', { ...datos, nombre: datos.nombre.trim(), correo: datos.correo.trim() });
-    location.href = destino();
+    salirConExito(boton, '¡Cuenta creada!', destino());
   } catch (er) {
     mostrarError(er.message);
-    boton.disabled = false;
+    botonCargando(boton, false);
   }
 });

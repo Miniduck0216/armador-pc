@@ -17,6 +17,10 @@ import { ComponentesService } from '../componentes/componentes.service';
 import { ReglasService } from '../reglas/reglas.service';
 import { publico } from '../auth/auth.controller';
 import { OfertaAdminDto } from './dto/oferta-admin.dto';
+import { ComponenteAdminDto } from '../componentes/dto/componente-admin.dto';
+import { CAMPOS_POR_CATEGORIA, CATEGORIAS_CON_SECCION_PROPIA } from '../componentes/campos-categoria';
+import { Categoria } from '../categorias/categoria.entity';
+import { Componente } from '../componentes/componente.entity';
 import { UsuarioAdminDto } from './dto/usuario-admin.dto';
 
 // ZONA SEGURA: todo este controlador exige sesión iniciada y el permiso "panel.ver".
@@ -89,6 +93,53 @@ export class AdminController {
   @HttpCode(204)
   async eliminar(@Param('id', ParseIntPipe) id: number) {
     await this.procesadores.eliminar(id);
+  }
+
+  // ---- Componentes (todas las categorías salvo procesadores) ----
+  // Categorías para el desplegable y qué campos técnicos pide cada una
+  @Get('catalogo/campos')
+  @Permisos('componentes.gestionar')
+  async camposCatalogo() {
+    const categorias = (await this.componentes.categoriasEditables()).map((c: Categoria) => ({ id: c.id, codigo: c.codigo, nombre: c.nombre }));
+    return { categorias, campos: CAMPOS_POR_CATEGORIA, zocalos: await this.componentes.zocalos() };
+  }
+
+  @Get('catalogo')
+  @Permisos('componentes.gestionar')
+  async catalogo(@Query('categoria') categoria?: string) {
+    if (categoria && !/^[A-Z]{2,10}$/.test(categoria)) throw new BadRequestException('Categoría no válida');
+    const lista = (await this.componentes.listar(categoria || undefined)).filter((c) => !CATEGORIAS_CON_SECCION_PROPIA.includes(c.categoria.codigo));
+    return lista.map((c: Componente) => ({
+      id: c.id, nombre: c.nombre, marca: c.marca, precio: c.precio, consumoW: c.consumoW, puntajeRendimiento: c.puntajeRendimiento,
+      busqueda: c.busqueda, categoria: { id: c.categoria.id, codigo: c.categoria.codigo, nombre: c.categoria.nombre },
+      tecnicos: Object.fromEntries((CAMPOS_POR_CATEGORIA[c.categoria.codigo] ?? []).map((f) => [f.campo, c[f.campo]])),
+    }));
+  }
+
+  @Post('catalogo')
+  @Permisos('componentes.gestionar')
+  @ApiOperation({ summary: 'Crea un componente (categoría por desplegable, campos técnicos validados según la categoría)' })
+  async crearComponente(@Body() cuerpo: any) {
+    const { dto, errores } = await validarFormulario(ComponenteAdminDto, cuerpo);
+    if (errores.length) throw new BadRequestException(errores);
+    const c = await this.componentes.crear(dto);
+    return { id: c.id };
+  }
+
+  @Put('catalogo/:id')
+  @Permisos('componentes.gestionar')
+  async editarComponente(@Param('id', ParseIntPipe) id: number, @Body() cuerpo: any) {
+    const { dto, errores } = await validarFormulario(ComponenteAdminDto, cuerpo);
+    if (errores.length) throw new BadRequestException(errores);
+    await this.componentes.actualizar(id, dto);
+    return { id };
+  }
+
+  @Delete('catalogo/:id')
+  @Permisos('componentes.gestionar')
+  @HttpCode(204)
+  async eliminarComponente(@Param('id', ParseIntPipe) id: number) {
+    await this.componentes.eliminar(id);
   }
 
   // ---- Tiendas y precios ----

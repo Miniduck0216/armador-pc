@@ -103,8 +103,11 @@ export function modal({ titulo, contenido = '', ancho = 760 }) {
       <div class="modal-cabecera"><h3>${esc(titulo)}</h3><button class="icono-boton" data-cerrar aria-label="Cerrar">✕</button></div>
       <div class="modal-cuerpo">${contenido}</div>
     </div>`;
+  // Al cerrar se espera la animación de salida antes de quitar la ventana
   const cerrar = () => {
-    fondo.remove();
+    if (fondo.classList.contains('cerrando')) return;
+    fondo.classList.add('cerrando');
+    setTimeout(() => fondo.remove(), 180);
     document.removeEventListener('keydown', alTeclear);
     document.body.style.overflow = '';
   };

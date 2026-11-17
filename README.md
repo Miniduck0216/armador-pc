@@ -56,6 +56,7 @@ Ruta: `/admin.html`. Cada rol ve solo las secciones que tiene permitidas, y el s
 | Tablero | Cifras del sistema y estado de los precios |
 | Tiendas y precios | Activar o desactivar tiendas, actualizar precios y **cargar un precio manual** |
 | Procesadores | Crear, editar y eliminar procesadores (los puntajes se recalculan) |
+| Componentes | CRUD del resto de categorías: la categoría se elige en un desplegable y el formulario muestra solo sus datos técnicos |
 | Usuarios | Cambiar rol o estado de una cuenta y **crear usuarios** |
 | Roles y permisos | Matriz de casillas rol × permiso, creación de roles y **permisos por usuario** |
 | Revisión de armados | Bandeja del técnico con los armados enviados o en revisión |
@@ -121,6 +122,22 @@ Antes de guardar, el servidor comprueba que el componente y la tienda existan. S
 
 Lo mismo al crear un usuario o cambiar su rol: el rol se elige en un desplegable que se carga desde la tabla `roles`, y el servidor comprueba que exista.
 
+### CRUD de componentes
+
+- **Categoría por desplegable** (llave foránea a `categorias`). Al cambiarla se dibujan solo los campos técnicos que usa esa categoría: por ejemplo, Placa madre pide zócalo, memoria y formato, y Caja pide formatos admitidos y largo máximo de tarjeta gráfica. Los zócalos salen de los procesadores del catálogo.
+- **Una sola definición** de esos campos, en `backend/src/componentes/campos-categoria.ts`: el formulario la descarga y el servidor la usa para validar.
+- **Reglas del servidor:** no puede faltar ningún dato técnico de la categoría, y los valores deben estar en rango o en la lista permitida. No se repiten marca y modelo en la misma categoría (`409`). No se elimina un componente que está en armados guardados. Los procesadores se gestionan solo en su sección.
+
+## Animaciones e interfaz sin saltos
+
+Están en `frontend/src/sass/componentes/_movimiento.scss`:
+
+- **Transición entre páginas** con View Transitions de CSS: la barra se queda quieta y el contenido se funde (Chrome, Edge y Opera).
+- **Sin saltos al cargar:** el contenido espera a que exista la barra y entra suave; `main` ocupa al menos una pantalla, así el pie no aparece arriba y luego baja. El cambio acumulado de diseño (CLS) de inicio, configurador y biblioteca bajó de entre 0,86 y 1,08 a menos de 0,01.
+- **Notificaciones:** la campana suena y el número rebota cuando hay avisos nuevos; los avisos nuevos se resaltan en la cuenta.
+- **Ingreso y registro:** el error sacude el mensaje, el botón muestra que está cargando y se pone verde con un saludo antes de cambiar de página.
+- **Ventanas y avisos flotantes** con entrada y salida animadas. Todo se desactiva si el sistema pide reducir el movimiento (`prefers-reduced-motion`).
+
 ## Reglas de compatibilidad (core)
 
 | Regla | Qué revisa |
@@ -160,6 +177,11 @@ Las reglas están en la tabla `reglas_compatibilidad`.
 | `POST /api/armados/:id/flujo` | Acción del flujo: `enviar`, `tomar`, `aprobar`, `devolver` o `rechazar` |
 | `PUT /api/armados/:id/piezas` | Cambia las piezas (solo en Borrador o Por corregir) |
 | `GET /api/revisiones` | Bandeja del técnico |
+| `GET /api/admin/catalogo/campos` | Categorías, campos técnicos por categoría y zócalos |
+| `GET /api/admin/catalogo?categoria=` | Componentes de una categoría (o todos) |
+| `POST /api/admin/catalogo` | Crea un componente |
+| `PUT /api/admin/catalogo/:id` | Edita un componente |
+| `DELETE /api/admin/catalogo/:id` | Elimina un componente que no esté en armados |
 
 ## Ejecutar en local
 
@@ -206,6 +228,11 @@ Abrir http://localhost:5173
 | Flujo | Devolver sin motivo | `400` Escribe el motivo (mínimo 5 caracteres) |
 | Flujo | Editar piezas mientras está enviado | `400` no se puede editar |
 | Flujo | Enviar → tomar → devolver → editar → reenviar → aprobar | Aprobado, 6 pasos en el historial y avisos en la campana |
+| Nuevo componente | Placa madre sin datos técnicos | `400` Falta: Zócalo. Falta: Tipo de memoria. Falta: Formato |
+| Nuevo componente | Zócalo `AM9` | `400` Zócalo: "AM9" no es una opción válida |
+| Nuevo componente | Marca y modelo repetidos | `409` Ya existe un componente con esa marca y modelo |
+| Nuevo componente | Categoría Procesador | `400` Los procesadores se gestionan en su propia sección |
+| Eliminar componente | Usado en un armado | `400` No se puede eliminar: está en 1 armado(s) guardado(s) |
 
 ## Despliegue en Render
 

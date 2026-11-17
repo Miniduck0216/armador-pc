@@ -22,4 +22,25 @@ export function mostrarError(texto) {
   const e = $('#error');
   e.textContent = texto;
   e.classList.toggle('oculto', !texto);
+  // Reinicia la animación de "sacudir" para que se note cada nuevo error
+  e.classList.remove('sacudir');
+  if (texto) {
+    void e.offsetWidth;
+    e.classList.add('sacudir');
+  }
+}
+
+// Estados visuales del botón de ingreso/registro
+export const botonCargando = (b, si) => {
+  b.disabled = si;
+  b.classList.toggle('boton--cargando', si);
+};
+
+// Éxito: el botón se pone verde, la página se desvanece y luego navega
+export function salirConExito(b, texto, url) {
+  b.classList.remove('boton--cargando');
+  b.classList.add('boton--listo');
+  b.textContent = texto;
+  setTimeout(() => document.body.classList.add('saliendo'), 350);
+  setTimeout(() => (location.href = url), 600);
 }
