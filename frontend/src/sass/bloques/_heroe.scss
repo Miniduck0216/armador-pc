@@ -1,0 +1,83 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: heroe (portada del inicio) ----------
+
+.heroe {
+  position: relative;
+  overflow: hidden;
+  padding: 64px 0 72px;
+  color: $color-blanco;
+  background:
+    radial-gradient(900px 420px at 85% 10%, rgba(107, 75, 255, 0.45), transparent 60%),
+    radial-gradient(600px 300px at 10% 100%, rgba(255, 210, 63, 0.12), transparent 60%),
+    linear-gradient(135deg, $color-marino, #1a1f55 55%, $color-morado-oscuro);
+
+  // Cuadrícula tenue de fondo que se desvanece hacia la izquierda
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.25;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: linear-gradient(90deg, transparent, #000 60%);
+  }
+
+  &__grilla {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: 48px;
+  }
+
+  &__titulo {
+    margin: 18px 0 16px;
+  }
+
+  &__resaltado {
+    font-style: normal;
+    color: $color-amarillo;
+  }
+
+  &__descripcion {
+    max-width: 560px;
+    margin-bottom: 26px;
+    font-size: 18px;
+    color: $color-claro-2;
+  }
+
+  &__cifras {
+    display: flex;
+    gap: 34px;
+    margin-top: 34px;
+  }
+
+  &__cifra {
+    display: grid;
+  }
+
+  &__numero {
+    @include fuente(800, 30px);
+  }
+
+  &__etiqueta {
+    font-size: 13px;
+    color: #aab0d6;
+  }
+
+  @include movil {
+    &__grilla {
+      grid-template-columns: 1fr;
+    }
+
+    &__cifras {
+      gap: 22px;
+    }
+  }
+}

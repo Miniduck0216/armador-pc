@@ -1,0 +1,90 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pie (pie de página) ----------
+
+.pie {
+  margin-top: 70px;
+  padding: 56px 0 30px;
+  background: linear-gradient(120deg, $color-marino 40%, $color-morado-oscuro);
+  color: $color-claro-2;
+
+  // En ingresar y registro el pie va pegado al contenido
+  &--pegado {
+    margin-top: 0;
+  }
+
+  &__columnas {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1.2fr;
+    gap: 30px;
+  }
+
+  &__lema {
+    margin: 18px 0 10px;
+    @include fuente(700, 17px);
+    color: $color-blanco;
+  }
+
+  &__barrita {
+    width: 56px;
+    height: 4px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, $color-violeta 70%, $color-amarillo 70%);
+  }
+
+  &__nota {
+    margin-top: 14px;
+    font-size: 13px;
+  }
+
+  &__titulo {
+    margin-bottom: 14px;
+    color: $color-blanco;
+    font-size: 15px;
+
+    // Rayita violeta debajo del título
+    &::after {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 3px;
+      margin-top: 8px;
+      border-radius: 3px;
+      background: $color-violeta;
+    }
+  }
+
+  &__enlace {
+    display: block;
+    padding: 4px 0;
+    color: $color-claro-2;
+    font-size: 14px;
+
+    &:hover {
+      color: $color-blanco;
+    }
+  }
+
+  &__final {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+    color: $color-claro-4;
+  }
+
+  @include movil {
+    &__columnas {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    &__marca {
+      grid-column: 1 / -1;
+    }
+  }
+}

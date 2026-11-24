@@ -1,0 +1,67 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: opcion-pieza (cada modelo dentro del selector) ----------
+
+.opcion-pieza {
+  display: grid;
+  grid-template-columns: 64px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid $color-borde;
+  border-radius: 12px;
+  transition: border-color 0.15s, transform 0.15s;
+  @include entrar(0.2s);
+
+  &:hover {
+    border-color: $color-violeta-borde;
+    transform: translateY(-1px);
+  }
+
+  &--incompatible {
+    opacity: 0.6;
+    background: #fafafa;
+  }
+
+  &--elegida {
+    border-color: $color-violeta;
+    background: $color-violeta-claro;
+  }
+
+  &__foto {
+    @include foto-producto(64px);
+  }
+
+  &__nombre {
+    display: block;
+    margin-bottom: 4px;
+    line-height: 1.25;
+  }
+
+  &__motivo {
+    font-size: 12.5px;
+    color: $color-rojo;
+  }
+
+  &__precio {
+    @include fuente(800, 17px);
+    text-align: right;
+  }
+
+  &__tienda {
+    @extend %texto-secundario;
+    font-weight: 400;
+    font-size: 12px;
+  }
+
+  @include movil {
+    grid-template-columns: 52px 1fr;
+
+    &__precio,
+    &__boton {
+      grid-column: 2;
+      text-align: left;
+    }
+  }
+}

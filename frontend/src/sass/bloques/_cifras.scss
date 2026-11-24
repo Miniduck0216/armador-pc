@@ -1,0 +1,29 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: cifras (números grandes del tablero) ----------
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+
+  &__cifra {
+    padding: 16px 18px;
+  }
+
+  &__numero {
+    display: block;
+    @include fuente(800, 28px);
+  }
+
+  &__etiqueta {
+    color: $color-tenue;
+  }
+
+  &__lista {
+    margin: 0;
+    padding-left: 18px;
+  }
+}

@@ -1,0 +1,36 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: chips (lista de etiquetas pequeñas) ----------
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  &__chip {
+    padding: 4px 9px;
+    border: 1px solid $color-borde;
+    border-radius: 8px;
+    background: $color-panel-2;
+    color: #3b4060;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  // Chips que se pueden pulsar (filtros de accesorios)
+  &__filtro {
+    padding: 6px 14px;
+    border: 1px solid $color-borde;
+    border-radius: 999px;
+    background: $color-blanco;
+    color: $color-texto;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+
+    &--activo {
+      @include color($color-violeta, $color-blanco, $color-violeta);
+    }
+  }
+}

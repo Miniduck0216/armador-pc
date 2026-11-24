@@ -1,0 +1,37 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: datos (cifras con etiqueta: mínimo, máximo, promedio…) ----------
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+
+  // Dos datos lado a lado (resumen del configurador)
+  &--dos {
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 0;
+  }
+
+  &__dato {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: $color-panel-2;
+  }
+
+  &__etiqueta {
+    display: block;
+    font-size: 12px;
+    color: $color-tenue;
+  }
+
+  &__valor {
+    @include fuente(800, 19px);
+  }
+
+  @include movil {
+    grid-template-columns: 1fr 1fr;
+  }
+}

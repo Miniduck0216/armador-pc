@@ -1,0 +1,60 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: menu-usuario (nombre de la persona y su menú) ----------
+
+.menu-usuario {
+  position: relative;
+
+  &__boton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px 5px 5px;
+    border: 0;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.07);
+    color: $color-blanco;
+    font: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    &:active {
+      transform: scale(0.97);
+    }
+  }
+
+  &__submenu {
+    @extend %desplegable;
+    top: calc(100% + 4px);
+    left: auto;
+    right: 0;
+  }
+
+  &:hover &__submenu,
+  &:focus-within &__submenu {
+    display: grid;
+  }
+
+  &__opcion {
+    @extend %opcion-desplegable;
+  }
+
+  &__detalle {
+    color: $color-tenue;
+    font-weight: 400;
+    font-size: 12.5px;
+  }
+
+  @include movil {
+    &__nombre {
+      display: none;
+    }
+  }
+}

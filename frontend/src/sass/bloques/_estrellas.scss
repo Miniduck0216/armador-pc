@@ -1,0 +1,14 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: estrellas ----------
+
+// Calificación con estrellas
+.estrellas {
+  color: #f5a400;
+  letter-spacing: 1px;
+
+  &__vacias {
+    color: #d5d6e3;
+  }
+}

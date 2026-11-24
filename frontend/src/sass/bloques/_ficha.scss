@@ -1,0 +1,129 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: ficha (página de un producto) ----------
+
+.ficha {
+  display: grid;
+  grid-template-columns: 440px 1fr;
+  align-items: start;
+  gap: 36px;
+
+  &__esqueleto {
+    height: 420px;
+  }
+
+  &__no-existe {
+    grid-column: 1 / -1;
+  }
+
+  &__galeria {
+    position: relative;
+    padding: 22px;
+    border: 1px solid $color-borde;
+    border-radius: 18px;
+    background: $color-blanco;
+  }
+
+  &__imagen {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+  }
+
+  &__credito {
+    margin-top: 10px;
+    font-size: 11.5px;
+    color: $color-tenue;
+  }
+
+  &__titulo {
+    margin: 10px 0 12px;
+    font-size: clamp(28px, 3.4vw, 40px);
+  }
+
+  &__chips {
+    margin-top: 14px;
+  }
+
+  &__precio {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0 6px;
+  }
+
+  &__monto {
+    @include fuente(800, 40px);
+
+    &--referencia {
+      color: $color-tenue;
+    }
+  }
+
+  // Caja violeta con la tienda más barata y el botón para ir
+  &__mejor {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 18px 0;
+    padding: 18px;
+    border: 1px solid $color-violeta-borde;
+    border-radius: 16px;
+    background: $color-violeta-claro;
+  }
+
+  // Cada sección de la ficha (precios, historial, reseñas…)
+  &__bloque {
+    scroll-margin-top: 140px;
+
+    & + & {
+      margin-top: 34px;
+    }
+  }
+
+  &__encabezado {
+    margin-bottom: 16px;
+    font-size: 26px;
+  }
+
+  &__subtitulo {
+    margin: 24px 0 10px;
+  }
+
+  &__nota {
+    margin-top: 10px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__alerta,
+  &__consejo,
+  &__similares {
+    margin-top: 18px;
+  }
+
+  &__puntaje {
+    margin-bottom: 18px;
+  }
+
+  &__puntos {
+    @include fuente(800, 34px);
+    color: $color-violeta;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+
+    &__galeria {
+      max-width: 460px;
+    }
+
+    &__monto {
+      font-size: 32px;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: flujo-acciones (botones del flujo bajo el título del armado) ----------
+
+.flujo-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed $color-borde;
+
+  &__motivo {
+    margin-top: 14px;
+  }
+}

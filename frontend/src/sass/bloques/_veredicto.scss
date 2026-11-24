@@ -1,0 +1,25 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: veredicto (más barato, más potente, ganador) ----------
+
+.veredicto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+
+  &__caja {
+    display: grid;
+    gap: 4px;
+  }
+
+  &__etiqueta {
+    font-size: 12.5px;
+    color: $color-tenue;
+  }
+
+  &__nombre {
+    @include fuente(800, 18px);
+  }
+}

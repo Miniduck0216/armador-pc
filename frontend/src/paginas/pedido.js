@@ -24,77 +24,79 @@ function textoLista(d) {
   return lineas.join('\n');
 }
 
-function pintar(d) {
-  const recomienda = d.recomendado;
-  $('#cabecera').innerHTML = `
-    <div class="migas"><a href="/">Inicio</a> / <a href="/configurador.html">Configurador</a> / Lista de compra</div>
-    <h1>Lista de compra</h1>
-    <p>Dónde comprar cada pieza para pagar lo menos posible, con los precios de hoy.</p>`;
-
-  const grupos = d.compraPorTienda
+// Una caja por tienda con sus productos, el envío y el total
+function grupoTienda(g) {
+  const productos = g.productos
     .map(
-      (g) => `
-      <div class="caja grupo-tienda" style="border-left:4px solid ${esc(g.tienda.color || 'var(--violeta)')}">
-        <div class="fila entre"><h3>${esc(g.tienda.nombre)}</h3><span class="tenue pequeno">Envío ${dinero(g.envio)}</span></div>
-        <ul class="lista-pedido">
-          ${g.productos
-            .map(
-              (p) => `<li>
-                <span class="nombre">${esc(p.nombre)}${p.enStock ? '' : ' <em class="tenue">(sin stock)</em>'}</span>
-                <span class="precio">${dinero(p.precio)}</span>
-                <a class="pequeno" href="${enlaceSeguro(p.url)}" target="_blank" rel="noopener noreferrer">Ver en tienda ${icono('externo', 14)}</a>
-              </li>`,
-            )
-            .join('')}
-        </ul>
-        <div class="fila entre pedido-total"><span>Subtotal ${dinero(g.subtotal)} + envío</span><b>${dinero(g.total)}</b></div>
-      </div>`,
+      (p) => `<li class="pedido__producto">
+        <span class="pedido__nombre">${esc(p.nombre)}${p.enStock ? '' : ' <em class="texto texto--tenue">(sin stock)</em>'}</span>
+        <span class="pedido__precio">${dinero(p.precio)}</span>
+        <a class="pedido__enlace" href="${enlaceSeguro(p.url)}" target="_blank" rel="noopener noreferrer">Ver en tienda ${icono('externo', 14)}</a>
+      </li>`,
     )
     .join('');
-
-  const opciones = `
-    <div class="opciones-pedido">
-      <div class="caja ${recomienda === 'separado' ? 'recomendada' : ''}">
-        <small class="antetitulo">Por separado</small>
-        <b>${dinero(d.totalSeparado)}</b>
-        <span class="tenue pequeno">Cada pieza en la tienda más barata (${d.compraPorTienda.length} ${d.compraPorTienda.length === 1 ? 'tienda' : 'tiendas'})</span>
-        ${recomienda === 'separado' ? '<span class="insignia">Recomendada</span>' : ''}
-      </div>
-      <div class="caja ${recomienda === 'unaTienda' ? 'recomendada' : ''}">
-        <small class="antetitulo">Todo en una tienda</small>
-        ${
-          d.unaTienda
-            ? `<b>${dinero(d.unaTienda.total)}</b><span class="tenue pequeno">En ${esc(d.unaTienda.tienda.nombre)} con todas las piezas en stock</span>${recomienda === 'unaTienda' ? '<span class="insignia">Recomendada</span>' : ''}`
-            : '<span class="tenue pequeno">Ninguna tienda tiene todas las piezas en stock</span>'
-        }
-      </div>
+  // El color de la tienda viene de la base de datos (borde izquierdo)
+  return `<div class="caja pedido__tienda" style="border-left-color:${esc(g.tienda.color || '#6b4bff')}">
+      <div class="fila fila--entre"><h3>${esc(g.tienda.nombre)}</h3><span class="texto texto--tenue texto--pequeno">Envío ${dinero(g.envio)}</span></div>
+      <ul class="pedido__productos">${productos}</ul>
+      <div class="fila fila--entre pedido__total"><span>Subtotal ${dinero(g.subtotal)} + envío</span><b>${dinero(g.total)}</b></div>
     </div>`;
+}
 
-  const alertas = [
-    d.sinOferta.length ? `<div class="aviso error">Sin precio disponible hoy: ${d.sinOferta.map(esc).join(', ')}.</div>` : '',
-    d.sinStock.length ? `<div class="aviso alerta">Sin stock en ninguna tienda: ${d.sinStock.map(esc).join(', ')}. Revísalo antes de comprar.</div>` : '',
+// Las dos formas de comprar: por separado o todo en una tienda
+function opciones(d) {
+  const recomienda = d.recomendado;
+  const insignia = '<span class="insignia insignia--amarilla pedido__recomendada">Recomendada</span>';
+  const opcion = (clave, titulo, contenido) => `<div class="caja caja--pila pedido__opcion ${recomienda === clave ? 'caja--destacada' : ''}">
+      <small class="seccion__antetitulo">${titulo}</small>${contenido}${recomienda === clave ? insignia : ''}</div>`;
+  const tiendas = d.compraPorTienda.length;
+  return `<div class="pedido__opciones">
+      ${opcion('separado', 'Por separado', `<b class="pedido__monto">${dinero(d.totalSeparado)}</b><span class="texto texto--tenue texto--pequeno">Cada pieza en la tienda más barata (${tiendas} ${tiendas === 1 ? 'tienda' : 'tiendas'})</span>`)}
+      ${opcion(
+        'unaTienda',
+        'Todo en una tienda',
+        d.unaTienda
+          ? `<b class="pedido__monto">${dinero(d.unaTienda.total)}</b><span class="texto texto--tenue texto--pequeno">En ${esc(d.unaTienda.tienda.nombre)} con todas las piezas en stock</span>`
+          : '<span class="texto texto--tenue texto--pequeno">Ninguna tienda tiene todas las piezas en stock</span>',
+      )}
+    </div>`;
+}
+
+function pintar(d) {
+  $('#cabecera').innerHTML = `
+    <div class="cabecera-pagina__migas"><a class="cabecera-pagina__miga" href="/">Inicio</a> / <a class="cabecera-pagina__miga" href="/configurador.html">Configurador</a> / Lista de compra</div>
+    <h1>Lista de compra</h1>
+    <p class="cabecera-pagina__texto">Dónde comprar cada pieza para pagar lo menos posible, con los precios de hoy.</p>`;
+
+  const avisos = [
+    d.sinOferta.length ? `<div class="aviso aviso--error">Sin precio disponible hoy: ${d.sinOferta.map(esc).join(', ')}.</div>` : '',
+    d.sinStock.length ? `<div class="aviso aviso--alerta">Sin stock en ninguna tienda: ${d.sinStock.map(esc).join(', ')}. Revísalo antes de comprar.</div>` : '',
   ].join('');
+  const grupos = d.compraPorTienda.map(grupoTienda).join('');
+  const ahorro = d.ahorro > 0
+    ? `<div class="variacion variacion--baja resumen-armado__cambio">Comprar todo en ${esc(d.unaTienda.tienda.nombre)} te ahorra ${dinero(d.ahorro)}</div>`
+    : '<div class="texto texto--tenue texto--pequeno">Comprar por separado es lo más barato hoy.</div>';
 
   const texto = textoLista(d);
   const asunto = encodeURIComponent('Lista de compra ArmadorPC');
   $('#cuerpo').innerHTML = `
-    <div>
-      ${opciones}
-      ${alertas}
+    <div class="pila">
+      ${opciones(d)}
+      ${avisos}
       ${grupos || '<div class="vacio">No encontramos precios para estas piezas.</div>'}
     </div>
     <aside class="resumen-armado">
-      <div class="caja sombra apilado">
-        <span class="antetitulo" style="margin:0">Total recomendado</span>
+      <div class="caja caja--sombra caja--pila">
+        <span class="seccion__antetitulo resumen-armado__etiqueta">Total recomendado</span>
         <div class="resumen-armado__total">${dinero(d.total)}</div>
-        ${d.ahorro > 0 ? `<div class="variacion baja" style="font-size:15px">Comprar todo en ${esc(d.unaTienda.tienda.nombre)} te ahorra ${dinero(d.ahorro)}</div>` : '<div class="tenue pequeno">Comprar por separado es lo más barato hoy.</div>'}
-        <div class="pedido-acciones">
-          <button class="boton violeta" id="copiar-lista">${icono('copiar', 16)} Copiar lista</button>
-          <a class="boton secundario" href="https://wa.me/?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener noreferrer">${icono('compartir', 16)} Enviar por WhatsApp</a>
-          <a class="boton secundario" href="mailto:?subject=${asunto}&body=${encodeURIComponent(texto)}">${icono('compartir', 16)} Enviar por correo</a>
-          <button class="boton secundario" id="copiar-enlace">${icono('externo', 16)} Copiar enlace de esta lista</button>
+        ${ahorro}
+        <div class="pila pila--chica">
+          <button class="boton boton--violeta" id="copiar-lista">${icono('copiar', 16)} Copiar lista</button>
+          <a class="boton boton--secundario" href="https://wa.me/?text=${encodeURIComponent(texto)}" target="_blank" rel="noopener noreferrer">${icono('compartir', 16)} Enviar por WhatsApp</a>
+          <a class="boton boton--secundario" href="mailto:?subject=${asunto}&body=${encodeURIComponent(texto)}">${icono('compartir', 16)} Enviar por correo</a>
+          <button class="boton boton--secundario" id="copiar-enlace">${icono('externo', 16)} Copiar enlace de esta lista</button>
         </div>
-        <p class="pequeno tenue">Los precios vienen de las tiendas consultadas. Confirma el precio y el stock en la tienda antes de pagar.</p>
+        <p class="texto texto--pequeno texto--tenue">Los precios vienen de las tiendas consultadas. Confirma el precio y el stock en la tienda antes de pagar.</p>
       </div>
     </aside>`;
 
@@ -111,8 +113,9 @@ function pintar(d) {
 
 async function iniciar() {
   if (!ids.length) {
-    $('#cabecera').innerHTML = `<h1>Lista de compra</h1><p>Todavía no hay piezas para comprar.</p>`;
-    $('#cuerpo').innerHTML = `<div class="vacio">Arma tu PC en el configurador y luego vuelve aquí. <br><a class="boton violeta" href="/configurador.html" style="margin-top:12px">${icono('pc', 16)} Ir al configurador</a></div>`;
+    $('#cabecera').innerHTML = `<h1>Lista de compra</h1><p class="cabecera-pagina__texto">Todavía no hay piezas para comprar.</p>`;
+    $('#cuerpo').innerHTML = `<div class="vacio pila">Arma tu PC en el configurador y luego vuelve aquí.
+      <div><a class="boton boton--violeta" href="/configurador.html">${icono('pc', 16)} Ir al configurador</a></div></div>`;
     return;
   }
   try {

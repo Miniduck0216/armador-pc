@@ -1,0 +1,81 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: bandeja-comparar (barra flotante "Comparar 2/3") ----------
+
+.bandeja-comparar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  padding: 10px 0;
+  background: $color-marino;
+  color: $color-blanco;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+
+  &__contenido {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &__titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: $fuente-titulos;
+    white-space: nowrap;
+  }
+
+  &__items {
+    flex: 1;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px 5px 5px;
+    border-radius: $radio-chico;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  &__foto {
+    @include foto-producto(34px);
+    border-radius: 7px;
+  }
+
+  &__nombre {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__quitar {
+    background: none;
+    border: 0;
+    color: #aab0d6;
+    cursor: pointer;
+  }
+
+  &__vaciar {
+    color: #c9bfff;
+  }
+
+  @include movil {
+    &__contenido {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    &__nombre {
+      max-width: 110px;
+    }
+  }
+}

@@ -1,0 +1,50 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: interruptor (casilla con forma de switch) ----------
+// <label class="interruptor"><input class="interruptor__entrada" type="checkbox"><span class="interruptor__deslizador"></span></label>
+
+.interruptor {
+  position: relative;
+  flex: none;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  vertical-align: middle;
+
+  &__entrada {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+
+  &__deslizador {
+    position: absolute;
+    inset: 0;
+    border-radius: 99px;
+    background: #d5d6e3;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    // Círculo blanco que se mueve
+    &::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: $color-blanco;
+      transition: transform 0.15s;
+    }
+  }
+
+  &__entrada:checked + &__deslizador {
+    background: $color-violeta;
+
+    &::after {
+      transform: translateX(20px);
+    }
+  }
+}

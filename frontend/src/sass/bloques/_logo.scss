@@ -1,0 +1,35 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: logo ----------
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: $color-blanco;
+  @include fuente(800, 23px);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &__imagen {
+    width: 38px;
+    height: 38px;
+  }
+
+  &__marca {
+    color: $color-amarillo;
+    font-weight: inherit;
+  }
+
+  // En la barra, en celulares solo queda el ícono
+  @include movil {
+    &--compacto &__texto {
+      display: none;
+    }
+  }
+}

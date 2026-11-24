@@ -1,0 +1,92 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: menu (menú principal con submenús) ----------
+
+.menu {
+  display: flex;
+  gap: 2px;
+  margin-left: 18px;
+
+  &__item {
+    position: relative;
+  }
+
+  &__enlace {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: $radio-chico;
+    background: none;
+    color: $color-blanco;
+    @include fuente(700, 14.5px);
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover,
+    &--activo {
+      background: rgba(255, 255, 255, 0.08);
+      text-decoration: none;
+    }
+  }
+
+  &__flecha {
+    opacity: 0.7;
+  }
+
+  &__submenu {
+    @extend %desplegable;
+  }
+
+  &__item:hover &__submenu,
+  &__item:focus-within &__submenu {
+    display: grid;
+  }
+
+  &__opcion {
+    @extend %opcion-desplegable;
+  }
+
+  &__detalle {
+    color: $color-tenue;
+    font-weight: 400;
+    font-size: 12.5px;
+  }
+
+  // En tablets y celulares el menú baja como una lista que se abre con el botón
+  @include movil {
+    display: none;
+    position: absolute;
+    top: 66px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 10px 16px 18px;
+    background: $color-marino;
+
+    &--abierto {
+      display: flex;
+    }
+
+    &__submenu {
+      position: static;
+      display: grid;
+      margin: 2px 0 6px;
+      border: 0;
+      box-shadow: none;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    &__opcion {
+      color: #e4e6ff;
+    }
+
+    &__detalle {
+      color: $color-claro-4;
+    }
+  }
+}

@@ -1,0 +1,132 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Niveles de seguridad de la contraseña: (nivel, ancho, color)
+$niveles-fuerza: (0 0% $color-rojo, 1 25% $color-rojo, 2 50% #d97706, 3 75% $color-verde, 4 100% $color-verde, 5 100% $color-verde);
+
+// ---------- Bloque: formulario ----------
+// <form class="formulario">
+//   <label class="formulario__campo"><span class="formulario__etiqueta">Correo</span><input></label>
+// </form>
+
+.formulario {
+  display: grid;
+  gap: 14px;
+
+  // Formulario en una sola fila (alertas de precio, filtros)
+  &--en-linea {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  &__campo {
+    display: grid;
+    gap: 6px;
+  }
+
+  &__etiqueta {
+    @extend %etiqueta-campo;
+  }
+
+  // Dos campos lado a lado (en celular uno debajo del otro)
+  &__dos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    @include movil {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Grupo de campos que se agregan según la categoría (CRUD de componentes)
+  &__grupo {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 14px 16px 6px;
+    border: 1px dashed $color-violeta-borde;
+    border-radius: $radio;
+    @include entrar(0.3s);
+  }
+
+  &__leyenda {
+    @extend %antetitulo-mini;
+    padding: 0 6px;
+  }
+
+  &__ayuda {
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  // Casilla con su texto
+  &__casilla {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 14.5px;
+    cursor: pointer;
+  }
+
+  // Lista de casillas con desplazamiento (filtros)
+  &__casillas {
+    display: grid;
+    gap: 7px;
+    max-height: 220px;
+    overflow: auto;
+  }
+
+  // Campo de dinero con el signo $ delante
+  &__precio {
+    display: flex;
+    align-items: center;
+    max-width: 180px;
+    padding-left: 12px;
+    border: 1px solid $color-borde;
+    border-radius: $radio-chico;
+    background: $color-blanco;
+
+    &:focus-within {
+      outline: 2px solid $color-violeta;
+    }
+  }
+
+  &__entrada-precio {
+    border: 0;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  // Desplegable que no ocupa todo el ancho (orden de resultados)
+  &__corto {
+    width: auto;
+  }
+
+  // Barra de fuerza de la contraseña
+  &__fuerza {
+    height: 6px;
+    border-radius: 6px;
+    background: $color-panel-2;
+    overflow: hidden;
+  }
+
+  &__fuerza-relleno {
+    display: block;
+    width: 0;
+    height: 100%;
+    transition: width 0.2s, background 0.2s;
+
+    // Un modificador por nivel (0 a 5): ancho y color, generados con @each
+    @each $nivel, $ancho, $color in $niveles-fuerza {
+      &--#{$nivel} {
+        width: $ancho;
+        background: $color;
+      }
+    }
+  }
+}

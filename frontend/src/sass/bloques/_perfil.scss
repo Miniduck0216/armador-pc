@@ -1,0 +1,28 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: perfil (cabecera de Mi cuenta) ----------
+
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  &__esqueleto {
+    width: 320px;
+    height: 72px;
+  }
+
+  &__nombre {
+    font-size: 34px;
+  }
+
+  &__datos {
+    margin-top: 4px;
+    color: $color-tenue;
+  }
+
+  &__salir {
+    margin-left: auto;
+  }
+}

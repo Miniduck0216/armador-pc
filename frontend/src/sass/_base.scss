@@ -1,0 +1,164 @@
+// Estilos base: solo etiquetas HTML (reset), animaciones compartidas
+// y la transición entre páginas. Aquí no hay ninguna clase.
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// ---------- 4. Estilos base (solo etiquetas) ----------
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: $color-fondo;
+  color: $color-texto;
+  font: 15px/1.6 $fuente-texto;
+  -webkit-font-smoothing: antialiased;
+}
+
+// El contenido ocupa al menos una pantalla: así el pie no sube y luego salta
+main {
+  min-height: calc(100vh - #{$alto-barra});
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: $color-violeta;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: $fuente-titulos;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(34px, 5vw, 58px);
+  font-weight: 800;
+}
+
+h2 {
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 800;
+}
+
+h3 {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+}
+
+// Campos de formulario
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: $radio-chico;
+  border: 1px solid $color-borde;
+  background: $color-blanco;
+  color: $color-texto;
+  font: inherit;
+
+  &:focus {
+    outline: 2px solid $color-violeta;
+    outline-offset: 0;
+    border-color: transparent;
+  }
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  accent-color: $color-violeta;
+}
+
+input[type='range'] {
+  padding: 0;
+  border: 0;
+  accent-color: $color-violeta;
+}
+
+// Los elementos con el atributo hidden nunca se muestran (lo usa el JavaScript)
+[hidden] {
+  display: none !important;
+}
+
+// ---------- Animaciones compartidas (CSS3) ----------
+
+@keyframes entrar-suave {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes desvanecer {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes mostrar {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Transición entre páginas (Chrome y Edge): la barra queda quieta y el contenido se funde
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: desvanecer 0.16s ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: entrar-suave 0.3s $curva-suave both;
+}
+
+// Quien prefiera menos movimiento (accesibilidad) no ve animaciones
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

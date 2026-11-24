@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ArmadorPC · Arma tu PC con precios de Ecuador</title>
   <meta name="description" content="Configurador de PC con compatibilidad en vivo y comparador de precios de tiendas de Ecuador.">
@@ -13,92 +13,94 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/inicio.js"></script>
 </head>
-<body>
-<main>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido">
   <section class="heroe">
-    <div class="contenedor heroe-grilla">
-      <div class="heroe-texto">
-        <span class="insignia amarilla" id="modo-precios">Precios de tiendas de Ecuador</span>
-        <h1>Arma tu PC ideal y paga <em>lo justo</em></h1>
-        <p>Elige cada pieza con compatibilidad comprobada en vivo, compara precios de tiendas ecuatorianas y recibe un aviso cuando baje lo que te interesa.</p>
+    <div class="contenedor heroe__grilla">
+      <div>
+        <span class="insignia insignia--amarilla" id="modo-precios">Precios de tiendas de Ecuador</span>
+        <h1 class="heroe__titulo">Arma tu PC ideal y paga <em class="heroe__resaltado">lo justo</em></h1>
+        <p class="heroe__descripcion">Elige cada pieza con compatibilidad comprobada en vivo, compara precios de tiendas ecuatorianas y recibe un aviso cuando baje lo que te interesa.</p>
         <div class="fila">
-          <a class="boton grande" href="/configurador.html">Empezar a armar</a>
-          <a class="boton grande contorno-claro" href="/configuraciones.html">Ver configuraciones</a>
+          <a class="boton boton--grande" href="/configurador.html">Empezar a armar</a>
+          <a class="boton boton--grande boton--contorno-claro" href="/configuraciones.html">Ver configuraciones</a>
         </div>
-        <div class="cifras" id="cifras">
-          <div><b>—</b><small>tiendas</small></div><div><b>—</b><small>modelos</small></div><div><b>—</b><small>precios hoy</small></div>
+        <div class="heroe__cifras" id="cifras">
+          <div class="heroe__cifra"><b class="heroe__numero">—</b><small class="heroe__etiqueta">tiendas</small></div>
+          <div class="heroe__cifra"><b class="heroe__numero">—</b><small class="heroe__etiqueta">modelos</small></div>
+          <div class="heroe__cifra"><b class="heroe__numero">—</b><small class="heroe__etiqueta">precios hoy</small></div>
         </div>
       </div>
-      <div class="caja que-hacer">
-        <h2>¿Qué quieres hacer hoy?</h2>
-        <p class="tenue">Elige un camino y te llevamos paso a paso.</p>
-        <div class="apilado" id="acciones-inicio"></div>
+      <div class="que-hacer">
+        <h2 class="que-hacer__titulo">¿Qué quieres hacer hoy?</h2>
+        <p class="que-hacer__texto">Elige un camino y te llevamos paso a paso.</p>
+        <div class="pila" id="acciones-inicio"></div>
       </div>
     </div>
   </section>
 
   <section class="seccion">
     <div class="contenedor">
-      <div class="cabecera-seccion">
-        <div><span class="antetitulo">Configura según tu uso</span><h2>Configuraciones listas para personalizar</h2></div>
-        <a class="boton secundario" href="/configuraciones.html">Ver todas</a>
+      <div class="seccion__cabecera">
+        <div><span class="seccion__antetitulo">Configura según tu uso</span><h2>Configuraciones listas para personalizar</h2></div>
+        <a class="boton boton--secundario" href="/configuraciones.html">Ver todas</a>
       </div>
-      <div class="grilla g3" id="configs"></div>
+      <div class="grilla grilla--3" id="configs"></div>
     </div>
   </section>
 
-  <section class="seccion blanca">
+  <section class="seccion seccion--blanca">
     <div class="contenedor">
-      <div class="cabecera-seccion">
-        <div><span class="antetitulo">Biblioteca</span><h2>Explora por categoría</h2></div>
-        <p class="tenue">Fotos reales de referencia, especificaciones y el mejor precio de hoy en cada categoría.</p>
+      <div class="seccion__cabecera">
+        <div><span class="seccion__antetitulo">Biblioteca</span><h2>Explora por categoría</h2></div>
+        <p class="seccion__descripcion">Fotos reales de referencia, especificaciones y el mejor precio de hoy en cada categoría.</p>
       </div>
       <div class="mosaicos" id="categorias"></div>
-      <h3 class="subtitulo">Periféricos</h3>
-      <div class="mosaicos compactos" id="perifericos"></div>
+      <h3 class="seccion__subtitulo">Periféricos</h3>
+      <div class="mosaicos mosaicos--compactos" id="perifericos"></div>
     </div>
   </section>
 
   <section class="seccion">
     <div class="contenedor">
-      <div class="cabecera-seccion">
-        <div><span class="antetitulo">Ofertas</span><h2>Bajadas de precio</h2></div>
-        <a class="boton secundario" href="/componentes.html?orden=bajada">Ver más ofertas</a>
+      <div class="seccion__cabecera">
+        <div><span class="seccion__antetitulo">Ofertas</span><h2>Bajadas de precio</h2></div>
+        <a class="boton boton--secundario" href="/componentes.html?orden=bajada">Ver más ofertas</a>
       </div>
-      <div class="grilla g4" id="bajadas"></div>
+      <div class="grilla grilla--4" id="bajadas"></div>
     </div>
   </section>
 
-  <section class="seccion oscura">
+  <section class="seccion seccion--oscura">
     <div class="contenedor">
-      <div class="cabecera-seccion">
-        <div><span class="antetitulo">Herramientas</span><h2>Resuelve dudas antes de comprar</h2></div>
-        <p class="tenue">Calculadoras basadas en el consumo y la temperatura reales de cada pieza.</p>
+      <div class="seccion__cabecera">
+        <div><span class="seccion__antetitulo">Herramientas</span><h2>Resuelve dudas antes de comprar</h2></div>
+        <p class="seccion__descripcion">Calculadoras basadas en el consumo y la temperatura reales de cada pieza.</p>
       </div>
-      <div class="grilla g3" id="herramientas"></div>
+      <div class="grilla grilla--3" id="herramientas"></div>
     </div>
   </section>
 
   <section class="seccion">
-    <div class="contenedor grilla dos-columnas">
+    <div class="contenedor grilla grilla--principal">
       <div>
-        <div class="cabecera-seccion"><div><span class="antetitulo">Ranking</span><h2>Procesadores más potentes</h2></div></div>
-        <div class="tabla-envoltura"><table class="tabla" id="ranking"></table></div>
+        <div class="seccion__cabecera"><div><span class="seccion__antetitulo">Ranking</span><h2>Procesadores más potentes</h2></div></div>
+        <div id="ranking"></div>
       </div>
       <div>
-        <div class="cabecera-seccion"><div><span class="antetitulo">Tiendas</span><h2>De dónde salen los precios</h2></div></div>
-        <div class="apilado" id="tiendas"></div>
+        <div class="seccion__cabecera"><div><span class="seccion__antetitulo">Tiendas</span><h2>De dónde salen los precios</h2></div></div>
+        <div class="pila" id="tiendas"></div>
       </div>
     </div>
   </section>
 
-  <section class="seccion blanca">
+  <section class="seccion seccion--blanca">
     <div class="contenedor">
-      <div class="cabecera-seccion">
-        <div><span class="antetitulo">Aprende</span><h2>Guías para comprar mejor</h2></div>
-        <a class="boton secundario" href="/guias.html">Todas las guías</a>
+      <div class="seccion__cabecera">
+        <div><span class="seccion__antetitulo">Aprende</span><h2>Guías para comprar mejor</h2></div>
+        <a class="boton boton--secundario" href="/guias.html">Todas las guías</a>
       </div>
-      <div class="grilla g3" id="guias"></div>
+      <div class="grilla grilla--3" id="guias"></div>
     </div>
   </section>
 
@@ -106,9 +108,9 @@
     <div class="banda-cta">
       <div>
         <h2>¿No sabes por dónde empezar?</h2>
-        <p>Dinos tu presupuesto y para qué usarás el equipo: armamos una configuración compatible y la puedes ajustar pieza por pieza.</p>
+        <p class="banda-cta__texto">Dinos tu presupuesto y para qué usarás el equipo: armamos una configuración compatible y la puedes ajustar pieza por pieza.</p>
       </div>
-      <a class="boton grande" href="/configurador.html?modo=guiado">Usar el asistente</a>
+      <a class="boton boton--grande" href="/configurador.html?modo=guiado">Usar el asistente</a>
     </div>
   </section>
 </main>

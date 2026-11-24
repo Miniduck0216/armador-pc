@@ -1,0 +1,27 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: resultado (caja violeta con la respuesta de una calculadora) ----------
+
+.resultado {
+  @include color($color-violeta-claro, $color-texto, $color-violeta-borde);
+
+  &__principal {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  &__cifra {
+    @include fuente(800, 46px);
+    color: $color-violeta-2;
+  }
+
+  &__titulo {
+    font-size: 22px;
+  }
+
+  &__texto {
+    margin-top: 6px;
+  }
+}

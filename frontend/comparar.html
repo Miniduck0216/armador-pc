@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Comparar componentes · ArmadorPC</title>
   <meta name="description" content="Compara hasta 3 componentes de PC lado a lado: especificaciones, rendimiento y precio.">
@@ -13,20 +13,20 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/comparar.js"></script>
 </head>
-<body>
-<main>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido">
   <section class="cabecera-pagina">
     <div class="contenedor">
-      <div class="migas"><a href="/">Inicio</a> / Comparar</div>
+      <div class="cabecera-pagina__migas"><a class="cabecera-pagina__miga" href="/">Inicio</a> / Comparar</div>
       <h1>Compara componentes</h1>
-      <p>Elige una categoría y hasta 3 modelos. Resaltamos en verde el mejor valor de cada fila.</p>
-      <div class="mosaicos compactos" id="categorias" style="margin-top:24px"></div>
+      <p class="cabecera-pagina__texto">Elige una categoría y hasta 3 modelos. Resaltamos en verde el mejor valor de cada fila.</p>
+      <div class="mosaicos mosaicos--compactos biblioteca__categorias" id="categorias"></div>
     </div>
   </section>
   <section class="seccion">
     <div class="contenedor">
       <div class="ranuras" id="ranuras"></div>
-      <div id="resultado"></div>
+      <div class="comparacion" id="resultado"></div>
     </div>
   </section>
 </main>

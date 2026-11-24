@@ -1,0 +1,70 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: tarjeta-accion (enlace con ícono, título y texto) ----------
+
+.tarjeta-accion {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid $color-borde;
+  border-radius: $radio;
+  background: $color-blanco;
+  color: $color-texto;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    text-decoration: none;
+    border-color: $color-violeta-borde;
+    box-shadow: $sombra;
+  }
+
+  &--compacta {
+    padding: 13px 14px;
+  }
+
+  &__icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    @include color($color-violeta-claro, $color-violeta);
+  }
+
+  &__titulo {
+    margin-bottom: 3px;
+    font-size: 16.5px;
+  }
+
+  &__texto {
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: $color-tenue;
+  }
+
+  &__flecha {
+    align-self: center;
+    margin-left: auto;
+    color: $color-violeta;
+  }
+
+  // Versión sobre fondo oscuro (sección de herramientas del inicio)
+  &--oscura {
+    @include color(rgba(255, 255, 255, 0.06), $color-blanco, rgba(255, 255, 255, 0.1));
+
+    &:hover {
+      border-color: rgba(255, 210, 63, 0.5);
+    }
+  }
+
+  &--oscura &__texto {
+    color: $color-claro-3;
+  }
+
+  &--oscura &__icono {
+    @include color(rgba(255, 210, 63, 0.15), $color-amarillo);
+  }
+}

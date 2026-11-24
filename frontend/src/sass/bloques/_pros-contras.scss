@@ -1,0 +1,33 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pros-contras (a favor / en contra) ----------
+
+.pros-contras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+
+  &__lista {
+    @extend %lista-limpia;
+    display: grid;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  &__item {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    gap: 8px;
+    font-size: 14.5px;
+  }
+
+  &__detalle {
+    display: block;
+    color: $color-tenue;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+  }
+}

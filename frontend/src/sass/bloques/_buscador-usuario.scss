@@ -1,0 +1,65 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: buscador-usuario (campo con lista desplegable de personas) ----------
+
+.buscador-usuario {
+  position: relative;
+
+  &__caja {
+    position: relative;
+  }
+
+  &__icono {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    color: $color-tenue;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  &__campo {
+    padding-left: 38px;
+  }
+
+  &__lista {
+    @include panel(6px, $radio-chico);
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    max-height: 280px;
+    overflow: auto;
+    box-shadow: $sombra-fuerte;
+    @include entrar(0.18s);
+  }
+
+  &__opcion {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: $color-texto;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-violeta-claro;
+    }
+  }
+
+  &__detalle,
+  &__vacio {
+    @extend %texto-secundario;
+  }
+
+  &__vacio {
+    padding: 10px 12px;
+  }
+}

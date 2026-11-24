@@ -1,0 +1,131 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: boton ----------
+// Por defecto es amarillo (acción principal). Los modificadores cambian el color
+// o el tamaño: <a class="boton boton--violeta boton--pequeno">.
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  @include fuente(800, 14.5px);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  @include color($color-amarillo, $color-marino);
+  transition: transform 0.15s, background 0.15s, box-shadow 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: $color-amarillo-2;
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  // Colores
+  &--violeta {
+    @include color($color-violeta, $color-blanco);
+
+    &:hover {
+      background: $color-violeta-2;
+    }
+  }
+
+  &--secundario {
+    @include color($color-blanco, $color-violeta, $color-violeta-borde);
+
+    &:hover {
+      background: $color-violeta-claro;
+    }
+  }
+
+  &--contorno-claro {
+    @include color(transparent, $color-blanco, rgba(255, 255, 255, 0.45));
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &--peligro {
+    @include color($color-blanco, $color-rojo, $color-rojo-borde);
+
+    &:hover {
+      background: $color-rojo-claro;
+    }
+  }
+
+  &--rojo {
+    @include color($color-rojo, $color-blanco, $color-rojo);
+
+    &:hover {
+      background: #be123c;
+    }
+  }
+
+  // Producto guardado en favoritos (corazón rojo)
+  &--favorito {
+    @include color($color-rojo-claro, $color-rojo, $color-rojo-borde);
+  }
+
+  // Tamaños
+  &--pequeno {
+    padding: 8px 13px;
+    font-size: 13.5px;
+    border-radius: $radio-chico;
+  }
+
+  &--grande {
+    padding: 16px 26px;
+    font-size: 15.5px;
+  }
+
+  &--ancho {
+    width: 100%;
+  }
+
+  // Estados
+  &--deshabilitado {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  // Mientras espera al servidor: el texto se oculta y gira un círculo
+  &--cargando {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      width: 20px;
+      height: 20px;
+      margin: auto;
+      border: 2.5px solid rgba(255, 255, 255, 0.45);
+      border-top-color: $color-blanco;
+      border-radius: 50%;
+      animation: girar 0.7s linear infinite;
+    }
+  }
+
+  // Cuando terminó bien (por ejemplo, al ingresar) se pone verde
+  &--listo {
+    @include color($color-verde, $color-blanco, $color-verde);
+  }
+}

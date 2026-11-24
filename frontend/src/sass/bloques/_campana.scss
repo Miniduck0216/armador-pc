@@ -1,0 +1,84 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: campana (notificaciones y acceso al panel) ----------
+
+@keyframes campanada {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  15% {
+    transform: rotate(14deg);
+  }
+
+  30% {
+    transform: rotate(-12deg);
+  }
+
+  45% {
+    transform: rotate(8deg);
+  }
+
+  60% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes rebote {
+  0% {
+    transform: scale(0);
+  }
+
+  70% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.campana {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  color: $color-blanco;
+  background: rgba(255, 255, 255, 0.07);
+  transition: transform 0.15s, background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.14);
+    text-decoration: none;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  // Número de avisos sin leer: aparece con un rebote
+  &__globo {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border-radius: 99px;
+    background: $color-amarillo;
+    color: $color-marino;
+    @include fuente(800, 11px);
+    line-height: 19px;
+    animation: rebote 0.45s $curva-rebote 0.3s both;
+  }
+
+  // Con avisos nuevos la campana suena dos veces
+  &--nueva &__icono {
+    transform-origin: 50% 10%;
+    animation: campanada 1s ease-in-out 0.4s 2;
+  }
+}

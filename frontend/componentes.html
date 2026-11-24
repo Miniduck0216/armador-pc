@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Componentes · ArmadorPC</title>
   <meta name="description" content="Biblioteca de componentes de PC con precios de tiendas de Ecuador.">
@@ -13,39 +13,39 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/componentes.js"></script>
 </head>
-<body>
-<main>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido">
   <section class="cabecera-pagina">
     <div class="contenedor">
-      <div class="migas"><a href="/">Inicio</a> / <span id="miga">Componentes</span></div>
+      <div class="cabecera-pagina__migas"><a class="cabecera-pagina__miga" href="/">Inicio</a> / <span id="miga">Componentes</span></div>
       <h1 id="titulo">Biblioteca de componentes</h1>
-      <p id="descripcion">Busca, filtra y compara piezas con el mejor precio de hoy en tiendas de Ecuador.</p>
-      <div class="mosaicos compactos" id="categorias" style="margin-top:24px"></div>
+      <p class="cabecera-pagina__texto" id="descripcion">Busca, filtra y compara piezas con el mejor precio de hoy en tiendas de Ecuador.</p>
+      <div class="mosaicos mosaicos--compactos biblioteca__categorias" id="categorias"></div>
     </div>
   </section>
   <section class="seccion">
     <div class="contenedor biblioteca">
-      <aside class="filtros" id="filtros">
-        <div class="caja">
-          <label class="campo"><span>Buscar</span><input id="f-buscar" type="search" placeholder="Modelo o marca"></label>
-          <div class="campo"><span>Precio</span>
-            <div class="dos-campos">
-              <label class="campo-precio">$<input id="f-min" type="number" min="0" placeholder="Mín"></label>
-              <label class="campo-precio">$<input id="f-max" type="number" min="0" placeholder="Máx"></label>
+      <aside class="biblioteca__filtros" id="filtros">
+        <div class="caja caja--compacta formulario">
+          <label class="formulario__campo"><span class="formulario__etiqueta">Buscar</span><input id="f-buscar" type="search" placeholder="Modelo o marca"></label>
+          <div class="formulario__campo"><span class="formulario__etiqueta">Precio</span>
+            <div class="formulario__dos">
+              <label class="formulario__precio">$<input class="formulario__entrada-precio" id="f-min" type="number" min="0" placeholder="Mín"></label>
+              <label class="formulario__precio">$<input class="formulario__entrada-precio" id="f-max" type="number" min="0" placeholder="Máx"></label>
             </div>
           </div>
-          <label class="casilla"><input type="checkbox" id="f-stock"> Solo con stock</label>
+          <label class="formulario__casilla"><input type="checkbox" id="f-stock"> Solo con stock</label>
         </div>
-        <div class="caja"><h4>Gama</h4><div class="lista-casillas" id="f-gamas"></div></div>
-        <div class="caja"><h4>Marca</h4><div class="lista-casillas" id="f-marcas"></div></div>
-        <button class="boton secundario ancho" id="limpiar" type="button">Limpiar filtros</button>
+        <div class="caja caja--compacta pila"><h4>Gama</h4><div class="formulario__casillas" id="f-gamas"></div></div>
+        <div class="caja caja--compacta pila"><h4>Marca</h4><div class="formulario__casillas" id="f-marcas"></div></div>
+        <button class="boton boton--secundario boton--ancho" id="limpiar" type="button">Limpiar filtros</button>
       </aside>
       <div>
-        <div class="aviso info que-mirar oculto" id="que-mirar"></div>
-        <div class="barra-resultados">
-          <div class="fila"><button class="boton secundario pequeno boton-filtros" id="ver-filtros" type="button">Filtros</button><b id="conteo">Cargando…</b></div>
-          <label class="fila pequeno tenue">Ordenar por
-            <select id="f-orden">
+        <div class="aviso aviso--info biblioteca__consejo" id="que-mirar" hidden></div>
+        <div class="biblioteca__barra">
+          <div class="fila"><button class="boton boton--secundario boton--pequeno biblioteca__ver-filtros" id="ver-filtros" type="button">Filtros</button><b id="conteo">Cargando…</b></div>
+          <label class="fila texto texto--pequeno texto--tenue">Ordenar por
+            <select class="formulario__corto" id="f-orden">
               <option value="relevancia">Relevancia</option>
               <option value="precio_asc">Precio: menor a mayor</option>
               <option value="precio_desc">Precio: mayor a menor</option>
@@ -55,7 +55,7 @@
             </select>
           </label>
         </div>
-        <div class="grilla auto" id="resultados"></div>
+        <div class="grilla grilla--auto" id="resultados"></div>
         <div class="paginacion" id="paginacion"></div>
       </div>
     </div>

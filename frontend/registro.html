@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Crear cuenta · ArmadorPC</title>
   <meta name="description" content="Crea tu cuenta gratis en ArmadorPC.">
@@ -13,26 +13,26 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/registro.js"></script>
 </head>
-<body>
-<main class="acceso">
-    <div class="acceso-arte">
-      <a class="logo" href="/"><img src="/logo-icono.svg" alt="" width="44" height="44"><span>Armador<b>PC</b></span></a>
-      <h2 style="font-size:36px">Tu cuenta guarda todo lo que armas</h2>
-      <ul id="beneficios"></ul>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido acceso">
+    <div class="acceso__arte">
+      <a class="logo" href="/"><img class="logo__imagen" src="/logo-icono.svg" alt="" width="44" height="44"><span class="logo__texto">Armador<b class="logo__marca">PC</b></span></a>
+      <h2 class="acceso__lema">Tu cuenta guarda todo lo que armas</h2>
+      <ul class="acceso__beneficios" id="beneficios"></ul>
     </div>
-    <div class="acceso-formulario">
-      <div class="caja sombra">
-        <h1>Crear cuenta</h1>
-        <p class="tenue" style="margin-bottom:20px">¿Ya tienes una? <a href="/ingresar.html" id="ir-ingresar">Ingresa</a></p>
+    <div class="acceso__zona">
+      <div class="caja caja--sombra acceso__caja">
+        <h1 class="acceso__titulo">Crear cuenta</h1>
+        <p class="acceso__texto">¿Ya tienes una? <a href="/ingresar.html" id="ir-ingresar">Ingresa</a></p>
         <form class="formulario" id="formulario" novalidate>
-          <div class="aviso error oculto" id="error"></div>
-          <label class="campo"><span>Nombre</span><input name="nombre" autocomplete="name" minlength="2" maxlength="40" required></label>
-          <label class="campo"><span>Correo</span><input name="correo" type="email" autocomplete="email" required></label>
-          <label class="campo"><span>Contraseña</span><input name="contrasena" type="password" autocomplete="new-password" minlength="8" required></label>
-          <div class="fuerza"><i id="fuerza"></i></div>
-          <small class="tenue" id="fuerza-texto">Mínimo 8 caracteres, con letras y números.</small>
-          <label class="campo"><span>Confirmar contraseña</span><input name="confirmar" type="password" autocomplete="new-password" required></label>
-          <button class="boton violeta grande ancho">Crear cuenta</button>
+          <div class="aviso aviso--error" id="error" hidden></div>
+          <label class="formulario__campo"><span class="formulario__etiqueta">Nombre</span><input name="nombre" autocomplete="name" minlength="2" maxlength="40" required></label>
+          <label class="formulario__campo"><span class="formulario__etiqueta">Correo</span><input name="correo" type="email" autocomplete="email" required></label>
+          <label class="formulario__campo"><span class="formulario__etiqueta">Contraseña</span><input name="contrasena" type="password" autocomplete="new-password" minlength="8" required></label>
+          <div class="formulario__fuerza"><i class="formulario__fuerza-relleno" id="fuerza"></i></div>
+          <small class="formulario__ayuda" id="fuerza-texto">Mínimo 8 caracteres, con letras y números.</small>
+          <label class="formulario__campo"><span class="formulario__etiqueta">Confirmar contraseña</span><input name="confirmar" type="password" autocomplete="new-password" required></label>
+          <button class="boton boton--violeta boton--grande boton--ancho">Crear cuenta</button>
         </form>
       </div>
     </div>

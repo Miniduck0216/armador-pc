@@ -1,0 +1,26 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: comparacion (resultado de comparar modelos) ----------
+
+.comparacion {
+  &--cargando {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &__cabecera {
+    margin-bottom: 12px;
+  }
+
+  &__razones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 22px;
+
+    @include movil {
+      grid-template-columns: 1fr;
+    }
+  }
+}

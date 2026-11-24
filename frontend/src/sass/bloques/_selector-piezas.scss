@@ -1,0 +1,37 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: selector-piezas (ventana para elegir una pieza) ----------
+
+.selector-piezas {
+  &__herramientas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  &__buscar {
+    flex: 1 1 200px;
+  }
+
+  &__consejo {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__lista {
+    display: grid;
+    gap: 8px;
+  }
+
+  // Sección aparte con los productos de NomadaWare
+  &__tienda {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid $color-borde;
+  }
+}

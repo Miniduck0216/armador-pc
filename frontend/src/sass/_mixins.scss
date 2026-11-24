@@ -1,0 +1,163 @@
+// Mixins y placeholders (componentes reutilizables).
+@use 'variables' as *;
+
+// ---------- 2. Mixins ----------
+
+// Media query para tablets y celulares (único punto de quiebre)
+@mixin movil {
+  @media (max-width: $movil) {
+    @content;
+  }
+}
+
+// Tipografía: peso, tamaño y familia en una sola línea
+@mixin fuente($peso, $tamano, $familia: $fuente-titulos) {
+  font: $peso #{$tamano} $familia;
+}
+
+// Caja blanca con borde y esquinas redondeadas
+@mixin panel($relleno: 22px, $radio-panel: $radio) {
+  background: $color-blanco;
+  border: 1px solid $color-borde;
+  border-radius: $radio-panel;
+  padding: $relleno;
+}
+
+// Imagen cuadrada de producto que no se deforma
+@mixin foto-producto($tamano) {
+  width: $tamano;
+  height: $tamano;
+  object-fit: contain;
+  background: $color-blanco;
+  border-radius: 8px;
+}
+
+// Variante de color: fondo y texto (estados, insignias, avisos)
+@mixin color($fondo, $texto, $borde: transparent) {
+  background: $fondo;
+  color: $texto;
+  border-color: $borde;
+}
+
+// Escalonar la entrada de los hijos (cada uno empieza un poco después)
+@mixin escalonado($cantidad: 8, $paso: 0.05s) {
+  @for $i from 1 through $cantidad {
+    &:nth-child(#{$i}) {
+      animation-delay: $paso * ($i - 1);
+    }
+  }
+}
+
+// Entrada suave (se usa en casi todo lo que llega del servidor)
+@mixin entrar($duracion: 0.35s) {
+  animation: entrar-suave $duracion $curva-suave both;
+}
+
+// ---------- 3. Componentes reutilizables (placeholders) ----------
+
+// Texto pequeño y apagado debajo de un título
+%texto-secundario {
+  display: block;
+  font-size: 12.5px;
+  color: $color-tenue;
+}
+
+// Etiqueta en mayúsculas sobre un dato
+%antetitulo-mini {
+  @include fuente(800, 10.5px);
+  color: $color-violeta;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// Etiqueta de campo de formulario
+%etiqueta-campo {
+  @include fuente(800, 11px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $color-tenue;
+}
+
+// Lista sin viñetas ni márgenes
+%lista-limpia {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+// Menú desplegable blanco (menú principal y menú de usuario)
+%desplegable {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 250px;
+  padding: 8px;
+  display: none;
+  background: $color-blanco;
+  border-radius: $radio;
+  box-shadow: $sombra-fuerte;
+  border: 1px solid $color-borde;
+
+  // Puente invisible para que el menú no se cierre al bajar el mouse
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10px;
+    height: 10px;
+  }
+}
+
+// Opción de un menú desplegable
+%opcion-desplegable {
+  display: grid;
+  gap: 1px;
+  padding: 9px 12px;
+  border-radius: $radio-chico;
+  color: $color-texto;
+  font-weight: 600;
+  font-size: 14px;
+
+  &:hover {
+    background: $color-violeta-claro;
+    text-decoration: none;
+  }
+}
+
+// Tarjeta blanca que se levanta al pasar el mouse
+%tarjeta-flotante {
+  background: $color-blanco;
+  border: 1px solid $color-borde;
+  border-radius: $radio;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: $color-texto;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+
+  &:hover {
+    text-decoration: none;
+    box-shadow: $sombra;
+    transform: translateY(-2px);
+    border-color: $color-violeta-borde;
+  }
+}
+
+// Foto que cubre todo su contenedor
+%foto-cubre {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// Pastilla redonda con texto corto
+%pastilla {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 5px 12px;
+  @include fuente(600, 12px, $fuente-texto);
+  white-space: nowrap;
+}

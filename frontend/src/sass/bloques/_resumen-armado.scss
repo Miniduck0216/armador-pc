@@ -1,0 +1,53 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: resumen-armado (panel lateral del configurador) ----------
+
+.resumen-armado {
+  position: sticky;
+  top: 94px;
+  display: grid;
+  gap: 14px;
+
+  &__etiqueta {
+    margin: 0;
+  }
+
+  &__total {
+    @include fuente(800, 36px);
+  }
+
+  &__ahorro {
+    font-size: 13px;
+    font-weight: 600;
+    color: $color-verde;
+  }
+
+  &__cambio {
+    font-size: 15px;
+  }
+
+  &__guardar {
+    flex: 1;
+  }
+
+  &__titulo {
+    margin-bottom: 10px;
+  }
+
+  &__pendientes {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__color {
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  @include movil {
+    position: static;
+  }
+}

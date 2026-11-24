@@ -1,0 +1,20 @@
+@use 'sass:list';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: estado-armado (etiqueta con el estado del flujo de revisión) ----------
+
+.estado-armado {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  @include fuente(700, 12.5px);
+
+  // Un modificador por estado, generado con @each sobre el mapa
+  @each $estado, $par in $colores-estado {
+    &--#{$estado} {
+      @include color(list.nth($par, 1), list.nth($par, 2));
+    }
+  }
+}

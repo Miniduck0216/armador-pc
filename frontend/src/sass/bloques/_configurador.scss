@@ -1,0 +1,52 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: configurador (piezas a la izquierda, resumen a la derecha) ----------
+
+.configurador {
+  display: grid;
+  grid-template-columns: 1fr 370px;
+  align-items: start;
+  gap: 26px;
+
+  // Mientras responde el servidor
+  &--cargando {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+
+  &__seccion {
+    padding-top: 28px;
+  }
+
+  &__edicion {
+    margin-bottom: 16px;
+  }
+
+  &__cabecera {
+    margin-bottom: 12px;
+
+    &--perifericos {
+      margin-top: 28px;
+    }
+  }
+
+  &__titulo {
+    font-size: 22px;
+  }
+
+  &__opcional {
+    font: 13px $fuente-texto;
+    color: $color-tenue;
+  }
+
+  &__lista {
+    display: grid;
+    gap: 10px;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+  }
+}

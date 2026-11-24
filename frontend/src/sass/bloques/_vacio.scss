@@ -1,0 +1,13 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloques: vacio (sin resultados) y esqueleto (cargando) ----------
+
+.vacio {
+  padding: 26px;
+  border: 1px dashed $color-borde;
+  border-radius: $radio;
+  background: $color-blanco;
+  color: $color-tenue;
+  text-align: center;
+}

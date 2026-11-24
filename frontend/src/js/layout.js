@@ -1,5 +1,5 @@
 // Encabezado, pie de página, buscador y bandeja de comparación comunes a todas las páginas
-import '../sass/main.scss';
+import '../styles.scss';
 import { api, enviar } from './api.js';
 import { icono } from './iconos.js';
 import { $, dinero, esc, imagen, retrasar } from './util.js';
@@ -39,67 +39,63 @@ const MENU = [
 let usuarioActual = null;
 
 function encabezado(activo) {
-  const menu = MENU.map((m) =>
-    m.url
-      ? `<div><a href="${m.url}" class="${m.clave === activo ? 'activo' : ''}">${m.texto}</a></div>`
-      : `<div>
-          <button type="button" class="${m.clave === activo ? 'activo' : ''}" aria-haspopup="true">${m.texto} ${icono('abajo', 14, 'flecha')}</button>
-          <div class="submenu">${m.enlaces.map(([u, t, d]) => `<a href="${u}">${t}<small>${d}</small></a>`).join('')}</div>
-        </div>`,
-  ).join('');
+  const menu = MENU.map((m) => {
+    const clase = `menu__enlace ${m.clave === activo ? 'menu__enlace--activo' : ''}`;
+    if (m.url) return `<div class="menu__item"><a class="${clase}" href="${m.url}">${m.texto}</a></div>`;
+    const opciones = m.enlaces
+      .map(([u, t, d]) => `<a class="menu__opcion" href="${u}">${t}<small class="menu__detalle">${d}</small></a>`)
+      .join('');
+    return `<div class="menu__item">
+        <button type="button" class="${clase}" aria-haspopup="true">${m.texto} ${icono('abajo', 14, 'menu__flecha')}</button>
+        <div class="menu__submenu">${opciones}</div>
+      </div>`;
+  }).join('');
   return `
     <nav class="barra" aria-label="Principal">
-      <div class="contenedor">
-        <button class="boton-menu" type="button" aria-label="Abrir menú">${icono('menu', 26)}</button>
-        <a class="logo" href="/"><img src="/logo-icono.svg" alt="" width="38" height="38"><span>Armador<b>PC</b></span></a>
+      <div class="contenedor barra__contenido">
+        <button class="barra__boton-menu" type="button" aria-label="Abrir menú">${icono('menu', 26)}</button>
+        ${logo('logo--compacto')}
         <div class="menu" id="menu-principal">${menu}</div>
         <form class="buscador" role="search" action="/componentes.html">
-          <input name="buscar" type="search" placeholder="Buscar componentes…" autocomplete="off" aria-label="Buscar componentes">
-          <div class="sugerencias oculto"></div>
+          <input class="buscador__campo" name="buscar" type="search" placeholder="Buscar componentes…" autocomplete="off" aria-label="Buscar componentes">
+          <div class="buscador__sugerencias" hidden></div>
         </form>
         <div class="sesion" id="sesion"></div>
       </div>
     </nav>`;
 }
 
+function logo(modificador = '') {
+  return `<a class="logo ${modificador}" href="/"><img class="logo__imagen" src="/logo-icono.svg" alt="" width="38" height="38"><span class="logo__texto">Armador<b class="logo__marca">PC</b></span></a>`;
+}
+
+// Columnas del pie: [título, [[url, texto], ...]]
+const COLUMNAS_PIE = [
+  ['Armar', [['/configurador.html', 'Configurador'], ['/configurador.html?modo=guiado', 'Asistente por presupuesto'], ['/configuraciones.html', 'Configuraciones']]],
+  ['Componentes', [['/componentes.html', 'Biblioteca'], ['/comparar.html', 'Comparar'], ['/componentes.html?categoria=CPU', 'Procesadores'], ['/componentes.html?categoria=GPU', 'Tarjetas gráficas']]],
+  ['Herramientas', [['/herramientas.html#comprobador', 'Compatibilidad'], ['/herramientas.html#fuente', 'Fuente de poder'], ['/herramientas.html#refrigeracion', 'Refrigeración'], ['/guias.html', 'Guías']]],
+  ['Proyecto', [['/api/docs', 'Documentación de la API'], ['/cuenta.html', 'Mi cuenta'], ['/guia.html?slug=compatibilidad-antes-de-comprar', 'Cómo comprobamos la compatibilidad']]],
+];
+
 function pie() {
+  const columnas = COLUMNAS_PIE.map(
+    ([titulo, enlaces]) => `<div>
+        <h4 class="pie__titulo">${titulo}</h4>
+        ${enlaces.map(([u, t]) => `<a class="pie__enlace" href="${u}"${u.startsWith('/api') ? ' target="_blank" rel="noopener"' : ''}>${t}</a>`).join('')}
+      </div>`,
+  ).join('');
   return `
     <div class="contenedor">
-      <div class="pie-columnas">
-        <div>
-          <a class="logo" href="/"><img src="/logo-icono.svg" alt="" width="38" height="38"><span>Armador<b>PC</b></span></a>
-          <p class="lema">Arma tu PC con precios reales de Ecuador.</p>
-          <div class="barrita"></div>
-          <p class="pequeno" style="margin-top:14px">Proyecto académico de Ingeniería Web · UDLA. Los precios son orientativos: confirma siempre en la tienda antes de comprar.</p>
+      <div class="pie__columnas">
+        <div class="pie__marca">
+          ${logo()}
+          <p class="pie__lema">Arma tu PC con precios reales de Ecuador.</p>
+          <div class="pie__barrita"></div>
+          <p class="pie__nota">Proyecto académico de Ingeniería Web · UDLA. Los precios son orientativos: confirma siempre en la tienda antes de comprar.</p>
         </div>
-        <div>
-          <h4>Armar</h4>
-          <a href="/configurador.html">Configurador</a>
-          <a href="/configurador.html?modo=guiado">Asistente por presupuesto</a>
-          <a href="/configuraciones.html">Configuraciones</a>
-        </div>
-        <div>
-          <h4>Componentes</h4>
-          <a href="/componentes.html">Biblioteca</a>
-          <a href="/comparar.html">Comparar</a>
-          <a href="/componentes.html?categoria=CPU">Procesadores</a>
-          <a href="/componentes.html?categoria=GPU">Tarjetas gráficas</a>
-        </div>
-        <div>
-          <h4>Herramientas</h4>
-          <a href="/herramientas.html#comprobador">Compatibilidad</a>
-          <a href="/herramientas.html#fuente">Fuente de poder</a>
-          <a href="/herramientas.html#refrigeracion">Refrigeración</a>
-          <a href="/guias.html">Guías</a>
-        </div>
-        <div>
-          <h4>Proyecto</h4>
-          <a href="/api/docs" target="_blank" rel="noopener">Documentación de la API</a>
-          <a href="/cuenta.html">Mi cuenta</a>
-          <a href="/guia.html?slug=compatibilidad-antes-de-comprar">Cómo comprobamos la compatibilidad</a>
-        </div>
+        ${columnas}
       </div>
-      <div class="pie-final">
+      <div class="pie__final">
         <span>© ${new Date().getFullYear()} ArmadorPC · Hecho con NestJS, SQLite y Vite</span>
         <span>Fotos de referencia: Wikimedia Commons (licencias CC, crédito en cada ficha)</span>
       </div>
@@ -108,22 +104,26 @@ function pie() {
 
 function pintarSesion(u) {
   const el = $('#sesion');
+  el.classList.add('sesion--lista');
   if (!u) {
-    el.innerHTML = `<a class="enlace-claro" href="/ingresar.html">Ingresar</a><a class="boton pequeno" href="/registro.html">Crear cuenta</a>`;
+    el.innerHTML = `<a class="sesion__enlace" href="/ingresar.html">Ingresar</a><a class="boton boton--pequeno sesion__boton" href="/registro.html">Crear cuenta</a>`;
     return;
   }
   const inicial = esc(u.nombre?.[0]?.toUpperCase() ?? '?');
+  const nuevas = u.alertasNuevas;
   el.innerHTML = `
     ${u.esAdmin ? `<a class="campana" href="/admin.html" title="Administración">${icono('admin', 19)}</a>` : ''}
-    <a class="campana ${u.alertasNuevas ? 'campana--nueva' : ''}" href="/cuenta.html#notificaciones" title="Notificaciones y alertas">${icono('campana', 19)}${u.alertasNuevas ? `<span class="globo">${u.alertasNuevas}</span>` : ''}</a>
+    <a class="campana ${nuevas ? 'campana--nueva' : ''}" href="/cuenta.html#notificaciones" title="Notificaciones y alertas">
+      ${icono('campana', 19, 'campana__icono')}${nuevas ? `<span class="campana__globo">${nuevas}</span>` : ''}
+    </a>
     <div class="menu-usuario">
-      <button type="button" class="chip-usuario"><span class="avatar">${inicial}</span><span class="nombre">${esc(u.nombre.split(' ')[0])}</span></button>
-      <div class="submenu derecha">
-        <a href="/cuenta.html">Mi cuenta<small>${esc(u.correo)}</small></a>
-        <a href="/cuenta.html#armados">Mis armados</a>
-        <a href="/cuenta.html#alertas">Alertas de precio</a>
-        ${u.esAdmin ? '<a href="/admin.html">Panel de administración</a>' : ''}
-        <a href="#" data-salir>Cerrar sesión</a>
+      <button type="button" class="menu-usuario__boton"><span class="avatar">${inicial}</span><span class="menu-usuario__nombre">${esc(u.nombre.split(' ')[0])}</span></button>
+      <div class="menu-usuario__submenu">
+        <a class="menu-usuario__opcion" href="/cuenta.html">Mi cuenta<small class="menu-usuario__detalle">${esc(u.correo)}</small></a>
+        <a class="menu-usuario__opcion" href="/cuenta.html#armados">Mis armados</a>
+        <a class="menu-usuario__opcion" href="/cuenta.html#alertas">Alertas de precio</a>
+        ${u.esAdmin ? '<a class="menu-usuario__opcion" href="/admin.html">Panel de administración</a>' : ''}
+        <a class="menu-usuario__opcion" href="#" data-salir>Cerrar sesión</a>
       </div>
     </div>`;
   el.querySelector('[data-salir]').addEventListener('click', async (e) => {
@@ -135,30 +135,34 @@ function pintarSesion(u) {
 
 function activarBuscador() {
   const form = $('.buscador');
-  const entrada = form.querySelector('input');
-  const caja = form.querySelector('.sugerencias');
+  const entrada = form.querySelector('.buscador__campo');
+  const caja = form.querySelector('.buscador__sugerencias');
   const buscar = retrasar(async () => {
     const q = entrada.value.trim();
-    if (q.length < 2) return caja.classList.add('oculto');
+    if (q.length < 2) return (caja.hidden = true);
     try {
       const r = await api(`/buscar?q=${encodeURIComponent(q)}`);
       caja.innerHTML = r.length
         ? r
             .slice(0, 6)
             .map(
-              (p) => `<a href="/producto.html?id=${p.id}">${imagen(p.imagen, p.nombre)}
-                <span>${esc(p.nombreCompleto)}<small>${esc(p.categoria.nombre)}</small></span><b>${dinero(p.precio)}</b></a>`,
+              (p) => `<a class="buscador__sugerencia" href="/producto.html?id=${p.id}">${imagen(p.imagen, p.nombre, 'buscador__foto')}
+                <span class="buscador__nombre">${esc(p.nombreCompleto)}<small class="buscador__categoria">${esc(p.categoria.nombre)}</small></span><b>${dinero(p.precio)}</b></a>`,
             )
-            .join('') + `<a class="ver-todo" href="/componentes.html?buscar=${encodeURIComponent(q)}">Ver todos los resultados</a>`
-        : `<div class="tenue pequeno" style="padding:12px">Sin resultados para “${esc(q)}”</div>`;
-      caja.classList.remove('oculto');
+            .join('') + `<a class="buscador__ver-todo" href="/componentes.html?buscar=${encodeURIComponent(q)}">Ver todos los resultados</a>`
+        : `<div class="buscador__vacio">Sin resultados para “${esc(q)}”</div>`;
+      caja.hidden = false;
     } catch {
-      caja.classList.add('oculto');
+      caja.hidden = true;
     }
   }, 220);
   entrada.addEventListener('input', buscar);
-  entrada.addEventListener('focus', () => entrada.value.trim().length >= 2 && caja.classList.remove('oculto'));
-  document.addEventListener('click', (e) => !form.contains(e.target) && caja.classList.add('oculto'));
+  entrada.addEventListener('focus', () => {
+    if (entrada.value.trim().length >= 2) caja.hidden = false;
+  });
+  document.addEventListener('click', (e) => {
+    if (!form.contains(e.target)) caja.hidden = true;
+  });
 }
 
 // Bandeja flotante "Comparar (2/3)" visible en todas las páginas
@@ -171,16 +175,23 @@ function bandejaComparar() {
     document.body.append(el);
   }
   const c = leerComparar();
-  if (!c.items.length || location.pathname.startsWith('/comparar')) return el.classList.add('oculto');
-  el.classList.remove('oculto');
+  const visible = c.items.length > 0 && !location.pathname.startsWith('/comparar');
+  el.hidden = !visible;
+  document.body.classList.toggle('pagina--con-bandeja', visible);
+  if (!visible) return;
+  const items = c.items
+    .map(
+      (x) => `<span class="bandeja-comparar__item">${imagen(x.imagen, x.nombre, 'bandeja-comparar__foto')}<em class="bandeja-comparar__nombre">${esc(x.nombre)}</em>
+        <button class="bandeja-comparar__quitar" data-quitar="${x.id}" aria-label="Quitar">✕</button></span>`,
+    )
+    .join('');
+  const enlace = `/comparar.html?categoria=${c.categoria}&ids=${c.items.map((x) => x.id).join(',')}`;
   el.innerHTML = `
-    <div class="contenedor">
-      <strong>${icono('comparar')} Comparar (${c.items.length}/3)</strong>
-      <div class="bandeja-items">${c.items
-        .map((x) => `<span>${imagen(x.imagen, x.nombre)}<em>${esc(x.nombre)}</em><button data-quitar="${x.id}" aria-label="Quitar">✕</button></span>`)
-        .join('')}</div>
-      <button class="enlace" data-vaciar>Vaciar</button>
-      <a class="boton pequeno ${c.items.length < 2 ? 'deshabilitado' : ''}" href="/comparar.html?categoria=${c.categoria}&ids=${c.items.map((x) => x.id).join(',')}">Comparar ahora</a>
+    <div class="contenedor bandeja-comparar__contenido">
+      <strong class="bandeja-comparar__titulo">${icono('comparar')} Comparar (${c.items.length}/3)</strong>
+      <div class="bandeja-comparar__items">${items}</div>
+      <button class="enlace bandeja-comparar__vaciar" data-vaciar>Vaciar</button>
+      <a class="boton boton--pequeno ${c.items.length < 2 ? 'boton--deshabilitado' : ''}" href="${enlace}">Comparar ahora</a>
     </div>`;
   el.querySelectorAll('[data-quitar]').forEach((b) =>
     b.addEventListener('click', () => alternarComparar({ id: Number(b.dataset.quitar), categoria: c.categoria })),
@@ -194,16 +205,15 @@ function bandejaComparar() {
  */
 export function montar(activo = '') {
   document.body.insertAdjacentHTML('afterbegin', `<header>${encabezado(activo)}</header>`);
-  // La barra ya existe: ahora el contenido puede entrar sin empujar nada (ver _movimiento.scss)
-  // En este punto los estilos ya están cargados (se importan arriba): se muestra la página
-  document.documentElement.classList.add('listo');
-  requestAnimationFrame(() => document.body.classList.add('listo'));
+  // La barra ya existe y los estilos ya cargaron (se importan arriba): el contenido
+  // entra suave sin empujar nada (ver bloques/_pagina.scss)
+  document.body.classList.replace('pagina--cargando', 'pagina--lista');
   const footer = document.createElement('footer');
-  footer.className = 'pie';
+  footer.className = `pie ${document.querySelector('.acceso') ? 'pie--pegado' : ''}`;
   footer.innerHTML = pie();
   document.body.append(footer);
 
-  $('.boton-menu').addEventListener('click', () => $('#menu-principal').classList.toggle('abierto'));
+  $('.barra__boton-menu').addEventListener('click', () => $('#menu-principal').classList.toggle('menu--abierto'));
   activarBuscador();
   bandejaComparar();
   window.addEventListener('comparar', bandejaComparar);

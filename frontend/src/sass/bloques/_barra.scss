@@ -1,0 +1,41 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: barra (navegación superior fija) ----------
+
+.barra {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: $color-marino;
+  color: $color-blanco;
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.04);
+  view-transition-name: barra; // no se funde al cambiar de página
+
+  &__contenido {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: $alto-barra;
+  }
+
+  // Botón de tres rayas: solo aparece en tablets y celulares
+  &__boton-menu {
+    display: none;
+    background: none;
+    border: 0;
+    color: $color-blanco;
+    cursor: pointer;
+  }
+
+  @include movil {
+    &__contenido {
+      gap: 12px;
+      height: 66px;
+    }
+
+    &__boton-menu {
+      display: block;
+    }
+  }
+}

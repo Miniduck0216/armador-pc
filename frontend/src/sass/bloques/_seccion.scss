@@ -1,0 +1,68 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: seccion (franja de la página) ----------
+
+.seccion {
+  padding: 56px 0;
+
+  &--blanca {
+    background: $color-blanco;
+    border-top: 1px solid $color-borde;
+    border-bottom: 1px solid $color-borde;
+  }
+
+  &--oscura {
+    background: linear-gradient(135deg, $color-marino, $color-marino-2 60%, $color-morado-oscuro);
+    color: $color-blanco;
+  }
+
+  &--sin-arriba {
+    padding-top: 0;
+  }
+
+  // Cabecera de una sección: título a la izquierda, texto o botón a la derecha
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    margin-bottom: 26px;
+    flex-wrap: wrap;
+  }
+
+  &__antetitulo {
+    display: block;
+    margin-bottom: 8px;
+    @include fuente(800, 11px);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $color-violeta;
+  }
+
+  &--oscura &__antetitulo {
+    color: #a99bff;
+  }
+
+  &__titulo {
+    margin-bottom: 0;
+  }
+
+  &__subtitulo {
+    margin: 28px 0 14px;
+    font-size: 18px;
+  }
+
+  &__descripcion {
+    max-width: 460px;
+    color: $color-tenue;
+  }
+
+  &--oscura &__descripcion {
+    color: $color-claro-3;
+  }
+
+  @include movil {
+    padding: 40px 0;
+  }
+}

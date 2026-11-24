@@ -1,0 +1,81 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: grafico (historial de precios en SVG) ----------
+
+.grafico {
+  position: relative;
+
+  &__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  &__eje {
+    stroke: $color-borde;
+  }
+
+  &__texto {
+    fill: $color-tenue;
+    font: 11px $fuente-texto;
+  }
+
+  &__linea {
+    fill: none;
+    stroke-width: 1.5;
+    opacity: 0.45;
+
+    &--mejor {
+      stroke: $color-violeta;
+      stroke-width: 3;
+      opacity: 1;
+    }
+  }
+
+  &__area {
+    fill: url(#degradado-grafico);
+  }
+
+  &__guia {
+    stroke: $color-violeta;
+    stroke-dasharray: 3 3;
+  }
+
+  &__tooltip {
+    position: absolute;
+    padding: 8px 11px;
+    border-radius: $radio-chico;
+    background: $color-marino;
+    color: $color-blanco;
+    font-size: 12.5px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: $sombra-fuerte;
+    transform: translate(-50%, -110%);
+  }
+
+  &__leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: $color-tenue;
+  }
+
+  // Cuadrito de color de cada tienda en la leyenda
+  &__color {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+    border-radius: 3px;
+    vertical-align: -1px;
+
+    &--mejor {
+      background: $color-violeta;
+    }
+  }
+}

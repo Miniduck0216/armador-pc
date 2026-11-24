@@ -1,0 +1,36 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: cabecera-pagina (título grande de cada página) ----------
+
+.cabecera-pagina {
+  background: $color-blanco;
+  border-bottom: 1px solid $color-borde;
+  padding: 42px 0 30px;
+
+  &__migas {
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__miga {
+    color: $color-tenue;
+  }
+
+  &__esqueleto {
+    height: 90px;
+  }
+
+  &__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__texto {
+    margin-top: 10px;
+    font-size: 16px;
+    color: $color-tenue;
+  }
+}

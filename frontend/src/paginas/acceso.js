@@ -9,7 +9,7 @@ const BENEFICIOS = [
 ];
 
 export function prepararAcceso() {
-  $('#beneficios').innerHTML = BENEFICIOS.map((b) => `<li>${icono('check', 20)} ${b}</li>`).join('');
+  $('#beneficios').innerHTML = BENEFICIOS.map((b) => `<li class="acceso__beneficio">${icono('check', 20, 'icono--amarillo')} ${b}</li>`).join('');
 }
 
 // Solo se permite volver a páginas de este mismo sitio (evita redirecciones abiertas)
@@ -21,12 +21,12 @@ export function destino() {
 export function mostrarError(texto) {
   const e = $('#error');
   e.textContent = texto;
-  e.classList.toggle('oculto', !texto);
+  e.hidden = !texto;
   // Reinicia la animación de "sacudir" para que se note cada nuevo error
-  e.classList.remove('sacudir');
+  e.classList.remove('aviso--sacudir');
   if (texto) {
-    void e.offsetWidth;
-    e.classList.add('sacudir');
+    void e.offsetWidth; // obliga al navegador a recalcular, así la animación vuelve a empezar
+    e.classList.add('aviso--sacudir');
   }
 }
 
@@ -41,6 +41,6 @@ export function salirConExito(b, texto, url) {
   b.classList.remove('boton--cargando');
   b.classList.add('boton--listo');
   b.textContent = texto;
-  setTimeout(() => document.body.classList.add('saliendo'), 350);
+  setTimeout(() => document.body.classList.add('pagina--saliendo'), 350);
   setTimeout(() => (location.href = url), 600);
 }

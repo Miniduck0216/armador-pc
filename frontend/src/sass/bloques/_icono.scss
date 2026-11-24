@@ -1,0 +1,21 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: icono (los SVG que genera iconos.js) ----------
+
+.icono {
+  flex: none;
+  vertical-align: -3px;
+
+  &--verde {
+    color: $color-verde;
+  }
+
+  &--rojo {
+    color: $color-rojo;
+  }
+
+  &--amarillo {
+    color: $color-amarillo;
+  }
+}

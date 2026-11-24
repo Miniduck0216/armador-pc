@@ -1,0 +1,73 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: compatibilidad (estado general y lista de reglas) ----------
+// Se usa en el configurador, en el armado guardado, en el compartido y en herramientas.
+
+@keyframes pulso {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.35);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba(225, 29, 72, 0);
+  }
+}
+
+.compatibilidad {
+  &__estado {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-weight: 700;
+
+    &--ok {
+      @include color($color-verde-claro, $color-verde-oscuro);
+    }
+
+    // Con problemas: además late dos veces para llamar la atención
+    &--mal {
+      @include color($color-rojo-claro, $color-rojo-oscuro);
+      animation: pulso 1.6s ease-out 2;
+    }
+
+    &--pendiente {
+      @include color($color-panel-2, $color-tenue);
+    }
+  }
+
+  &__reglas {
+    @extend %lista-limpia;
+    display: grid;
+    gap: 7px;
+    font-size: 13.5px;
+  }
+
+  &__regla {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    align-items: start;
+    gap: 8px;
+  }
+
+  &__detalle {
+    @extend %texto-secundario;
+  }
+
+  &__icono {
+    &--ok {
+      color: $color-verde;
+    }
+
+    &--mal {
+      color: $color-rojo;
+    }
+
+    &--omitida {
+      color: #b5b8cc;
+    }
+  }
+}

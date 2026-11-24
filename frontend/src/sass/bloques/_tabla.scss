@@ -1,0 +1,97 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: tabla ----------
+// <div class="tabla"><table class="tabla__tabla">
+//   <tr class="tabla__fila"><th class="tabla__titulo">…</th><td class="tabla__celda">…</td></tr>
+// </table></div>
+
+.tabla {
+  overflow-x: auto;
+  border: 1px solid $color-borde;
+  border-radius: $radio;
+  background: $color-blanco;
+
+  &__tabla {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  &__titulo,
+  &__celda {
+    padding: 13px 16px;
+    border-bottom: 1px solid $color-borde;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  &__titulo {
+    @extend %etiqueta-campo;
+    background: #fafaff;
+  }
+
+  // Las filas llegan una tras otra (cada una 0.03 s después)
+  &__fila {
+    @include entrar(0.3s);
+    @include escalonado(12, 0.03s);
+
+    &:last-child .tabla__celda {
+      border-bottom: 0;
+    }
+
+    &--destacada {
+      background: #fbfaff;
+    }
+
+    &--igual {
+      color: $color-tenue;
+    }
+  }
+
+  // Celdas con números o botones: alineadas a la derecha
+  &__celda--derecha,
+  &__titulo--derecha {
+    text-align: right;
+  }
+
+  &__celda--centro,
+  &__titulo--centro {
+    text-align: center;
+  }
+
+  // Columnas cortas (tipo, activa): no se parten en dos líneas
+  &__celda--corta,
+  &__titulo--corta {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  &__celda--etiqueta {
+    width: 24%;
+    color: $color-tenue;
+    font-weight: 600;
+  }
+
+  // El ganador de cada fila en la comparación
+  &__celda--ganadora {
+    background: #f0fbf4;
+    color: $color-verde-oscuro;
+    font-weight: 700;
+
+    &::after {
+      content: ' ✓';
+    }
+  }
+
+  // Fila de grupo (módulo) dentro de la tabla
+  &__grupo {
+    @extend %antetitulo-mini;
+    padding: 8px 16px;
+    background: $color-panel-2;
+  }
+
+  // Texto secundario dentro de una celda
+  &__detalle {
+    @extend %texto-secundario;
+  }
+}

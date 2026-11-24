@@ -1,0 +1,32 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: ficha-nav (pestañas fijas de la ficha) ----------
+
+.ficha-nav {
+  position: sticky;
+  top: $alto-barra;
+  z-index: 30;
+  background: $color-blanco;
+  border-bottom: 1px solid $color-borde;
+
+  &__contenido {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+  }
+
+  &__enlace {
+    padding: 14px;
+    border-bottom: 3px solid transparent;
+    color: $color-tenue;
+    @include fuente(700, 14px);
+    white-space: nowrap;
+
+    &:hover {
+      color: $color-violeta;
+      text-decoration: none;
+      border-color: $color-violeta-borde;
+    }
+  }
+}

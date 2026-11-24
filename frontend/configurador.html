@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Configurador de PC · ArmadorPC</title>
   <meta name="description" content="Arma tu PC pieza por pieza con compatibilidad, consumo y precios de Ecuador en vivo.">
@@ -13,46 +13,50 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/configurador.js"></script>
 </head>
-<body>
-<main>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido">
   <section class="cabecera-pagina">
-    <div class="contenedor fila entre">
+    <div class="contenedor fila fila--entre">
       <div>
-        <div class="migas"><a href="/">Inicio</a> / Configurador</div>
+        <div class="cabecera-pagina__migas"><a class="cabecera-pagina__miga" href="/">Inicio</a> / Configurador</div>
         <h1>Configurador de PC</h1>
-        <p>Elige cada pieza: comprobamos la compatibilidad, el consumo y el mejor precio mientras armas.</p>
+        <p class="cabecera-pagina__texto">Elige cada pieza: comprobamos la compatibilidad, el consumo y el mejor precio mientras armas.</p>
       </div>
-      <button class="boton violeta" id="abrir-asistente" type="button"></button>
+      <button class="boton boton--violeta" id="abrir-asistente" type="button"></button>
     </div>
   </section>
-  <section class="seccion" style="padding-top:28px">
+  <section class="seccion configurador__seccion">
     <div class="contenedor">
-      <form class="asistente oculto" id="asistente">
-        <div><span class="antetitulo">Asistente por presupuesto</span><h2>¿Cuánto quieres gastar?</h2>
+      <form class="asistente" id="asistente" hidden>
+        <div><span class="seccion__antetitulo">Asistente por presupuesto</span><h2>¿Cuánto quieres gastar?</h2>
           <p class="asistente__texto">Armamos un equipo completo y compatible con los mejores precios de hoy. Después puedes cambiar cualquier pieza.</p></div>
         <div class="asistente__grilla">
-          <div class="campo"><span>Presupuesto</span>
+          <div class="formulario__campo"><span class="formulario__etiqueta">Presupuesto</span>
             <div class="asistente__presupuesto" id="valor-presupuesto">$1,200</div>
             <input class="asistente__rango" type="range" name="presupuesto" min="400" max="5000" step="50" value="1200" aria-label="Presupuesto en dólares">
-            <div class="fila entre pequeno tenue"><span>$400</span><span>$5,000</span></div>
+            <div class="fila fila--entre asistente__limites"><span>$400</span><span>$5,000</span></div>
           </div>
-          <div class="apilado">
-            <div class="campo"><span>¿Para qué lo usarás?</span>
+          <div class="pila">
+            <div class="formulario__campo"><span class="formulario__etiqueta">¿Para qué lo usarás?</span>
               <div class="asistente__usos">
                 <label class="asistente__uso"><input class="asistente__radio" type="radio" name="uso" value="juegos" checked><span class="asistente__etiqueta">Juegos</span></label>
                 <label class="asistente__uso"><input class="asistente__radio" type="radio" name="uso" value="trabajo"><span class="asistente__etiqueta">Trabajo y creación</span></label>
               </div>
             </div>
-            <label class="casilla asistente__casilla"><input type="checkbox" name="sinGrafica"> Sin tarjeta gráfica (usar gráficos integrados)</label>
+            <label class="formulario__casilla asistente__casilla"><input type="checkbox" name="sinGrafica"> Sin tarjeta gráfica (usar gráficos integrados)</label>
           </div>
-          <button class="boton grande">Armar mi PC</button>
+          <button class="boton boton--grande">Armar mi PC</button>
         </div>
       </form>
+      <div class="aviso aviso--alerta configurador__edicion" id="aviso-edicion" hidden>
+        Editando las piezas de <b id="nombre-edicion"></b>: al pulsar «Guardar» se actualiza ese armado.
+        <button class="enlace" id="cancelar-edicion" type="button">Cancelar edición</button>
+      </div>
       <div class="configurador">
         <div>
-          <div class="fila entre" style="margin-bottom:12px"><h2 class="configurador__titulo">Componentes</h2><button class="enlace peligro" id="vaciar" type="button">Vaciar todo</button></div>
+          <div class="fila fila--entre configurador__cabecera"><h2 class="configurador__titulo">Componentes</h2><button class="enlace enlace--peligro" id="vaciar" type="button">Vaciar todo</button></div>
           <div class="configurador__lista" id="lista"></div>
-          <div class="fila entre" style="margin:28px 0 12px"><h2 class="configurador__titulo">Periféricos <span class="tenue pequeno" style="font-family:Inter">(opcional)</span></h2></div>
+          <div class="configurador__cabecera configurador__cabecera--perifericos"><h2 class="configurador__titulo">Periféricos <span class="configurador__opcional">(opcional)</span></h2></div>
           <div class="configurador__lista" id="perifericos"></div>
         </div>
         <aside class="resumen-armado" id="resumen"></aside>

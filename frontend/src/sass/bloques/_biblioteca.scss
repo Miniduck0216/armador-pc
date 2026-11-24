@@ -1,0 +1,61 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: biblioteca (página de componentes: filtros + resultados) ----------
+
+.biblioteca {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  align-items: start;
+  gap: 26px;
+
+  &__categorias {
+    margin-top: 24px;
+  }
+
+  &__filtros {
+    position: sticky;
+    top: 94px;
+    display: grid;
+    gap: 18px;
+  }
+
+  // Botón "Filtros": solo en tablets y celulares
+  &__ver-filtros {
+    display: none;
+  }
+
+  &__barra {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  // Consejo "Qué mirar al elegir…"
+  &__consejo {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+
+    &__filtros {
+      position: static;
+      display: none;
+
+      &--abiertos {
+        display: grid;
+      }
+    }
+
+    &__ver-filtros {
+      display: inline-flex;
+    }
+  }
+}

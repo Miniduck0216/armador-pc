@@ -1,0 +1,24 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: fila ----------
+
+// Elementos en una fila que bajan a la siguiente si no caben
+.fila {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  &--entre {
+    justify-content: space-between;
+  }
+
+  &--arriba {
+    align-items: flex-start;
+  }
+
+  &--chica {
+    gap: 6px;
+  }
+}

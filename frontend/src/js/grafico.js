@@ -37,25 +37,25 @@ export function graficoHistorial(el, datos) {
 
   el.innerHTML = `
     <div class="grafico">
-      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Historial de precios">
+      <svg class="grafico__svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Historial de precios">
         <defs><linearGradient id="degradado-grafico" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4bff" stop-opacity=".22"/><stop offset="1" stop-color="#6b4bff" stop-opacity="0"/></linearGradient></defs>
-        ${marcas.map((m) => `<line class="eje" x1="${M.iz}" x2="${W - M.d}" y1="${y(m)}" y2="${y(m)}"/><text x="${M.iz - 8}" y="${y(m) + 4}" text-anchor="end">$${Math.round(m)}</text>`).join('')}
-        ${datos.fechas.map((f, i) => (i % pasos === 0 || i === n - 1 ? `<text x="${x(i)}" y="${H - 8}" text-anchor="middle">${esc(fecha(f).replace(/ de \d{4}|\.? \d{4}/, ''))}</text>` : '')).join('')}
-        ${datos.porTienda.map((t) => `<path class="linea" stroke="${esc(t.color)}" d="${camino(t.precios)}"/>`).join('')}
-        <path class="area" d="${area}"/>
-        <path class="linea mejor" d="${lineaMejor}"/>
-        <line class="guia-vertical oculto" y1="${M.a}" y2="${H - M.ab}"/>
-        <circle class="punto oculto" r="5" fill="#6b4bff" stroke="#fff" stroke-width="2"/>
-        <rect x="${M.iz}" y="0" width="${W - M.iz - M.d}" height="${H}" fill="transparent" class="captura"/>
+        ${marcas.map((m) => `<line class="grafico__eje" x1="${M.iz}" x2="${W - M.d}" y1="${y(m)}" y2="${y(m)}"/><text class="grafico__texto" x="${M.iz - 8}" y="${y(m) + 4}" text-anchor="end">$${Math.round(m)}</text>`).join('')}
+        ${datos.fechas.map((f, i) => (i % pasos === 0 || i === n - 1 ? `<text class="grafico__texto" x="${x(i)}" y="${H - 8}" text-anchor="middle">${esc(fecha(f).replace(/ de \d{4}|\.? \d{4}/, ''))}</text>` : '')).join('')}
+        ${datos.porTienda.map((t) => `<path class="grafico__linea" stroke="${esc(t.color)}" d="${camino(t.precios)}"/>`).join('')}
+        <path class="grafico__area" d="${area}"/>
+        <path class="grafico__linea grafico__linea--mejor" d="${lineaMejor}"/>
+        <line class="grafico__guia" hidden y1="${M.a}" y2="${H - M.ab}"/>
+        <circle class="grafico__punto" hidden r="5" fill="#6b4bff" stroke="#fff" stroke-width="2"/>
+        <rect x="${M.iz}" y="0" width="${W - M.iz - M.d}" height="${H}" fill="transparent" class="grafico__captura"/>
       </svg>
-      <div class="grafico-tooltip oculto"></div>
+      <div class="grafico__tooltip" hidden></div>
     </div>
-    <div class="leyenda"><span><i style="background:#6b4bff"></i>Mejor precio del día</span>${datos.porTienda.map((t) => `<span><i style="background:${esc(t.color)}"></i>${esc(t.tienda)}</span>`).join('')}</div>`;
+    <div class="grafico__leyenda"><span><i class="grafico__color grafico__color--mejor"></i>Mejor precio del día</span>${datos.porTienda.map((t) => `<span><i class="grafico__color" style="background:${esc(t.color)}"></i>${esc(t.tienda)}</span>`).join('')}</div>`;
 
   const svg = el.querySelector('svg');
-  const guia = svg.querySelector('.guia-vertical');
-  const punto = svg.querySelector('.punto');
-  const tip = el.querySelector('.grafico-tooltip');
+  const guia = svg.querySelector('.grafico__guia');
+  const punto = svg.querySelector('.grafico__punto');
+  const tip = el.querySelector('.grafico__tooltip');
   const mover = (evento) => {
     const r = svg.getBoundingClientRect();
     const px = ((evento.clientX - r.left) / r.width) * W;
@@ -66,11 +66,11 @@ export function graficoHistorial(el, datos) {
     guia.setAttribute('x2', x(i));
     punto.setAttribute('cx', x(i));
     punto.setAttribute('cy', y(v));
-    [guia, punto, tip].forEach((e) => e.classList.remove('oculto'));
+    [guia, punto, tip].forEach((e) => e.removeAttribute('hidden')); // los SVG no tienen la propiedad .hidden
     tip.innerHTML = `<b>${dinero(v)}</b><br>${esc(fecha(datos.fechas[i]))}`;
     tip.style.left = `${(x(i) / W) * r.width}px`;
     tip.style.top = `${(y(v) / H) * r.height}px`;
   };
   svg.addEventListener('pointermove', mover);
-  svg.addEventListener('pointerleave', () => [guia, punto, tip].forEach((e) => e.classList.add('oculto')));
+  svg.addEventListener('pointerleave', () => [guia, punto, tip].forEach((e) => e.setAttribute('hidden', '')));
 }

@@ -1,0 +1,108 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: acceso (ingresar y registro) ----------
+
+@keyframes deslizar-izquierda {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes entrar-caja {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.acceso {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - #{$alto-barra});
+
+  // Lado izquierdo oscuro con el logo y los beneficios
+  &__arte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 18px;
+    overflow: hidden;
+    padding: 60px;
+    background: $degradado-oscuro;
+    color: $color-blanco;
+  }
+
+  // Lo de la izquierda entra deslizándose, uno tras otro
+  &__lema {
+    font-size: 36px;
+    animation: deslizar-izquierda 0.5s $curva-suave 0.08s both;
+  }
+
+  &__beneficios {
+    @extend %lista-limpia;
+    display: grid;
+    gap: 12px;
+    margin-top: 10px;
+    color: $color-claro-2;
+  }
+
+  &__beneficio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: deslizar-izquierda 0.45s $curva-suave both;
+    @include escalonado(4, 0.1s);
+  }
+
+  &__zona {
+    display: grid;
+    place-items: center;
+    padding: 40px 20px;
+  }
+
+  &__caja {
+    width: 100%;
+    max-width: 430px;
+    padding: 32px;
+    animation: entrar-caja 0.45s $curva-suave 0.1s both;
+  }
+
+  &__titulo {
+    margin-bottom: 6px;
+    font-size: 30px;
+  }
+
+  &__texto {
+    margin-bottom: 20px;
+    color: $color-tenue;
+  }
+
+  &__pruebas {
+    margin-top: 18px;
+    padding: 10px 12px;
+    border-radius: $radio-chico;
+    background: $color-panel-2;
+    font-size: 13px;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+
+    &__arte {
+      display: none;
+    }
+  }
+}

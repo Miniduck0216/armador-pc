@@ -1,0 +1,85 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: asistente (arma la PC según presupuesto y uso) ----------
+
+.asistente {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 22px;
+  padding: 26px;
+  border-radius: 18px;
+  background: $degradado-oscuro;
+  color: $color-blanco;
+  animation: entrar-suave 0.3s ease-out;
+
+  &__texto {
+    color: $color-claro-3;
+  }
+
+  &__grilla {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr auto;
+    align-items: end;
+    gap: 22px;
+  }
+
+  &__presupuesto {
+    @include fuente(800, 34px);
+    color: $color-amarillo;
+  }
+
+  &__rango {
+    width: 100%;
+  }
+
+  &__limites {
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__usos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__uso {
+    cursor: pointer;
+  }
+
+  // El botón de radio real se oculta: se ve la etiqueta con forma de botón
+  &__radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &__etiqueta {
+    display: inline-block;
+    padding: 9px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: $radio-chico;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  &__radio:checked + &__etiqueta {
+    @include color($color-amarillo, $color-marino, $color-amarillo);
+  }
+
+  &__radio:focus-visible + &__etiqueta {
+    outline: 2px solid $color-blanco;
+  }
+
+  &__casilla {
+    color: $color-claro-1;
+  }
+
+  @include movil {
+    &__grilla {
+      grid-template-columns: 1fr;
+    }
+  }
+}

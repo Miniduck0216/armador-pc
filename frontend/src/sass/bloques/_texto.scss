@@ -1,0 +1,44 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: texto (variantes de texto que se repiten) ----------
+// Se combina con modificadores: <p class="texto texto--tenue texto--pequeno">.
+
+.texto {
+  &--tenue {
+    color: $color-tenue;
+  }
+
+  &--pequeno {
+    font-size: 13px;
+  }
+
+  &--centrado {
+    text-align: center;
+  }
+
+  &--derecha {
+    text-align: right;
+  }
+
+  &--fuerte {
+    font-weight: 700;
+  }
+
+  &--titulos {
+    font-family: $fuente-titulos;
+  }
+
+  &--verde {
+    color: $color-verde;
+  }
+
+  &--rojo {
+    color: $color-rojo;
+  }
+
+  // Precio o cifra destacada
+  &--cifra {
+    @include fuente(800, 19px);
+  }
+}

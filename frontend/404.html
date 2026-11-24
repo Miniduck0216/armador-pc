@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Página no encontrada · ArmadorPC</title>
   <meta name="description" content="Página no encontrada.">
@@ -13,12 +13,12 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/no-encontrado.js"></script>
 </head>
-<body>
-<main class="no-encontrado">
-  <div class="codigo">404</div>
-  <h1 style="font-size:32px;margin:12px 0">Esta página no existe</h1>
-  <p class="tenue" style="margin-bottom:22px">Puede que el enlace esté mal escrito o que la página se haya movido.</p>
-  <div class="fila" style="justify-content:center"><a class="boton" href="/">Ir al inicio</a><a class="boton secundario" href="/componentes.html">Ver componentes</a></div>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido no-encontrado">
+  <div class="no-encontrado__codigo">404</div>
+  <h1 class="no-encontrado__titulo">Esta página no existe</h1>
+  <p class="no-encontrado__texto">Puede que el enlace esté mal escrito o que la página se haya movido.</p>
+  <div class="no-encontrado__acciones"><a class="boton" href="/">Ir al inicio</a><a class="boton boton--secundario" href="/componentes.html">Ver componentes</a></div>
 </main>
 </body>
 </html>

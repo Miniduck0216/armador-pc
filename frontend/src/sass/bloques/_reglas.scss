@@ -1,0 +1,22 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: reglas (qué compara cada regla de compatibilidad) ----------
+
+.reglas {
+  &__compara {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__codigo {
+    padding: 2px 7px;
+    border: 1px solid $color-borde;
+    border-radius: 6px;
+    background: $color-panel-2;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}

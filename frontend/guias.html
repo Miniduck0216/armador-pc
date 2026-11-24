@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Guías · ArmadorPC</title>
   <meta name="description" content="Guías para elegir componentes y armar tu PC.">
@@ -13,16 +13,16 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/guias.js"></script>
 </head>
-<body>
-<main>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido">
   <section class="cabecera-pagina">
     <div class="contenedor">
-      <div class="migas"><a href="/">Inicio</a> / Guías</div>
+      <div class="cabecera-pagina__migas"><a class="cabecera-pagina__miga" href="/">Inicio</a> / Guías</div>
       <h1>Guías para armar tu PC</h1>
-      <p>Explicaciones cortas y prácticas para decidir con criterio, sin jerga innecesaria.</p>
+      <p class="cabecera-pagina__texto">Explicaciones cortas y prácticas para decidir con criterio, sin jerga innecesaria.</p>
     </div>
   </section>
-  <section class="seccion"><div class="contenedor"><div class="grilla g3" id="lista"></div></div></section>
+  <section class="seccion"><div class="contenedor"><div class="grilla grilla--3" id="lista"></div></div></section>
 </main>
 </body>
 </html>

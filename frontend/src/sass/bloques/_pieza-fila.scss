@@ -1,0 +1,54 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pieza-fila (foto, nombre y precio de una pieza) ----------
+
+.pieza-fila {
+  display: grid;
+  grid-template-columns: 58px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px;
+  border: 1px solid $color-borde;
+  border-radius: 12px;
+  color: $color-texto;
+
+  &:hover {
+    text-decoration: none;
+    border-color: $color-violeta-borde;
+    background: #fcfbff;
+  }
+
+  // Fila con un botón extra al final (favoritos en la cuenta)
+  &--con-accion {
+    grid-template-columns: 58px 1fr auto auto;
+  }
+
+  &__foto {
+    @include foto-producto(58px);
+  }
+
+  &__texto {
+    display: grid;
+    line-height: 1.3;
+  }
+
+  &__categoria {
+    @extend %antetitulo-mini;
+  }
+
+  &__detalle {
+    font-style: normal;
+    font-size: 12.5px;
+    color: $color-tenue;
+  }
+
+  &__tienda {
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  &__precio {
+    font-family: $fuente-titulos;
+  }
+}

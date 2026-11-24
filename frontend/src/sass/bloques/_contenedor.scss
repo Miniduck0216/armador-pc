@@ -1,0 +1,15 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: contenedor (ancho máximo centrado) ----------
+
+.contenedor {
+  max-width: $ancho-maximo;
+  margin: 0 auto;
+  padding: 0 20px;
+
+  // Texto largo para leer cómodo (guías)
+  &--angosto {
+    max-width: 820px;
+  }
+}

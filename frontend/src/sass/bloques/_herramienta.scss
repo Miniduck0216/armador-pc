@@ -1,0 +1,42 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: herramienta (cada calculadora de la página Herramientas) ----------
+
+.herramienta {
+  scroll-margin-top: 100px;
+
+  & + & {
+    margin-top: 30px;
+  }
+
+  &__atajos {
+    margin-top: 18px;
+  }
+
+  // Formulario a la izquierda, resultado a la derecha
+  &__grilla {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 26px;
+  }
+
+  &__subtitulo {
+    margin: 18px 0 10px;
+  }
+
+  &__datos {
+    margin: 14px 0;
+  }
+
+  &__aviso {
+    margin-top: 16px;
+  }
+
+  @include movil {
+    &__grilla {
+      grid-template-columns: 1fr;
+    }
+  }
+}

@@ -1,0 +1,100 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: tarjeta-producto (biblioteca, inicio y ficha) ----------
+
+.tarjeta-producto {
+  @extend %tarjeta-flotante;
+
+  &__foto {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: $color-blanco;
+    border-bottom: 1px solid $color-borde;
+  }
+
+  &__imagen {
+    width: 100%;
+    height: 100%;
+    padding: 14px;
+    object-fit: contain;
+  }
+
+  &__insignias {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 6px;
+  }
+
+  &__referencia {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.92);
+    color: $color-tenue;
+    font-size: 10.5px;
+    font-weight: 600;
+  }
+
+  &__cuerpo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px 16px;
+  }
+
+  &__categoria {
+    font-size: 12px;
+    font-weight: 600;
+    color: $color-tenue;
+  }
+
+  &__nombre {
+    font-size: 17px;
+    line-height: 1.25;
+  }
+
+  &__enlace {
+    color: $color-texto;
+  }
+
+  &__pie {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  &__precio {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    @include fuente(800, 21px);
+    color: $color-texto;
+
+    &--referencia {
+      color: $color-tenue;
+    }
+  }
+
+  &__tienda {
+    margin-top: 2px;
+    font-size: 12.5px;
+    line-height: 1.35;
+    color: $color-tenue;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: 6px;
+  }
+}

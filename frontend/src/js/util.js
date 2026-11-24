@@ -30,11 +30,12 @@ export function hace(valor) {
 // Mensaje flotante breve (éxito o error)
 export function aviso(texto, tipo = 'exito') {
   const el = document.createElement('div');
-  el.className = `aviso-flotante ${tipo}`;
+  const conBandeja = document.body.classList.contains('pagina--con-bandeja');
+  el.className = `aviso-flotante ${tipo === 'error' ? 'aviso-flotante--error' : ''} ${conBandeja ? 'aviso-flotante--alto' : ''}`;
   el.setAttribute('role', 'status');
   el.textContent = texto;
   document.body.append(el);
-  setTimeout(() => el.classList.add('saliendo'), 2800);
+  setTimeout(() => el.classList.add('aviso-flotante--saliendo'), 2800);
   setTimeout(() => el.remove(), 3200);
 }
 
@@ -63,18 +64,18 @@ export function guardarLocal(clave, valor) {
 
 export function insigniaGama(gama) {
   if (!gama) return '';
-  const clase = { Básica: 'gris', Media: '', Alta: 'verde', Entusiasta: 'amarilla' }[gama] ?? '';
-  return `<span class="insignia ${clase}">${esc(gama)}</span>`;
+  const color = { Básica: 'gris', Alta: 'verde', Entusiasta: 'amarilla' }[gama];
+  return `<span class="insignia ${color ? `insignia--${color}` : ''}">${esc(gama)}</span>`;
 }
 
 export function variacion(v) {
   if (v === null || v === undefined || Math.abs(v) < 0.5) return '';
-  return `<span class="variacion ${v < 0 ? 'baja' : 'sube'}">${v < 0 ? '▼' : '▲'} ${Math.abs(v).toFixed(1)}%</span>`;
+  return `<span class="variacion variacion--${v < 0 ? 'baja' : 'sube'}">${v < 0 ? '▼' : '▲'} ${Math.abs(v).toFixed(1)}%</span>`;
 }
 
 export function estrellas(promedio) {
   const llenas = Math.round(Number(promedio) || 0);
-  return `<span class="estrellas" aria-label="${promedio} de 5">${'★'.repeat(llenas)}<span class="vacias">${'★'.repeat(5 - llenas)}</span></span>`;
+  return `<span class="estrellas" aria-label="${promedio} de 5">${'★'.repeat(llenas)}<span class="estrellas__vacias">${'★'.repeat(5 - llenas)}</span></span>`;
 }
 
 export function cargando(el, filas = 3, alto = 120) {
@@ -82,7 +83,7 @@ export function cargando(el, filas = 3, alto = 120) {
 }
 
 export function errorEn(el, e) {
-  el.innerHTML = `<div class="aviso error">${esc(e?.message ?? e)}</div>`;
+  el.innerHTML = `<div class="aviso aviso--error">${esc(e?.message ?? e)}</div>`;
 }
 
 // Debounce para buscadores
@@ -97,16 +98,17 @@ export function retrasar(fn, ms = 250) {
 // Abre un panel modal; devuelve funciones para cerrarlo y su cuerpo
 export function modal({ titulo, contenido = '', ancho = 760, alCerrar = null }) {
   const fondo = document.createElement('div');
-  fondo.className = 'modal-fondo';
+  fondo.className = 'modal';
+  // El ancho cambia en cada ventana, por eso va como estilo en línea
   fondo.innerHTML = `
-    <div class="modal" role="dialog" aria-modal="true" aria-label="${esc(titulo)}" style="max-width:${ancho}px">
-      <div class="modal-cabecera"><h3>${esc(titulo)}</h3><button class="icono-boton" data-cerrar aria-label="Cerrar">✕</button></div>
-      <div class="modal-cuerpo">${contenido}</div>
+    <div class="modal__ventana" role="dialog" aria-modal="true" aria-label="${esc(titulo)}" style="max-width:${ancho}px">
+      <div class="modal__cabecera"><h3>${esc(titulo)}</h3><button class="icono-boton" data-cerrar aria-label="Cerrar">✕</button></div>
+      <div class="modal__cuerpo">${contenido}</div>
     </div>`;
   // Al cerrar se espera la animación de salida antes de quitar la ventana
   const cerrar = () => {
-    if (fondo.classList.contains('cerrando')) return;
-    fondo.classList.add('cerrando');
+    if (fondo.classList.contains('modal--cerrando')) return;
+    fondo.classList.add('modal--cerrando');
     alCerrar?.();
     setTimeout(() => fondo.remove(), 180);
     document.removeEventListener('keydown', alTeclear);
@@ -119,7 +121,7 @@ export function modal({ titulo, contenido = '', ancho = 760, alCerrar = null }) 
   document.addEventListener('keydown', alTeclear);
   document.body.append(fondo);
   document.body.style.overflow = 'hidden';
-  return { cerrar, cuerpo: fondo.querySelector('.modal-cuerpo'), raiz: fondo };
+  return { cerrar, cuerpo: fondo.querySelector('.modal__cuerpo'), raiz: fondo };
 }
 
 // Confirmación con el diseño de la página (reemplaza al confirm() del navegador).
@@ -135,8 +137,8 @@ export function confirmar({ titulo = '¿Estás seguro?', mensaje = 'Esta acción
         <span class="confirmar__icono ${peligro ? 'confirmar__icono--peligro' : ''}">${peligro ? '!' : '?'}</span>
         <p class="confirmar__mensaje">${esc(mensaje)}</p>
         <div class="confirmar__botones">
-          <button type="button" class="boton secundario" data-respuesta="no">Cancelar</button>
-          <button type="button" class="boton ${peligro ? 'confirmar__aceptar--peligro' : 'violeta'}" data-respuesta="si">${esc(boton)}</button>
+          <button type="button" class="boton boton--secundario" data-respuesta="no">Cancelar</button>
+          <button type="button" class="boton ${peligro ? 'boton--rojo' : 'boton--violeta'}" data-respuesta="si">${esc(boton)}</button>
         </div></div>`,
     });
     m.cuerpo.querySelector('[data-respuesta="si"]').focus();
@@ -154,8 +156,8 @@ export function mostrarTexto(titulo, texto) {
   const m = modal({
     titulo,
     ancho: 560,
-    contenido: `<textarea class="texto-copiar" readonly rows="${Math.min(12, texto.split('\n').length + 1)}">${esc(texto)}</textarea>
-      <p class="tenue pequeno" style="margin-top:8px">Selecciona el texto y cópialo con Ctrl + C.</p>`,
+    contenido: `<textarea class="confirmar__texto" readonly rows="${Math.min(12, texto.split('\n').length + 1)}">${esc(texto)}</textarea>
+      <p class="confirmar__ayuda">Selecciona el texto y cópialo con Ctrl + C.</p>`,
   });
   m.cuerpo.querySelector('textarea').select();
 }
@@ -165,4 +167,37 @@ export function copiar(texto) {
     () => aviso('Enlace copiado'),
     () => mostrarTexto('Copia este enlace', texto),
   );
+}
+
+// Arma una tabla con las clases BEM del bloque "tabla".
+// Cada título o celda puede ser un texto o [texto, modificador], por ejemplo ['$20', 'derecha'].
+// Si una fila es un objeto { celdas, modificador }, el modificador se aplica a la fila.
+export function tabla(titulos, filas, { vacio = 'Sin datos.' } = {}) {
+  if (!filas.length) return `<div class="vacio">${vacio}</div>`;
+  const partes = (x) => (Array.isArray(x) ? x : [x, '']);
+  const th = titulos
+    .map((t) => {
+      const [texto, mod] = partes(t);
+      return `<th class="tabla__titulo ${mod ? `tabla__titulo--${mod}` : ''}">${texto}</th>`;
+    })
+    .join('');
+  const tr = filas
+    .map((f) => {
+      const { celdas, modificador } = Array.isArray(f) ? { celdas: f } : f;
+      const td = celdas
+        .map((c) => {
+          const [html, mod] = partes(c);
+          return `<td class="tabla__celda ${mod ? mod.split(' ').map((m) => `tabla__celda--${m}`).join(' ') : ''}">${html}</td>`;
+        })
+        .join('');
+      return `<tr class="tabla__fila ${modificador ? `tabla__fila--${modificador}` : ''}">${td}</tr>`;
+    })
+    .join('');
+  return `<div class="tabla"><table class="tabla__tabla"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`;
+}
+
+// Muestra un mensaje de error dentro de un formulario (en un <div class="aviso aviso--error" hidden>)
+export function errorFormulario(el, mensaje) {
+  el.textContent = mensaje;
+  el.hidden = false;
 }

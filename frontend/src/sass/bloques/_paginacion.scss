@@ -1,0 +1,27 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: paginacion ----------
+
+.paginacion {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 26px;
+
+  &__boton {
+    min-width: 40px;
+    height: 40px;
+    border: 1px solid $color-borde;
+    border-radius: $radio-chico;
+    background: $color-blanco;
+    color: $color-texto;
+    font-weight: 700;
+    cursor: pointer;
+
+    &--activa {
+      @include color($color-violeta, $color-blanco, $color-violeta);
+    }
+  }
+}

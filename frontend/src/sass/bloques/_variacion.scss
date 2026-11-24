@@ -1,0 +1,19 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: variacion ----------
+
+// Cambio de precio con flecha (▼ baja en verde, ▲ sube en rojo)
+.variacion {
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &--baja {
+    color: $color-verde;
+  }
+
+  &--sube {
+    color: $color-rojo;
+  }
+}

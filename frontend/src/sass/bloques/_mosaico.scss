@@ -1,0 +1,71 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: mosaico ----------
+
+.mosaico {
+  position: relative;
+  display: block;
+  aspect-ratio: 5 / 4;
+  overflow: hidden;
+  border-radius: $radio;
+  background: $color-marino;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &--compacto {
+    aspect-ratio: 4 / 3;
+  }
+
+  // Mosaico elegido en el filtro
+  &--activo {
+    outline: 3px solid $color-amarillo;
+    outline-offset: 2px;
+  }
+
+  // Mosaico "Todas" sin foto, solo con degradado
+  &--todas {
+    background: linear-gradient(135deg, $color-violeta-2, $color-violeta 60%, #8f74ff);
+  }
+
+  &__imagen {
+    @extend %foto-cubre;
+    transition: transform 0.3s;
+  }
+
+  &:hover &__imagen {
+    transform: scale(1.06);
+  }
+
+  // Degradado oscuro para que el texto se lea sobre la foto
+  &__velo {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(18, 22, 58, 0) 35%, rgba(18, 22, 58, 0.92));
+  }
+
+  &--todas &__velo {
+    background: none;
+  }
+
+  &__texto {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 12px;
+    display: grid;
+    line-height: 1.25;
+    color: $color-blanco;
+  }
+
+  &__titulo {
+    @include fuente(800, 17px);
+  }
+
+  &__detalle {
+    color: #d9dcf5;
+    font-size: 12.5px;
+  }
+}

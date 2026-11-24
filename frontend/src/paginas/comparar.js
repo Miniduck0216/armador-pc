@@ -1,7 +1,7 @@
 import { montar, usuario } from '../js/layout.js';
 import { api, enviar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, dinero, errorEn, esc, imagen, insigniaGama } from '../js/util.js';
+import { $, aviso, dinero, errorEn, esc, imagen, insigniaGama, tabla } from '../js/util.js';
 import { mosaicoCategoria } from '../js/tarjetas.js';
 import { leerComparar, MAX_COMPARAR } from '../js/estado.js';
 
@@ -25,27 +25,36 @@ function sincronizarUrl() {
 
 function pintarCategorias() {
   $('#categorias').innerHTML = categorias
-    .map((c) => mosaicoCategoria(c, `/comparar.html?categoria=${c.codigo}`).replace('class="mosaico"', `class="mosaico ${c.codigo === categoria ? 'activo' : ''}" data-cat="${c.codigo}"`))
+    .map((c) =>
+      mosaicoCategoria(c, {
+        href: `/comparar.html?categoria=${c.codigo}`,
+        modificador: `mosaico--compacto ${c.codigo === categoria ? 'mosaico--activo' : ''}`,
+        atributos: `data-cat="${c.codigo}"`,
+      }),
+    )
     .join('');
 }
 
+const precioDe = (p) => dinero(p.tieneOfertas ? p.precio : p.precioReferencia);
+
+// Las tres ranuras: con un modelo elegido o con un buscador para elegirlo
 function pintarRanuras() {
   const html = [];
   for (let i = 0; i < MAX_COMPARAR; i++) {
     const p = catalogo.find((x) => x.id === ids[i]);
     html.push(
       p
-        ? `<div class="ranura llena">
-            <button class="icono-boton quitar" data-quitar="${i}" aria-label="Quitar">${icono('x', 16)}</button>
-            ${imagen(p.imagen, p.nombreCompleto)}
+        ? `<div class="ranuras__ranura ranuras__ranura--llena">
+            <button class="icono-boton ranuras__quitar" data-quitar="${i}" aria-label="Quitar">${icono('x', 16)}</button>
+            ${imagen(p.imagen, p.nombreCompleto, 'ranuras__imagen')}
             <div>${insigniaGama(p.gama)}</div>
-            <h3><a href="/producto.html?id=${p.id}">${esc(p.nombreCompleto)}</a></h3>
-            <b>${dinero(p.tieneOfertas ? p.precio : p.precioReferencia)}</b>
+            <h3 class="ranuras__nombre"><a href="/producto.html?id=${p.id}">${esc(p.nombreCompleto)}</a></h3>
+            <b>${precioDe(p)}</b>
           </div>`
-        : `<div class="ranura">
-            <span class="antetitulo">Modelo ${i + 1}</span>
-            <div class="selector"><input type="search" placeholder="Busca un modelo…" data-buscar="${i}" autocomplete="off"><div class="opciones oculto"></div></div>
-            <p class="tenue pequeno">${i < 2 ? 'Necesitas al menos 2 modelos.' : 'Opcional'}</p>
+        : `<div class="ranuras__ranura">
+            <span class="seccion__antetitulo">Modelo ${i + 1}</span>
+            <div class="ranuras__selector"><input type="search" placeholder="Busca un modelo…" data-buscar="${i}" autocomplete="off"><div class="ranuras__opciones" hidden></div></div>
+            <p class="texto texto--tenue texto--pequeno">${i < 2 ? 'Necesitas al menos 2 modelos.' : 'Opcional'}</p>
           </div>`,
     );
   }
@@ -54,12 +63,17 @@ function pintarRanuras() {
 
 function opciones(texto) {
   const q = texto.toLowerCase();
-  return catalogo
+  const lista = catalogo
     .filter((p) => !ids.includes(p.id) && p.nombreCompleto.toLowerCase().includes(q))
     .slice(0, 30)
-    .map((p) => `<button type="button" data-elegir="${p.id}">${imagen(p.imagen, '')}<span>${esc(p.nombreCompleto)}</span><b>${dinero(p.tieneOfertas ? p.precio : p.precioReferencia)}</b></button>`)
-    .join('') || '<div class="tenue pequeno" style="padding:10px">Sin coincidencias</div>';
+    .map((p) => `<button class="ranuras__opcion" type="button" data-elegir="${p.id}">${imagen(p.imagen, '', 'ranuras__miniatura')}<span>${esc(p.nombreCompleto)}</span><b>${precioDe(p)}</b></button>`)
+    .join('');
+  return lista || '<div class="ranuras__sin-resultados">Sin coincidencias</div>';
 }
+
+// Tarjeta del veredicto (más barato, más potente, ganador)
+const veredicto = (ico, titulo, nombre, detalle) =>
+  `<div class="caja veredicto__caja"><small class="veredicto__etiqueta">${icono(ico, 14)} ${titulo}</small><b class="veredicto__nombre">${esc(nombre)}</b><span class="texto texto--tenue">${detalle}</span></div>`;
 
 async function comparar() {
   sincronizarUrl();
@@ -69,49 +83,59 @@ async function comparar() {
     r.innerHTML = `<div class="vacio">Elige al menos dos ${esc(categorias.find((c) => c.codigo === categoria)?.plural.toLowerCase() ?? 'modelos')} para ver la comparación.</div>`;
     return;
   }
-  r.classList.add('cargando');
+  r.classList.add('comparacion--cargando');
   try {
     const d = await api(`/comparar-componentes?ids=${ids.join(',')}`);
     let cpu = null;
     if (categoria === 'CPU' && ids.length === 2) cpu = await api(`/comparar?a=${ids[0]}&b=${ids[1]}`).catch(() => null);
+    const { masBarato, masPotente } = d.resumen;
+    const ganador = cpu ? (cpu.ganador === 'a' ? cpu.a : cpu.b) : null;
+
+    // Fila por característica; en verde el valor que gana (si no empatan todos)
+    const filas = d.filas.map((f) => ({
+      modificador: f.diferente === false ? 'igual' : '',
+      celdas: [
+        [esc(f.etiqueta), 'etiqueta'],
+        ...f.valores.map((v, i) => {
+          const gana = f.ganadores?.[i] && f.ganadores.filter(Boolean).length < f.valores.length;
+          return [esc(v ?? '—'), gana ? 'centro ganadora' : 'centro'];
+        }),
+      ],
+    }));
+
+    const razones = cpu
+      ? `<div class="comparacion__razones">${[[cpu.a, cpu.razonesA], [cpu.b, cpu.razonesB]]
+          .map(
+            ([p, lista]) => `<div class="caja"><h3>Por qué elegir ${esc(p.nombreCompleto)}</h3>
+              <ul class="pros-contras__lista">${
+                lista.length
+                  ? lista.map((x) => `<li class="pros-contras__item">${icono('check', 18, 'icono--verde')}<span>${esc(x.texto)}<small class="pros-contras__detalle">${esc(x.valor)}</small></span></li>`).join('')
+                  : '<li class="texto texto--tenue">Sin ventajas claras</li>'
+              }</ul></div>`,
+          )
+          .join('')}</div>`
+      : '';
+
     r.innerHTML = `
       <div class="veredicto">
-        ${d.resumen.masBarato ? `<div class="caja"><small>${icono('etiqueta', 14)} Más barato</small><b>${esc(d.resumen.masBarato.nombre)}</b><span class="tenue">${dinero(d.resumen.masBarato.precio)}</span></div>` : ''}
-        ${d.resumen.masPotente ? `<div class="caja"><small>${icono('rayo', 14)} Más potente</small><b>${esc(d.resumen.masPotente.nombre)}</b><span class="tenue">Puntaje ${d.resumen.masPotente.puntaje}/100</span></div>` : ''}
-        ${cpu ? `<div class="caja"><small>${icono('estrella', 14)} Gana en más apartados</small><b>${esc((cpu.ganador === 'a' ? cpu.a : cpu.b).nombreCompleto)}</b><span class="tenue">${Math.max(cpu.victoriasA, cpu.victoriasB)} victorias · ${cpu.diferenciaPuntos} puntos de diferencia</span></div>` : ''}
+        ${masBarato ? veredicto('etiqueta', 'Más barato', masBarato.nombre, dinero(masBarato.precio)) : ''}
+        ${masPotente ? veredicto('rayo', 'Más potente', masPotente.nombre, `Puntaje ${masPotente.puntaje}/100`) : ''}
+        ${cpu ? veredicto('estrella', 'Gana en más apartados', ganador.nombreCompleto, `${Math.max(cpu.victoriasA, cpu.victoriasB)} victorias · ${cpu.diferenciaPuntos} puntos de diferencia`) : ''}
       </div>
-      <div class="fila entre" style="margin-bottom:12px">
+      <div class="fila fila--entre comparacion__cabecera">
         <h2>Detalle lado a lado</h2>
         <div class="fila">
-          <label class="casilla solo-diferencias"><input type="checkbox" id="solo-dif" ${soloDiferencias ? 'checked' : ''}> Mostrar solo diferencias</label>
-          ${cpu ? `<button class="boton secundario pequeno" id="guardar-comp">${icono('guardar', 15)} Guardar comparación</button>` : ''}
+          <label class="formulario__casilla"><input type="checkbox" id="solo-dif" ${soloDiferencias ? 'checked' : ''}> Mostrar solo diferencias</label>
+          ${cpu ? `<button class="boton boton--secundario boton--pequeno" id="guardar-comp">${icono('guardar', 15)} Guardar comparación</button>` : ''}
         </div>
       </div>
-      <div class="tabla-envoltura"><table class="tabla tabla-comparar">
-        <thead><tr><th></th>${d.productos.map((p) => `<th>${esc(p.nombreCompleto)}</th>`).join('')}</tr></thead>
-        <tbody>${d.filas
-          .map(
-            (f) => `<tr class="${f.diferente === false ? 'igual' : ''}" ${soloDiferencias && f.diferente === false ? 'hidden' : ''}><td>${esc(f.etiqueta)}</td>${f.valores
-              .map((v, i) => `<td class="${f.ganadores?.[i] && f.ganadores.filter(Boolean).length < f.valores.length ? 'ganador' : ''}">${esc(v ?? '—')}</td>`)
-              .join('')}</tr>`,
-          )
-          .join('')}</tbody>
-      </table></div>
-      ${
-        cpu
-          ? `<div class="razones">
-              ${[['a', cpu.a, cpu.razonesA], ['b', cpu.b, cpu.razonesB]]
-                .map(
-                  ([, p, razones]) => `<div class="caja pros-contras-una"><h3>Por qué elegir ${esc(p.nombreCompleto)}</h3>
-                    <ul class="lista-razones">${razones.length ? razones.map((x) => `<li>${icono('check', 18)}<span>${esc(x.texto)}<small>${esc(x.valor)}</small></span></li>`).join('') : '<li class="tenue">Sin ventajas claras</li>'}</ul></div>`,
-                )
-                .join('')}
-            </div>`
-          : ''
-      }`;
+      ${tabla(['', ...d.productos.map((p) => [esc(p.nombreCompleto), 'centro'])], filas)}
+      ${razones}`;
+    const ocultarIguales = () => r.querySelectorAll('.tabla__fila--igual').forEach((tr) => (tr.hidden = soloDiferencias));
+    ocultarIguales();
     $('#solo-dif').addEventListener('change', (e) => {
       soloDiferencias = e.target.checked;
-      r.querySelectorAll('tr.igual').forEach((tr) => (tr.hidden = soloDiferencias));
+      ocultarIguales();
     });
     $('#guardar-comp')?.addEventListener('click', async () => {
       if (!usuario()) return (location.href = `/ingresar.html?volver=${encodeURIComponent(location.pathname + location.search)}`);
@@ -125,7 +149,7 @@ async function comparar() {
   } catch (e) {
     errorEn(r, e);
   } finally {
-    r.classList.remove('cargando');
+    r.classList.remove('comparacion--cargando');
   }
 }
 
@@ -139,19 +163,22 @@ async function cambiarCategoria(codigo) {
   comparar();
 }
 
+// La lista de modelos está justo después del buscador
+function mostrarOpciones(entrada) {
+  const caja = entrada.nextElementSibling;
+  caja.innerHTML = opciones(entrada.value.trim());
+  caja.hidden = false;
+}
+
 // Eventos de las ranuras (búsqueda, elegir, quitar)
 $('#ranuras').addEventListener('input', (e) => {
   const entrada = e.target.closest('[data-buscar]');
   if (!entrada) return;
-  const caja = entrada.nextElementSibling;
-  caja.innerHTML = opciones(entrada.value.trim());
-  caja.classList.remove('oculto');
+  mostrarOpciones(entrada);
 });
 $('#ranuras').addEventListener('focusin', (e) => {
   const entrada = e.target.closest('[data-buscar]');
-  if (!entrada) return;
-  entrada.nextElementSibling.innerHTML = opciones(entrada.value.trim());
-  entrada.nextElementSibling.classList.remove('oculto');
+  if (entrada) mostrarOpciones(entrada);
 });
 $('#ranuras').addEventListener('click', (e) => {
   const elegir = e.target.closest('[data-elegir]');
@@ -166,7 +193,7 @@ $('#ranuras').addEventListener('click', (e) => {
   }
 });
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.selector')) document.querySelectorAll('.ranura .opciones').forEach((o) => o.classList.add('oculto'));
+  if (!e.target.closest('.ranuras__selector')) document.querySelectorAll('.ranuras__opciones').forEach((o) => (o.hidden = true));
 });
 $('#categorias').addEventListener('click', (e) => {
   const a = e.target.closest('[data-cat]');

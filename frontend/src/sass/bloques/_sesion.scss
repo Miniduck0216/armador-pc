@@ -1,0 +1,31 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: sesion (zona derecha de la barra) ----------
+// Reserva su espacio para que la barra no se mueva cuando responde el servidor.
+
+.sesion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 210px;
+
+  &--lista {
+    @include entrar(0.3s);
+  }
+
+  &__enlace {
+    color: $color-claro-1;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  @include movil {
+    min-width: 0;
+
+    &__boton {
+      display: none;
+    }
+  }
+}

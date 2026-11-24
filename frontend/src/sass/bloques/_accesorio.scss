@@ -1,0 +1,56 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: accesorio (tarjeta de un producto de NomadaWare) ----------
+
+.accesorio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid $color-borde;
+  border-radius: $radio;
+  background: $color-blanco;
+  box-shadow: $sombra;
+
+  &__foto {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: $radio-chico;
+    background: #f5f5f8;
+  }
+
+  &__imagen {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &__nombre {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  &__precios {
+    display: flex;
+    gap: 16px;
+  }
+
+  &__nota {
+    display: block;
+    font-size: 12px;
+    color: $color-tenue;
+  }
+
+  &__precio {
+    font-size: 18px;
+    color: $color-marino;
+  }
+
+  &__secundario {
+    font-size: 15px;
+  }
+}

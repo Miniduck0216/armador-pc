@@ -1,0 +1,71 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pedido (lista de compra) ----------
+
+.pedido {
+  &__opciones {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+
+    @include movil {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // Cada opción tiene una insignia "Recomendada" en la esquina
+  &__opcion {
+    position: relative;
+    gap: 4px;
+  }
+
+  &__recomendada {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  &__monto {
+    @include fuente(800, 24px);
+    color: $color-marino;
+  }
+
+  // Caja de una tienda: borde izquierdo del color de la tienda
+  &__tienda {
+    border-left: 4px solid $color-violeta;
+  }
+
+  &__productos {
+    @extend %lista-limpia;
+    margin-top: 10px;
+  }
+
+  &__producto {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    padding: 10px 0;
+    border-top: 1px solid $color-borde;
+  }
+
+  &__nombre {
+    font-weight: 600;
+  }
+
+  &__precio {
+    @include fuente(800, 21px);
+    text-align: right;
+  }
+
+  &__enlace {
+    grid-column: 1 / -1;
+    font-size: 13px;
+  }
+
+  &__total {
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid $color-borde;
+  }
+}

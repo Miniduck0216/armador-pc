@@ -1,0 +1,21 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: enlace (botón que se ve como texto) ----------
+
+.enlace {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $color-violeta;
+  @include fuente(600, 14px, $fuente-texto);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &--peligro {
+    color: $color-rojo;
+  }
+}

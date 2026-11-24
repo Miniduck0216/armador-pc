@@ -1,0 +1,89 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: panel (menú lateral + contenido: Mi cuenta y Administración) ----------
+
+.panel {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  align-items: start;
+  gap: 26px;
+
+  &__menu {
+    @include panel(10px);
+    position: sticky;
+    top: 94px;
+    display: grid;
+    gap: 4px;
+  }
+
+  &__opcion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: $radio-chico;
+    background: none;
+    color: $color-texto;
+    @include fuente(600, 14.5px, $fuente-texto);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: $color-panel-2;
+      text-decoration: none;
+    }
+
+    &--activa {
+      @include color($color-violeta-claro, $color-violeta-2);
+    }
+  }
+
+  &__contador {
+    margin-left: auto;
+    padding: 1px 8px;
+    border-radius: 99px;
+    background: $color-panel-2;
+    font-size: 12px;
+  }
+
+  // Cada sección que se abre entra suave (se vuelve a crear en cada cambio)
+  &__seccion {
+    @include entrar;
+  }
+
+  &__titulo {
+    margin-bottom: 18px;
+  }
+
+  // Bloque de la sección separado del siguiente
+  &__bloque {
+    margin-bottom: 14px;
+  }
+
+  // Botones arriba a la derecha de una tabla
+  &__acciones {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
+  }
+
+  // Resultado técnico en texto (respuesta de la actualización de precios)
+  &__codigo {
+    margin: 0;
+    padding: 10px;
+    overflow: auto;
+    border-radius: $radio-chico;
+    background: $color-panel-2;
+    font-size: 13px;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+
+    &__menu {
+      position: static;
+    }
+  }
+}

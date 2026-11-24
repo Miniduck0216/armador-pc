@@ -1,0 +1,22 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: esqueleto ----------
+
+@keyframes brillo {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+// Rectángulo gris con brillo mientras llegan los datos
+.esqueleto {
+  border-radius: $radio;
+  background: linear-gradient(90deg, #ececf4 25%, $color-fondo 50%, #ececf4 75%);
+  background-size: 200% 100%;
+  animation: brillo 1.2s infinite;
+
+  &--alto {
+    height: 300px;
+  }
+}

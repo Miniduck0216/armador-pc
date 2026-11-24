@@ -1,0 +1,64 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: confirmar (ventana propia en lugar de confirm()) ----------
+
+@keyframes aparecer-icono {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-20deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.confirmar {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 6px 4px 2px;
+  text-align: center;
+
+  &__icono {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    @include fuente(800, 26px);
+    @include color($color-violeta-claro, $color-violeta-2);
+    animation: aparecer-icono 0.4s $curva-rebote 0.1s both;
+
+    &--peligro {
+      @include color($color-rojo-claro, $color-rojo);
+    }
+  }
+
+  &__mensaje {
+    max-width: 340px;
+    color: $color-tenue;
+  }
+
+  &__botones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  // Texto para copiar a mano (cuando el navegador no deja usar el portapapeles)
+  &__texto {
+    resize: vertical;
+    font: 13px/1.5 ui-monospace, Consolas, monospace;
+  }
+
+  &__ayuda {
+    margin-top: 8px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+}

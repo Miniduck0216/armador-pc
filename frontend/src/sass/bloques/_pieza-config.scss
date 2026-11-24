@@ -1,0 +1,85 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pieza-config (una fila por categoría del configurador) ----------
+
+.pieza-config {
+  @include panel(12px 14px);
+  display: grid;
+  grid-template-columns: 170px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  @include entrar(0.25s);
+
+  // La pieza choca con otra (por ejemplo, zócalo distinto)
+  &--conflicto {
+    border-color: $color-rojo-borde;
+    background: #fff8fa;
+  }
+
+  &__categoria {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    @include fuente(700, 14.5px);
+  }
+
+  &__icono {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: $radio-chico;
+  }
+
+  &__requisito {
+    display: block;
+    @include fuente(400, 12px, $fuente-texto);
+    color: $color-tenue;
+  }
+
+  &__elegida {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__foto {
+    @include foto-producto(56px);
+    border: 1px solid $color-borde;
+  }
+
+  &__modelo {
+    display: block;
+    line-height: 1.25;
+    color: inherit;
+  }
+
+  &__detalle {
+    @extend %texto-secundario;
+  }
+
+  &__aviso {
+    @extend %texto-secundario;
+    color: $color-rojo;
+  }
+
+  &__precio {
+    @include fuente(800, 17px);
+  }
+
+  &__vacia {
+    font-size: 14px;
+    color: $color-tenue;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: 6px;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}

@@ -1,0 +1,21 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: cabecera-icono (título con un ícono grande al lado) ----------
+
+.cabecera-icono {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+
+  &__icono {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: $radio;
+    @include color($color-violeta-claro, $color-violeta);
+  }
+}

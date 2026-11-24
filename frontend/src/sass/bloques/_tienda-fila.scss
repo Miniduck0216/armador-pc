@@ -1,0 +1,34 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: tienda-fila (tienda con su color y cantidad de precios) ----------
+
+.tienda-fila {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid $color-borde;
+  border-radius: 12px;
+  background: $color-blanco;
+  color: $color-texto;
+
+  &:hover {
+    text-decoration: none;
+    border-color: $color-violeta-borde;
+  }
+
+  // El color de cada tienda viene de la base de datos (estilo en línea)
+  &__color {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  &__cantidad {
+    margin-left: auto;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+}

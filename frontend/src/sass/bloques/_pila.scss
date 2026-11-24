@@ -1,0 +1,18 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pila ----------
+
+// Elementos uno debajo del otro
+.pila {
+  display: grid;
+  gap: 12px;
+
+  &--chica {
+    gap: 8px;
+  }
+
+  &--grande {
+    gap: 20px;
+  }
+}

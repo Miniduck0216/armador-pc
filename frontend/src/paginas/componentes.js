@@ -29,24 +29,34 @@ function sincronizarUrl() {
 function pintarCabecera() {
   const c = categorias.find((x) => x.codigo === filtros.categoria);
   $('#titulo').textContent = c ? c.plural : filtros.orden === 'bajada' ? 'Bajadas de precio' : 'Biblioteca de componentes';
-  $('#miga').innerHTML = c ? `<a href="/componentes.html">Componentes</a> / ${esc(c.plural)}` : 'Componentes';
+  $('#miga').innerHTML = c ? `<a class="cabecera-pagina__miga" href="/componentes.html">Componentes</a> / ${esc(c.plural)}` : 'Componentes';
   $('#descripcion').textContent = c?.descripcion ?? 'Busca, filtra y compara piezas con el mejor precio de hoy en tiendas de Ecuador.';
   document.title = `${c ? c.plural : 'Componentes'} · ArmadorPC`;
   const qm = $('#que-mirar');
   if (c?.queMirar) {
     qm.innerHTML = `${icono('info', 20)}<div><b>Qué mirar al elegir ${esc(c.nombre.toLowerCase())}:</b> ${esc(c.queMirar)}</div>`;
-    qm.classList.remove('oculto');
-  } else qm.classList.add('oculto');
+  }
+  qm.hidden = !c?.queMirar;
+  const total = categorias.reduce((suma, x) => suma + x.referencias, 0);
+  const todas = `<a class="mosaico mosaico--compacto mosaico--todas ${filtros.categoria ? '' : 'mosaico--activo'}" href="/componentes.html" data-cat="">
+      <span class="mosaico__velo"></span><span class="mosaico__texto"><b class="mosaico__titulo">Todas</b><small class="mosaico__detalle">${total} modelos</small></span></a>`;
   $('#categorias').innerHTML =
-    `<a class="mosaico todas ${filtros.categoria ? '' : 'activo'}" href="/componentes.html" data-cat=""><span class="velo"></span><span class="texto"><b>Todas</b><small>${categorias.reduce((s, x) => s + x.referencias, 0)} modelos</small></span></a>` +
-    categorias.map((x) => mosaicoCategoria(x, `/componentes.html?categoria=${x.codigo}`).replace('class="mosaico"', `class="mosaico ${x.codigo === filtros.categoria ? 'activo' : ''}" data-cat="${x.codigo}"`)).join('');
+    todas +
+    categorias
+      .map((x) =>
+        mosaicoCategoria(x, {
+          modificador: `mosaico--compacto ${x.codigo === filtros.categoria ? 'mosaico--activo' : ''}`,
+          atributos: `data-cat="${x.codigo}"`,
+        }),
+      )
+      .join('');
 }
 
 function casillas(el, valores, seleccion, clave) {
   const elegidos = seleccion ? seleccion.split(',') : [];
   el.innerHTML = valores.length
-    ? valores.map((v) => `<label class="casilla"><input type="checkbox" value="${esc(v)}" ${elegidos.includes(String(v)) ? 'checked' : ''}> ${esc(v)}</label>`).join('')
-    : '<span class="tenue pequeno">—</span>';
+    ? valores.map((v) => `<label class="formulario__casilla"><input type="checkbox" value="${esc(v)}" ${elegidos.includes(String(v)) ? 'checked' : ''}> ${esc(v)}</label>`).join('')
+    : '<span class="texto texto--pequeno texto--tenue">—</span>';
   el.onchange = () => {
     filtros[clave] = [...el.querySelectorAll('input:checked')].map((i) => i.value).join(',');
     filtros.pagina = 1;
@@ -58,7 +68,7 @@ async function cargar() {
   sincronizarUrl();
   pintarCabecera();
   const res = $('#resultados');
-  res.classList.add('cargando');
+  res.classList.add('grilla--cargando');
   if (!res.children.length) cargando(res, 8, 340);
   try {
     const datos = await api(`/componentes${consulta({ ...filtros, limite: 24 })}`);
@@ -67,17 +77,20 @@ async function cargar() {
     casillas($('#f-gamas'), datos.facetas.gamas, filtros.gama, 'gama');
     res.innerHTML = datos.resultados.length
       ? datos.resultados.map((p) => tarjetaProducto(p)).join('')
-      : `<div class="vacio" style="grid-column:1/-1">No encontramos componentes con esos filtros. <button class="enlace" id="vacio-limpiar">Limpiar filtros</button></div>`;
+      : `<div class="vacio">No encontramos componentes con esos filtros. <button class="enlace" id="vacio-limpiar">Limpiar filtros</button></div>`;
     $('#vacio-limpiar')?.addEventListener('click', limpiar);
     activarTarjetas(res, datos.resultados);
     $('#paginacion').innerHTML =
       datos.paginas > 1
-        ? Array.from({ length: datos.paginas }, (_, i) => `<button class="${i + 1 === datos.pagina ? 'activa' : ''}" data-pagina="${i + 1}">${i + 1}</button>`).join('')
+        ? Array.from(
+            { length: datos.paginas },
+            (_, i) => `<button class="paginacion__boton ${i + 1 === datos.pagina ? 'paginacion__boton--activa' : ''}" data-pagina="${i + 1}">${i + 1}</button>`,
+          ).join('')
         : '';
   } catch (e) {
     errorEn(res, e);
   } finally {
-    res.classList.remove('cargando');
+    res.classList.remove('grilla--cargando');
   }
 }
 
@@ -113,7 +126,7 @@ $('#f-orden').addEventListener('change', (e) => {
   cargar();
 });
 $('#limpiar').addEventListener('click', limpiar);
-$('#ver-filtros').addEventListener('click', () => $('#filtros').classList.toggle('abiertos'));
+$('#ver-filtros').addEventListener('click', () => $('#filtros').classList.toggle('biblioteca__filtros--abiertos'));
 $('#paginacion').addEventListener('click', (e) => {
   const b = e.target.closest('[data-pagina]');
   if (!b) return;

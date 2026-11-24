@@ -1,0 +1,54 @@
+@use 'sass:list';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: historial-flujo (línea de tiempo de la revisión) ----------
+
+.historial-flujo {
+  @extend %lista-limpia;
+  display: grid;
+  gap: 12px;
+  padding-left: 14px;
+  border-left: 2px solid $color-borde;
+
+  &__paso {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    @include entrar(0.25s);
+
+    // Punto sobre la línea, del color del estado
+    &::before {
+      content: '';
+      position: absolute;
+      left: -21px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border: 2px solid $color-blanco;
+      border-radius: 50%;
+      background: $color-tenue;
+    }
+
+    @each $estado, $par in $colores-estado {
+      &--#{$estado}::before {
+        background: list.nth($par, 2);
+      }
+    }
+  }
+
+  &__estado {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__quien {
+    @extend %texto-secundario;
+  }
+
+  &__comentario {
+    font-size: 13px;
+    font-style: italic;
+    color: $color-texto;
+  }
+}

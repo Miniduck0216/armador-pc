@@ -1,0 +1,104 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: articulo (una guía) ----------
+
+.articulo {
+  max-width: 780px;
+  margin: 0 auto;
+
+  &__seccion {
+    padding-top: 36px;
+  }
+
+  &__esqueleto {
+    height: 500px;
+  }
+
+  &__titulo {
+    margin: 14px 0 10px;
+    font-size: clamp(30px, 4vw, 44px);
+  }
+
+  &__datos {
+    margin-top: 8px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__portada {
+    aspect-ratio: 16 / 8;
+    margin: 22px 0 6px;
+    overflow: hidden;
+    border-radius: 18px;
+    background: $color-marino;
+  }
+
+  &__imagen {
+    @extend %foto-cubre;
+  }
+
+  &__credito {
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__accion {
+    margin-top: 30px;
+  }
+
+  &__otras {
+    margin-bottom: 20px;
+  }
+}
+
+// ---------- Bloque: contenido-guia (texto de la guía) ----------
+// El HTML viene de la base de datos (lo escribe el equipo), por eso aquí se estilan
+// las etiquetas que trae: es la única excepción a "solo clases" del proyecto.
+
+.articulo__contenido {
+  font-size: 16.5px;
+  line-height: 1.75;
+
+  h2 {
+    margin: 32px 0 10px;
+    font-size: 24px;
+  }
+
+  h3 {
+    margin: 24px 0 8px;
+  }
+
+  p {
+    margin: 0 0 14px;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 14px;
+    padding-left: 22px;
+  }
+
+  li {
+    margin-bottom: 6px;
+  }
+
+  table {
+    width: 100%;
+    margin: 10px 0 18px;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+
+  th,
+  td {
+    padding: 9px 12px;
+    border: 1px solid $color-borde;
+    text-align: left;
+  }
+
+  th {
+    background: #fafaff;
+  }
+}

@@ -1,0 +1,25 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: total-modal (total al pie de la lista de piezas) ----------
+
+.total-modal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px 0 6px;
+  padding: 14px;
+  border-radius: 12px;
+  background: $color-violeta-claro;
+
+  &__monto {
+    @include fuente(800, 24px);
+    color: $color-violeta-2;
+  }
+
+  &__acciones {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+}

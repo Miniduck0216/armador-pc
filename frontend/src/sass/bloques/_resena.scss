@@ -1,0 +1,17 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: resena (opinión de una persona) ----------
+
+.resena {
+  padding: 16px 0;
+  border-bottom: 1px solid $color-borde;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &__estrellas {
+    margin: 6px 0;
+  }
+}

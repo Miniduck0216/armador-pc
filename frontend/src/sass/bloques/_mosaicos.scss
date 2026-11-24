@@ -1,0 +1,14 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: mosaicos y mosaico (categorías con foto) ----------
+
+.mosaicos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 14px;
+
+  &--compactos {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}

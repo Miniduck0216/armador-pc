@@ -1,0 +1,11 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: configuraciones (barra con pestañas y botón) ----------
+
+.configuraciones {
+  &__barra {
+    margin-bottom: 24px;
+    gap: 16px;
+  }
+}

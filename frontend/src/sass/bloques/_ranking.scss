@@ -1,0 +1,21 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: ranking (posición y puntos en la tabla de procesadores) ----------
+
+.ranking {
+  &__posicion {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    @include color($color-violeta-claro, $color-violeta);
+    @include fuente(800, 13px);
+  }
+
+  &__puntos {
+    @include fuente(800, 16px);
+    color: $color-violeta;
+  }
+}

@@ -1,0 +1,70 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: modal (ventana sobre la página) ----------
+// El bloque es el fondo oscuro; la ventana blanca es un elemento.
+
+@keyframes entrar-modal {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes salir-modal {
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(12, 14, 40, 0.6);
+  animation: mostrar 0.15s;
+
+  &__ventana {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    border-radius: 18px;
+    background: $color-blanco;
+    box-shadow: $sombra-fuerte;
+    animation: entrar-modal 0.28s $curva-suave both;
+  }
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 1px solid $color-borde;
+  }
+
+  &__cuerpo {
+    padding: 18px 22px 22px;
+    overflow: auto;
+  }
+
+  // Al cerrar: el fondo se desvanece y la ventana baja un poco
+  &--cerrando {
+    animation: desvanecer 0.18s ease-in forwards;
+  }
+
+  &--cerrando &__ventana {
+    animation: salir-modal 0.18s ease-in forwards;
+  }
+}

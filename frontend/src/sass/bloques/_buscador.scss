@@ -1,0 +1,93 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: buscador (barra superior, con sugerencias) ----------
+
+.buscador {
+  position: relative;
+  flex: 0 1 340px;
+  margin-left: auto;
+
+  &__campo {
+    height: 44px;
+    padding: 0 14px 0 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.06)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23aab0d6' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5.5'/%3E%3Cpath d='m11 11 4 4'/%3E%3C/svg%3E")
+      no-repeat 14px center;
+    color: $color-blanco;
+
+    &::placeholder {
+      color: $color-claro-4;
+    }
+
+    &:focus {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  &__sugerencias {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 50;
+    min-width: 340px;
+    padding: 6px;
+    background: $color-blanco;
+    color: $color-texto;
+    border-radius: $radio;
+    box-shadow: $sombra-fuerte;
+    border: 1px solid $color-borde;
+  }
+
+  &__sugerencia {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 7px;
+    border-radius: $radio-chico;
+    color: $color-texto;
+
+    &:hover {
+      background: $color-violeta-claro;
+      text-decoration: none;
+    }
+  }
+
+  &__foto {
+    @include foto-producto(44px);
+    background: $color-panel-2;
+  }
+
+  &__nombre {
+    display: grid;
+    line-height: 1.25;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  &__categoria {
+    color: $color-tenue;
+    font-weight: 400;
+  }
+
+  &__ver-todo {
+    display: block;
+    padding: 9px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  &__vacio {
+    padding: 12px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  @include movil {
+    flex: 1 1 auto;
+  }
+}

@@ -1,0 +1,67 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: contexto-permisos (a quién se le asignan los permisos) ----------
+
+.contexto-permisos {
+  @include panel(20px 22px);
+  margin-bottom: 16px;
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  &__titulo {
+    @include fuente(800, 17px);
+  }
+
+  &__ayuda {
+    @extend %texto-secundario;
+    margin-top: 4px;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  &__chip {
+    @extend %pastilla;
+    border: 1px solid $color-borde;
+    @include color($color-panel-2, $color-tenue, $color-borde);
+  }
+
+  &__campos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: 14px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid $color-borde;
+  }
+
+  // Dato de solo lectura (usuario elegido, correo, descripción)
+  &__dato {
+    display: block;
+    padding: 11px 14px;
+    overflow: hidden;
+    border: 1px solid $color-borde;
+    border-radius: $radio-chico;
+    background: $color-panel-2;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @include movil {
+    &__campos {
+      grid-template-columns: 1fr;
+    }
+  }
+}

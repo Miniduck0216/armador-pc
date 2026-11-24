@@ -1,0 +1,19 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: oferta-tienda (celda de la tienda en la tabla de precios) ----------
+
+.oferta-tienda {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+
+  &__origen {
+    display: block;
+    max-width: 340px;
+    font-size: 12px;
+    font-weight: 400;
+    color: $color-tenue;
+  }
+}

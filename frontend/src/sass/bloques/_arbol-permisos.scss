@@ -1,0 +1,196 @@
+@use 'sass:list';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: arbol-permisos (un nodo por módulo con sus permisos) ----------
+
+// Colores de las etiquetas: nombre → (fondo, texto)
+$marcas: (
+  'completo': ($color-verde-claro, $color-verde-oscuro),
+  'parcial': ($color-naranja-claro, $color-naranja),
+  'vacio': ($color-panel-2, $color-tenue),
+  'rol': ($color-violeta-claro, $color-violeta-2),
+  'agregado': ($color-verde-claro, $color-verde-oscuro),
+  'quitado': ($color-rojo-claro, $color-rojo),
+);
+
+.arbol-permisos {
+  @include panel(18px 20px);
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  &__titulo {
+    @include fuente(800, 17px);
+  }
+
+  &__ayuda {
+    @extend %texto-secundario;
+    margin-top: 4px;
+  }
+
+  &__bloqueo {
+    margin-top: 12px;
+  }
+
+  &__herramientas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  &__total {
+    @extend %pastilla;
+    @include color($color-violeta-claro, $color-violeta-2);
+  }
+
+  &__enlace {
+    @extend %pastilla;
+    border: 1px solid $color-borde;
+    background: $color-blanco;
+    color: $color-texto;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: $color-panel-2;
+    }
+  }
+
+  &__leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  &__buscar {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid $color-borde;
+    border-radius: 12px;
+    background: rgba($color-panel-2, 0.6);
+  }
+
+  &__etiqueta {
+    @extend %antetitulo-mini;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  &__lista {
+    margin-top: 14px;
+    padding: 8px;
+    border: 1px solid $color-borde;
+    border-radius: 12px;
+    background: $color-panel-2;
+  }
+
+  &__rama + &__rama {
+    margin-top: 4px;
+  }
+
+  &__fila {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: $color-blanco;
+    }
+
+    &--modulo {
+      @include fuente(700, 14.5px);
+    }
+
+    &--permiso {
+      padding-left: 46px;
+      font-size: 14px;
+
+      @include movil {
+        padding-left: 30px;
+      }
+    }
+
+    // Permiso que cambió y aún no se guarda: raya amarilla a la izquierda
+    &--cambiado {
+      background: $color-blanco;
+      box-shadow: inset 3px 0 0 $color-amarillo;
+    }
+  }
+
+  // Flecha para abrir o cerrar el módulo (gira 90° cuando está cerrado)
+  &__flecha {
+    flex-shrink: 0;
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: $color-tenue;
+    cursor: pointer;
+    transform: rotate(-90deg);
+    transition: transform 0.2s, background 0.15s;
+
+    &:hover {
+      background: $color-borde;
+    }
+  }
+
+  &__rama--abierta &__flecha {
+    transform: rotate(0);
+  }
+
+  &__hijos {
+    display: none;
+    margin-top: 2px;
+  }
+
+  &__rama--abierta &__hijos {
+    display: block;
+    @include entrar(0.2s);
+  }
+
+  &__nombre {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__codigo {
+    @extend %texto-secundario;
+    font-weight: 400;
+  }
+
+  &__marca {
+    @extend %pastilla;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 700;
+
+    // Un modificador de color por cada entrada del mapa
+    @each $nombre, $par in $marcas {
+      &--#{$nombre} {
+        @include color(list.nth($par, 1), list.nth($par, 2));
+      }
+    }
+  }
+
+  &__sin-resultados {
+    @extend %texto-secundario;
+    padding: 16px;
+    text-align: center;
+  }
+}

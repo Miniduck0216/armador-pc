@@ -1,7 +1,7 @@
 import { montar } from '../js/layout.js';
 import { api, borrar, enviar, irAIngresar } from '../js/api.js';
 import { icono } from '../js/iconos.js';
-import { $, aviso, confirmar, dinero, errorEn, esc, estrellas, fecha, imagen } from '../js/util.js';
+import { $, aviso, confirmar, dinero, errorEn, esc, estrellas, fecha, imagen, tabla } from '../js/util.js';
 import { activarTarjetas, tarjetaProducto } from '../js/tarjetas.js';
 
 montar('');
@@ -16,56 +16,63 @@ const SECCIONES = [
   ['resenas', 'Mis reseñas', 'estrella'],
 ];
 
+// Cambio de precio de un armado desde que se guardó (▼ verde si bajó)
+const diferencia = (d) => (d ? `<div class="variacion variacion--${d < 0 ? 'baja' : 'sube'}">${d < 0 ? '▼' : '▲'} ${dinero(Math.abs(d))}</div>` : '');
+
+// Una función por sección: recibe los datos de /api/cuenta y devuelve el HTML
 const vista = {
   armados: (d) =>
-    d.armados.length
-      ? `<div class="tabla-envoltura"><table class="tabla">
-          <thead><tr><th>Armado</th><th>Piezas</th><th class="der">Al guardar</th><th class="der">Hoy</th><th>Estado</th><th></th></tr></thead>
-          <tbody>${d.armados
-            .map(
-              (a) => `<tr><td><a href="/armado.html?id=${a.id}"><b>${esc(a.nombre)}</b></a><div class="pequeno tenue">${fecha(a.fechaCreacion)}</div></td>
-                <td>${a.piezas}</td><td class="der">${dinero(a.precioTotal)}</td>
-                <td class="der"><b>${dinero(a.precioHoy)}</b>${a.diferencia ? `<div class="variacion ${a.diferencia < 0 ? 'baja' : 'sube'}">${a.diferencia < 0 ? '▼' : '▲'} ${dinero(Math.abs(a.diferencia))}</div>` : ''}</td>
-                <td><span class="estado-armado estado-armado--${a.estado}">${esc(a.nombreEstado)}</span></td>
-                <td class="der"><button class="enlace peligro" data-borrar="armados/${a.id}">Eliminar</button></td></tr>`,
-            )
-            .join('')}</tbody></table></div>`
-      : `<div class="vacio">Todavía no guardas armados. <a href="/configurador.html">Abre el configurador</a> y pulsa «Guardar».</div>`,
+    tabla(
+      ['Armado', 'Piezas', ['Al guardar', 'derecha'], ['Hoy', 'derecha'], 'Estado', ''],
+      d.armados.map((a) => [
+        `<a href="/armado.html?id=${a.id}"><b>${esc(a.nombre)}</b></a><small class="tabla__detalle">${fecha(a.fechaCreacion)}</small>`,
+        a.piezas,
+        [dinero(a.precioTotal), 'derecha'],
+        [`<b>${dinero(a.precioHoy)}</b>${diferencia(a.diferencia)}`, 'derecha'],
+        `<span class="estado-armado estado-armado--${a.estado}">${esc(a.nombreEstado)}</span>`,
+        [`<button class="enlace enlace--peligro" data-borrar="armados/${a.id}">Eliminar</button>`, 'derecha'],
+      ]),
+      { vacio: 'Todavía no guardas armados. <a href="/configurador.html">Abre el configurador</a> y pulsa «Guardar».' },
+    ),
 
   notificaciones: (d) =>
     d.notificaciones.length
       ? `<ul class="avisos">${d.notificaciones
-          .map((n) => `<li class="avisos__item ${n.nueva ? 'avisos__item--nueva' : ''}">
-            ${n.enlace.startsWith('/') ? `<a class="avisos__texto" href="${esc(n.enlace)}">${esc(n.mensaje)}</a>` : `<span class="avisos__texto">${esc(n.mensaje)}</span>`}
-            <span class="avisos__fecha">${fecha(n.fecha, true)}</span></li>`)
+          .map((n) => {
+            const texto = n.enlace.startsWith('/') ? `<a class="avisos__texto" href="${esc(n.enlace)}">${esc(n.mensaje)}</a>` : `<span class="avisos__texto">${esc(n.mensaje)}</span>`;
+            return `<li class="avisos__item ${n.nueva ? 'avisos__item--nueva' : ''}">${texto}<span class="avisos__fecha">${fecha(n.fecha, true)}</span></li>`;
+          })
           .join('')}</ul>`
       : '<div class="vacio">No tienes notificaciones. Aquí verás cuando un técnico revise tus armados.</div>',
 
   alertas: (d) =>
     d.alertas.length
-      ? `<div class="apilado">${d.alertas
-          .map(
-            (a) => `<div class="pieza-fila" style="grid-template-columns:58px 1fr auto auto">
-              ${imagen(a.componente.imagen, a.componente.nombre)}
-              <span><a href="/producto.html?id=${a.componente.id}"><b>${esc(a.componente.nombre)}</b></a>
-                <em>Objetivo ${dinero(a.precioObjetivo)} · hoy ${dinero(a.actual)}${a.falta ? ` · faltan ${dinero(a.falta)}` : ''}</em></span>
-              ${a.disparada ? `<span class="insignia ${a.nueva ? 'amarilla' : 'verde'}">${a.nueva ? '¡Nueva! ' : ''}Alcanzó ${dinero(a.precioAlcanzado)}</span>` : '<span class="insignia gris">Esperando</span>'}
-              <button class="icono-boton" data-borrar="alertas/${a.id}" title="Eliminar">${icono('basura', 16)}</button></div>`,
-          )
+      ? `<div class="pila">${d.alertas
+          .map((a) => {
+            const estado = a.disparada
+              ? `<span class="insignia ${a.nueva ? 'insignia--amarilla' : 'insignia--verde'}">${a.nueva ? '¡Nueva! ' : ''}Alcanzó ${dinero(a.precioAlcanzado)}</span>`
+              : '<span class="insignia insignia--gris">Esperando</span>';
+            return `<div class="pieza-fila pieza-fila--con-accion">
+              ${imagen(a.componente.imagen, a.componente.nombre, 'pieza-fila__foto')}
+              <span class="pieza-fila__texto"><a href="/producto.html?id=${a.componente.id}"><b>${esc(a.componente.nombre)}</b></a>
+                <em class="pieza-fila__detalle">Objetivo ${dinero(a.precioObjetivo)} · hoy ${dinero(a.actual)}${a.falta ? ` · faltan ${dinero(a.falta)}` : ''}</em></span>
+              ${estado}
+              <button class="icono-boton" data-borrar="alertas/${a.id}" title="Eliminar">${icono('basura', 16)}</button></div>`;
+          })
           .join('')}</div>`
       : '<div class="vacio">No tienes alertas. Entra a cualquier componente y usa «Avísame si baja de precio».</div>',
 
   favoritos: (d) =>
     d.favoritos.length
-      ? `<div class="grilla auto" id="favoritos">${d.favoritos.map((p) => tarjetaProducto(p)).join('')}</div>`
+      ? `<div class="grilla grilla--auto" id="favoritos">${d.favoritos.map((p) => tarjetaProducto(p)).join('')}</div>`
       : '<div class="vacio">Sin favoritos todavía. Usa el corazón en la ficha de un componente.</div>',
 
   comparaciones: (d) =>
     d.comparaciones.length
-      ? `<div class="apilado">${d.comparaciones
+      ? `<div class="pila">${d.comparaciones
           .map(
-            (c) => `<div class="fila-tienda"><a href="/comparar.html?categoria=CPU&ids=${c.a.id},${c.b.id}"><b>${esc(c.a.nombre)}</b> vs <b>${esc(c.b.nombre)}</b></a>
-              <span class="tenue pequeno">${fecha(c.fecha)}</span><button class="enlace peligro" data-borrar="comparaciones/${c.id}">Eliminar</button></div>`,
+            (c) => `<div class="tienda-fila"><a href="/comparar.html?categoria=CPU&ids=${c.a.id},${c.b.id}"><b>${esc(c.a.nombre)}</b> vs <b>${esc(c.b.nombre)}</b></a>
+              <span class="tienda-fila__cantidad">${fecha(c.fecha)}</span><button class="enlace enlace--peligro" data-borrar="comparaciones/${c.id}">Eliminar</button></div>`,
           )
           .join('')}</div>`
       : '<div class="vacio">Puedes guardar comparaciones de procesadores desde <a href="/comparar.html?categoria=CPU">Comparar</a>.</div>',
@@ -74,8 +81,8 @@ const vista = {
     d.resenas.length
       ? `<div class="caja">${d.resenas
           .map(
-            (r) => `<div class="resena"><div class="fila entre"><a href="/producto.html?id=${r.componente.id}"><b>${esc(r.componente.nombre)}</b></a><span class="pequeno tenue">${fecha(r.fecha)}</span></div>
-              <div>${estrellas(r.calificacion)}</div><p>${esc(r.comentario)}</p><button class="enlace peligro pequeno" data-borrar="resenas/${r.id}">Eliminar</button></div>`,
+            (r) => `<div class="resena"><div class="fila fila--entre"><a href="/producto.html?id=${r.componente.id}"><b>${esc(r.componente.nombre)}</b></a><span class="texto texto--pequeno texto--tenue">${fecha(r.fecha)}</span></div>
+              <div>${estrellas(r.calificacion)}</div><p>${esc(r.comentario)}</p><button class="enlace enlace--peligro" data-borrar="resenas/${r.id}">Eliminar</button></div>`,
           )
           .join('')}</div>`
       : '<div class="vacio">Aún no escribes reseñas.</div>',
@@ -83,9 +90,9 @@ const vista = {
 
 function mostrar(clave) {
   if (!vista[clave]) clave = datos.notificaciones.some((n) => n.nueva) ? 'notificaciones' : 'armados';
-  document.querySelectorAll('#menu [data-seccion]').forEach((b) => b.classList.toggle('activa', b.dataset.seccion === clave));
+  document.querySelectorAll('#menu [data-seccion]').forEach((b) => b.classList.toggle('panel__opcion--activa', b.dataset.seccion === clave));
   const [, titulo] = SECCIONES.find(([k]) => k === clave);
-  $('#contenido').innerHTML = `<h2 style="margin-bottom:18px">${titulo}</h2>${vista[clave](datos)}`;
+  $('#contenido').innerHTML = `<div class="panel__seccion"><h2 class="panel__titulo">${titulo}</h2>${vista[clave](datos)}</div>`;
   if (clave === 'favoritos' && $('#favoritos')) activarTarjetas($('#favoritos'), datos.favoritos);
   history.replaceState(null, '', `#${clave}`);
 }
@@ -98,16 +105,16 @@ async function cargar() {
     return errorEn($('#contenido'), e);
   }
   const p = datos.perfil;
-  $('#perfil').innerHTML = `<span class="avatar grande">${esc(p.nombre[0].toUpperCase())}</span>
-    <div><h1 style="font-size:34px">${esc(p.nombre)}</h1><p class="tenue" style="margin:4px 0 0">${esc(p.correo)} · ${p.esAdmin ? 'Administrador · ' : ''}miembro desde ${fecha(p.fechaRegistro)}</p></div>
-    <button class="boton secundario" id="salir" style="margin-left:auto">${icono('salir', 16)} Cerrar sesión</button>`;
+  $('#perfil').innerHTML = `<span class="avatar avatar--grande">${esc(p.nombre[0].toUpperCase())}</span>
+    <div><h1 class="perfil__nombre">${esc(p.nombre)}</h1><p class="perfil__datos">${esc(p.correo)} · ${p.esAdmin ? 'Administrador · ' : ''}miembro desde ${fecha(p.fechaRegistro)}</p></div>
+    <button class="boton boton--secundario perfil__salir" id="salir">${icono('salir', 16)} Cerrar sesión</button>`;
   $('#salir').addEventListener('click', async () => {
     await enviar('/auth/salir');
     location.href = '/';
   });
   $('#menu').innerHTML =
-    SECCIONES.map(([k, t, i]) => `<button data-seccion="${k}">${icono(i, 17)} ${t}<span class="contador">${datos[k].length}</span></button>`).join('') +
-    (p.esAdmin ? `<a href="/admin.html">${icono('admin', 17)} Administración</a>` : '');
+    SECCIONES.map(([k, t, i]) => `<button class="panel__opcion" data-seccion="${k}">${icono(i, 17)} ${t}<span class="panel__contador">${datos[k].length}</span></button>`).join('') +
+    (p.esAdmin ? `<a class="panel__opcion" href="/admin.html">${icono('admin', 17)} Administración</a>` : '');
   mostrar(location.hash.slice(1));
 }
 

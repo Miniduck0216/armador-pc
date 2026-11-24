@@ -1,0 +1,98 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: resumen-permisos (cambios pendientes con Guardar y Descartar) ----------
+
+.resumen-permisos {
+  @include panel(18px 20px);
+  position: sticky;
+  top: 90px;
+
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  &__titulo {
+    @include fuente(800, 17px);
+  }
+
+  &__sujeto {
+    @extend %texto-secundario;
+    margin-top: 4px;
+  }
+
+  &__estado {
+    @extend %pastilla;
+    border: 1px solid $color-borde;
+    color: $color-tenue;
+
+    &--pendiente {
+      @include color($color-naranja-claro, $color-naranja);
+    }
+  }
+
+  &__grupo {
+    display: grid;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid $color-borde;
+    border-radius: 12px;
+    background: $color-panel-2;
+  }
+
+  &__subtitulo {
+    @extend %antetitulo-mini;
+  }
+
+  &__lista {
+    @extend %lista-limpia;
+    display: grid;
+    gap: 6px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13.5px;
+    @include entrar(0.2s);
+  }
+
+  &__signo {
+    @include fuente(800, 14px);
+
+    &--mas {
+      color: $color-verde;
+    }
+
+    &--menos {
+      color: $color-rojo;
+    }
+  }
+
+  &__vacio {
+    @extend %texto-secundario;
+  }
+
+  &__pie {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid $color-borde;
+  }
+
+  &__cuenta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: $color-tenue;
+  }
+
+  @include movil {
+    position: static;
+  }
+}

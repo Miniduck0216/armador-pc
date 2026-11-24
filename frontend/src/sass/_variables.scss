@@ -1,0 +1,74 @@
+// Variables: colores, fuentes, medidas y punto de quiebre.
+// Se usan en todos los demás archivos con @use.
+
+// Colores de la marca
+$color-marino: #12163a;
+$color-marino-2: #1c2152;
+$color-morado-oscuro: #2a1f6e;
+$color-violeta: #6b4bff;
+$color-violeta-2: #5333ea;
+$color-violeta-claro: #efebff;
+$color-violeta-borde: #d9d1ff;
+$color-amarillo: #ffd23f;
+$color-amarillo-2: #f5c400;
+
+// Colores de texto y superficies
+$color-blanco: #ffffff;
+$color-texto: #14172e;
+$color-tenue: #5f6582;
+$color-fondo: #f6f6fb;
+$color-panel-2: #f1f1f8;
+$color-borde: #e5e5ef;
+
+// Colores de estado
+$color-verde: #12a150;
+$color-verde-oscuro: #0d6b37;
+$color-verde-claro: #e6f6ec;
+$color-rojo: #e11d48;
+$color-rojo-oscuro: #a3133a;
+$color-rojo-claro: #fde8ed;
+$color-rojo-borde: #f6c0cc;
+$color-naranja: #9a5b00;
+$color-naranja-claro: #fff4dc;
+$color-azul: #1d4ed8;
+$color-azul-claro: #e8f1ff;
+
+// Colores sobre fondo oscuro (barra, pie y héroe)
+$color-claro-1: #dfe2ff;
+$color-claro-2: #cfd2ef;
+$color-claro-3: #b7bbdc;
+$color-claro-4: #9ea4cc;
+
+// Colores de cada estado del flujo de revisión: nombre → (fondo, texto).
+// Los usan los bloques estado-armado e historial-flujo.
+$colores-estado: (
+  'borrador': ($color-panel-2, $color-tenue),
+  'enviado': ($color-azul-claro, $color-azul),
+  'en_revision': ($color-violeta-claro, $color-violeta-2),
+  'aprobado': ($color-verde-claro, $color-verde-oscuro),
+  'por_corregir': ($color-naranja-claro, $color-naranja),
+  'rechazado': ($color-rojo-claro, $color-rojo-oscuro),
+);
+
+// Fuentes
+$fuente-titulos: 'Outfit', system-ui, sans-serif;
+$fuente-texto: 'Inter', system-ui, sans-serif;
+
+// Medidas
+$radio: 14px;
+$radio-chico: 10px;
+$ancho-maximo: 1240px;
+$alto-barra: 74px;
+$sombra: 0 10px 30px rgba(20, 23, 60, 0.08);
+$sombra-fuerte: 0 20px 50px rgba(20, 23, 60, 0.16);
+
+// Degradados que se repiten
+$degradado-oscuro: linear-gradient(135deg, $color-marino, $color-morado-oscuro);
+$degradado-violeta: linear-gradient(120deg, $color-violeta-2, $color-violeta 55%, #8f74ff);
+
+// Curvas de las animaciones
+$curva-suave: cubic-bezier(0.22, 1, 0.36, 1);
+$curva-rebote: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// Punto de quiebre: tablets y celulares (uno solo para todo el sitio)
+$movil: 1024px;

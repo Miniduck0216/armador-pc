@@ -1,0 +1,22 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: datos-tecnicos (resumen técnico en la tabla de componentes) ----------
+
+.datos-tecnicos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  &__dato {
+    padding: 3px 8px;
+    border-radius: 8px;
+    @include color($color-panel-2, $color-tenue);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  &__valor {
+    color: $color-texto;
+  }
+}

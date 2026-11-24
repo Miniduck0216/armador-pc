@@ -1,0 +1,28 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pagina (el <body> de cada página) ----------
+// El HTML llega con "pagina--cargando": el contenido espera invisible a que carguen
+// los estilos y exista la barra. El JavaScript cambia a "pagina--lista" y entra suave.
+// Si el JavaScript fallara, igual se muestra al segundo (animación "mostrar").
+
+.pagina {
+  &--cargando &__contenido {
+    opacity: 0;
+    animation: mostrar 0s 1s forwards;
+  }
+
+  &--lista &__contenido {
+    @include entrar;
+  }
+
+  // Al terminar el ingreso, el contenido se desvanece antes de cambiar de página
+  &--saliendo &__contenido {
+    animation: desvanecer 0.25s ease-in forwards;
+  }
+
+  // Con la bandeja de comparar abierta, el pie no queda tapado
+  &--con-bandeja {
+    padding-bottom: 72px;
+  }
+}

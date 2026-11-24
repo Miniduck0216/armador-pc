@@ -1,0 +1,49 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloques de distribución: grilla, fila y pila ----------
+
+// Grilla de columnas iguales. En tablets y celulares se acomodan solas
+// (todas las que quepan de al menos 240 px).
+.grilla {
+  display: grid;
+  gap: 20px;
+
+  &--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  &--auto {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  // Dos columnas: la izquierda más ancha (inicio)
+  &--principal {
+    grid-template-columns: 1.3fr 1fr;
+    gap: 36px;
+  }
+
+  // Mientras llegan nuevos resultados la grilla se ve apagada
+  &--cargando {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+
+  @include movil {
+    &--2,
+    &--3,
+    &--4,
+    &--principal {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+  }
+}

@@ -1,0 +1,126 @@
+// =====================================================
+//  ArmadorPC · archivo principal de Sass
+//  Este archivo solo junta las partes. Vite lo compila a CSS.
+//  Los archivos que empiezan con "_" son parciales: no se
+//  compilan solos, solo se importan.
+//
+//  sass/_variables.scss  -> colores, fuentes, medidas y el punto de quiebre
+//  sass/_mixins.scss     -> mixins y placeholders
+//  sass/_base.scss       -> reset de etiquetas y animaciones compartidas
+//  sass/bloques/         -> un archivo por cada bloque BEM
+// =====================================================
+
+@use "sass/base";
+
+// Orden: primero los componentes reutilizables y después los bloques que los
+// acomodan (estructura, tarjetas, páginas). Así, cuando un elemento combina dos
+// clases (por ejemplo "boton sesion__boton"), gana la del bloque que lo contiene.
+
+// Componentes reutilizables
+@use "sass/bloques/boton";
+@use "sass/bloques/enlace";
+@use "sass/bloques/icono";
+@use "sass/bloques/icono-boton";
+@use "sass/bloques/formulario";
+@use "sass/bloques/caja";
+@use "sass/bloques/aviso";
+@use "sass/bloques/aviso-flotante";
+@use "sass/bloques/insignia";
+@use "sass/bloques/chips";
+@use "sass/bloques/texto";
+@use "sass/bloques/variacion";
+@use "sass/bloques/estrellas";
+@use "sass/bloques/grilla";
+@use "sass/bloques/fila";
+@use "sass/bloques/pila";
+@use "sass/bloques/vacio";
+@use "sass/bloques/esqueleto";
+@use "sass/bloques/tabla";
+@use "sass/bloques/modal";
+@use "sass/bloques/confirmar";
+@use "sass/bloques/pestanas";
+@use "sass/bloques/paginacion";
+@use "sass/bloques/interruptor";
+@use "sass/bloques/datos";
+@use "sass/bloques/cabecera-icono";
+@use "sass/bloques/barras";
+@use "sass/bloques/pieza-fila";
+@use "sass/bloques/total-modal";
+@use "sass/bloques/grafico";
+
+// Estructura de la página
+@use "sass/bloques/pagina";
+@use "sass/bloques/contenedor";
+@use "sass/bloques/seccion";
+@use "sass/bloques/cabecera-pagina";
+@use "sass/bloques/barra";
+@use "sass/bloques/logo";
+@use "sass/bloques/menu";
+@use "sass/bloques/buscador";
+@use "sass/bloques/sesion";
+@use "sass/bloques/campana";
+@use "sass/bloques/menu-usuario";
+@use "sass/bloques/avatar";
+@use "sass/bloques/pie";
+@use "sass/bloques/bandeja-comparar";
+
+// Tarjetas
+@use "sass/bloques/tarjeta-producto";
+@use "sass/bloques/mosaicos";
+@use "sass/bloques/mosaico";
+@use "sass/bloques/tarjeta-config";
+@use "sass/bloques/tarjeta-guia";
+@use "sass/bloques/tarjeta-accion";
+@use "sass/bloques/tienda-fila";
+
+// Configurador (core) y compatibilidad
+@use "sass/bloques/configurador";
+@use "sass/bloques/pieza-config";
+@use "sass/bloques/resumen-armado";
+@use "sass/bloques/asistente";
+@use "sass/bloques/selector-piezas";
+@use "sass/bloques/opcion-pieza";
+@use "sass/bloques/compatibilidad";
+
+// Flujo de revisión de armados
+@use "sass/bloques/estado-armado";
+@use "sass/bloques/historial-flujo";
+@use "sass/bloques/flujo-acciones";
+@use "sass/bloques/avisos";
+
+// Páginas
+@use "sass/bloques/heroe";
+@use "sass/bloques/que-hacer";
+@use "sass/bloques/ranking";
+@use "sass/bloques/banda-cta";
+@use "sass/bloques/biblioteca";
+@use "sass/bloques/ficha";
+@use "sass/bloques/ficha-nav";
+@use "sass/bloques/especificaciones";
+@use "sass/bloques/oferta-tienda";
+@use "sass/bloques/pros-contras";
+@use "sass/bloques/resena";
+@use "sass/bloques/ranuras";
+@use "sass/bloques/comparacion";
+@use "sass/bloques/veredicto";
+@use "sass/bloques/herramienta";
+@use "sass/bloques/resultado";
+@use "sass/bloques/configuraciones";
+@use "sass/bloques/accesorios";
+@use "sass/bloques/accesorio";
+@use "sass/bloques/articulo";
+@use "sass/bloques/acceso";
+@use "sass/bloques/no-encontrado";
+@use "sass/bloques/pedido";
+@use "sass/bloques/perfil";
+
+// Panel de administración
+@use "sass/bloques/panel";
+@use "sass/bloques/cifras";
+@use "sass/bloques/datos-tecnicos";
+@use "sass/bloques/reglas";
+@use "sass/bloques/contexto-permisos";
+@use "sass/bloques/buscador-usuario";
+@use "sass/bloques/asignar-permisos";
+@use "sass/bloques/arbol-permisos";
+@use "sass/bloques/resumen-permisos";

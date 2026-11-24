@@ -1,0 +1,38 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: accesorios (página de NomadaWare) ----------
+
+.accesorios {
+  &__barra {
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+
+  &__buscar {
+    max-width: 320px;
+  }
+
+  &__orden {
+    width: auto;
+    min-width: 230px;
+  }
+
+  &__total {
+    margin: 10px 0 16px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+
+  &__grilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  &__fuente {
+    margin-top: 24px;
+    font-size: 13px;
+    color: $color-tenue;
+  }
+}

@@ -1,0 +1,52 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: pestanas (botones para cambiar de vista) ----------
+
+.pestanas {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid $color-borde;
+  border-radius: $radio;
+  background: $color-blanco;
+
+  // Variante gris del panel de administración
+  &--gris {
+    margin-bottom: 16px;
+    border: 0;
+    background: $color-panel-2;
+  }
+
+  &__boton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    border: 0;
+    border-radius: $radio-chico;
+    background: none;
+    color: $color-tenue;
+    @include fuente(700, 14px);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      color: $color-violeta;
+    }
+
+    &--activa {
+      @include color($color-violeta, $color-blanco);
+
+      &:hover {
+        color: $color-blanco;
+      }
+    }
+  }
+
+  &--gris &__boton--activa {
+    @include color($color-blanco, $color-violeta-2);
+    box-shadow: 0 2px 8px rgba(20, 23, 60, 0.08);
+  }
+}

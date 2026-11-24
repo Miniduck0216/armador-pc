@@ -1,0 +1,32 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: no-encontrado (página 404) ----------
+
+.no-encontrado {
+  padding: 90px 20px;
+  text-align: center;
+
+  &__codigo {
+    @include fuente(800, 120px);
+    line-height: 1;
+    color: $color-violeta;
+  }
+
+  &__titulo {
+    margin: 12px 0;
+    font-size: 32px;
+  }
+
+  &__texto {
+    margin-bottom: 22px;
+    color: $color-tenue;
+  }
+
+  &__acciones {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}

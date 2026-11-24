@@ -1,0 +1,35 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: especificaciones (lista de datos técnicos en dos columnas) ----------
+
+.especificaciones {
+  @include panel(4px 20px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 28px;
+  margin: 0;
+
+  &__fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px solid $color-borde;
+    font-size: 14.5px;
+  }
+
+  &__nombre {
+    color: $color-tenue;
+  }
+
+  &__valor {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+  }
+}

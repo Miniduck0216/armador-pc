@@ -1,0 +1,31 @@
+@use 'sass:list';
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: insignia (etiqueta corta en mayúsculas) ----------
+
+// Colores de cada modificador: nombre → (fondo, texto)
+$colores-insignia: (
+  'amarilla': ($color-amarillo, $color-marino),
+  'verde': ($color-verde-claro, $color-verde),
+  'roja': ($color-rojo-claro, $color-rojo),
+  'gris': ($color-panel-2, $color-tenue),
+  'oscura': (rgba(18, 22, 58, 0.85), $color-blanco),
+);
+
+.insignia {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 7px;
+  @include fuente(800, 10.5px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  @include color($color-violeta-claro, $color-violeta-2);
+
+  // Un modificador por color, generado con un bucle @each sobre el mapa
+  @each $nombre, $par in $colores-insignia {
+    &--#{$nombre} {
+      @include color(list.nth($par, 1), list.nth($par, 2));
+    }
+  }
+}

@@ -1,0 +1,28 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: asignar-permisos (árbol a la izquierda, resumen a la derecha) ----------
+// Diseño tomado de la pantalla «Privilegios» de Omnium 3.
+
+.asignar-permisos {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.75fr);
+  align-items: start;
+  gap: 16px;
+
+  // Pestaña "Por usuario" sin nadie elegido
+  &__vacio {
+    @include panel(36px 22px);
+    text-align: center;
+    color: $color-tenue;
+  }
+
+  &__icono {
+    margin: 0 auto 8px;
+    color: $color-violeta;
+  }
+
+  @include movil {
+    grid-template-columns: 1fr;
+  }
+}

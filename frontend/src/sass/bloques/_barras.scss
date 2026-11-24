@@ -1,0 +1,50 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: barras (barras horizontales de puntaje) ----------
+
+.barras {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+
+  &__fila {
+    display: grid;
+    grid-template-columns: minmax(120px, 1fr) 2fr auto;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  &__pista {
+    height: 10px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: $color-panel-2;
+  }
+
+  // El ancho de la barra se calcula en JavaScript (estilo en línea)
+  &__relleno {
+    display: block;
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, $color-violeta, #9b84ff);
+  }
+
+  &__valor {
+    min-width: 54px;
+    font-family: $fuente-titulos;
+    text-align: right;
+  }
+
+  @include movil {
+    &__fila {
+      grid-template-columns: 1fr auto;
+    }
+
+    &__pista {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+  }
+}

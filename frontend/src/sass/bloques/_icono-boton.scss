@@ -1,0 +1,41 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: icono-boton (botón cuadrado con un ícono) ----------
+
+.icono-boton {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid $color-borde;
+  border-radius: $radio-chico;
+  background: $color-blanco;
+  color: $color-tenue;
+  font-size: 17px;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+
+  &:hover {
+    border-color: $color-violeta-borde;
+    color: $color-violeta;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &--activo {
+    @include color($color-violeta-claro, $color-violeta, $color-violeta);
+  }
+
+  &--amarillo {
+    @include color(#fff8db, #8a6a00, #f6e39b);
+  }
+
+  // Favorito marcado (corazón rojo)
+  &--favorito {
+    @include color($color-rojo-claro, $color-rojo, $color-rojo-borde);
+  }
+}

@@ -1,0 +1,27 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: tarjeta-guia ----------
+
+.tarjeta-guia {
+  @extend %tarjeta-flotante;
+
+  &__foto {
+    aspect-ratio: 16 / 9;
+    background: $color-marino;
+  }
+
+  &__imagen {
+    @extend %foto-cubre;
+  }
+
+  &__cuerpo {
+    display: grid;
+    gap: 10px;
+    padding: 18px;
+  }
+
+  &__titulo {
+    font-size: 18px;
+  }
+}

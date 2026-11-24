@@ -1,0 +1,34 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: caja (tarjeta blanca con borde) ----------
+
+.caja {
+  @include panel;
+
+  &--sombra {
+    box-shadow: $sombra;
+  }
+
+  &--compacta {
+    padding: 16px 18px;
+  }
+
+  &--destacada {
+    border: 2px solid $color-violeta;
+  }
+
+  // Cajas que se ordenan en columna con espacio entre sus partes
+  &--pila {
+    display: grid;
+    gap: 12px;
+  }
+
+  &__titulo {
+    margin-bottom: 12px;
+  }
+
+  &__texto {
+    color: $color-tenue;
+  }
+}

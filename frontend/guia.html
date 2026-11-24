@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <!-- Oculta la página hasta que carguen los estilos (evita ver el HTML sin diseño un instante) -->
-  <style>html:not(.listo) body{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
+  <style>.pagina--cargando{opacity:0;animation:respaldo-visible 0s 2s forwards}@keyframes respaldo-visible{to{opacity:1}}</style>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Guía · ArmadorPC</title>
   <meta name="description" content="Guía de ArmadorPC.">
@@ -13,12 +13,12 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap">
   <script type="module" src="/src/paginas/guia.js"></script>
 </head>
-<body>
-<main>
-  <section class="seccion" style="padding-top:36px">
-    <article class="contenedor articulo" id="articulo"><div class="esqueleto" style="height:500px"></div></article>
+<body class="pagina pagina--cargando">
+<main class="pagina__contenido">
+  <section class="seccion articulo__seccion">
+    <article class="contenedor articulo" id="articulo"><div class="esqueleto articulo__esqueleto"></div></article>
   </section>
-  <section class="seccion blanca"><div class="contenedor"><h2 style="margin-bottom:20px">Sigue leyendo</h2><div class="grilla g3" id="otras"></div></div></section>
+  <section class="seccion seccion--blanca"><div class="contenedor"><h2 class="articulo__otras">Sigue leyendo</h2><div class="grilla grilla--3" id="otras"></div></div></section>
 </main>
 </body>
 </html>

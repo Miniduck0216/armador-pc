@@ -1,0 +1,22 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ---------- Bloque: avatar (inicial del nombre en un círculo) ----------
+
+.avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b6cff, #4f2fe0);
+  color: $color-blanco;
+  @include fuente(800, 14px);
+
+  &--grande {
+    width: 72px;
+    height: 72px;
+    font-size: 30px;
+  }
+}
