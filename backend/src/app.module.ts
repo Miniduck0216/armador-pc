@@ -20,7 +20,11 @@ import { HerramientasModule } from './herramientas/herramientas.module';
 import { NotificacionesModule } from './notificaciones/notificaciones.module';
 import { UsuarioActualMiddleware } from './auth/usuario-actual.middleware';
 import { CuentaController } from './cuenta/cuenta.controller';
-import { AdminController } from './admin/admin.controller';
+import { TableroController } from './admin/tablero.controller';
+import { CatalogoAdminController } from './admin/catalogo-admin.controller';
+import { PreciosAdminController } from './admin/precios-admin.controller';
+import { UsuariosAdminController } from './admin/usuarios-admin.controller';
+import { RolesAdminController } from './admin/roles-admin.controller';
 import { InicioController } from './inicio.controller';
 
 @Module({
@@ -51,7 +55,16 @@ import { InicioController } from './inicio.controller';
     ArmadosModule,
     SemillaModule,
   ],
-  controllers: [InicioController, CuentaController, AdminController],
+  controllers: [
+    InicioController,
+    CuentaController,
+    // Panel de administración: un controlador por sección
+    TableroController,
+    CatalogoAdminController,
+    PreciosAdminController,
+    UsuariosAdminController,
+    RolesAdminController,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

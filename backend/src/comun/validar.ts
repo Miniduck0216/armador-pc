@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -18,4 +19,12 @@ export async function validarFormulario<T extends object>(clase: new () => T, da
 export function rutaSegura(ruta: string | undefined, porDefecto = '/') {
   if (!ruta || !ruta.startsWith('/') || ruta.startsWith('//') || ruta.includes('\\')) return porDefecto;
   return ruta;
+}
+
+// Igual que validarFormulario, pero si hay errores responde 400 con la lista de mensajes.
+// Así cada ruta del panel queda en una sola línea: const dto = await validarODetener(Dto, cuerpo);
+export async function validarODetener<T extends object>(clase: new () => T, datos: any) {
+  const { dto, errores } = await validarFormulario(clase, datos);
+  if (errores.length) throw new BadRequestException(errores);
+  return dto;
 }

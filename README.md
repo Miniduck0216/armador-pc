@@ -18,34 +18,69 @@ Aplicación web para armar una computadora pieza por pieza: revisa que las pieza
 
 ```
 armador-pc/
-├── backend/                         # API (puerto 3000)
+├── backend/                              # API (puerto 3000)
 │   └── src/
-│       ├── main.ts                  # arranca NestJS y sirve el frontend compilado
-│       ├── componentes/             # MODELO: entidad Componente y su servicio
-│       ├── categorias/              # MODELO: entidad Categoria
-│       ├── precios/                 # MODELO: Tienda, Oferta, historial y sincronización de precios
-│       ├── usuarios/                # MODELO: Usuario, Rol y Permiso; catálogo de permisos
-│       ├── configurador/            # core: compatibilidad, rendimiento y armado automático
-│       ├── admin/                   # CONTROLADOR del panel de administración
-│       │   ├── admin.controller.ts  # rutas /api/admin, cada una protegida por un permiso
-│       │   └── dto/                 # validación en el servidor de los datos sensibles
-│       ├── auth/                    # ingreso, sesiones y PermisosGuard
-│       └── semilla/                 # datos de prueba (componentes, tiendas, cuentas)
-├── frontend/                        # VISTA (puerto 5173 en desarrollo)
-│   ├── *.html                       # una página por pantalla
+│       ├── main.ts                       # arranca NestJS y sirve el frontend compilado
+│       ├── armados/                      # cada módulo tiene la misma forma:
+│       │   ├── armado.entity.ts          #   MODELO: la tabla (TypeORM)
+│       │   ├── armados.service.ts        #   MODELO: reglas del negocio (flujo de revisión)
+│       │   ├── armados.controller.ts     #   CONTROLADOR: rutas /api/armados, valida y responde JSON
+│       │   ├── dto/                      #   validación de los datos que llegan
+│       │   └── armados.module.ts         #   junta las piezas
+│       ├── componentes/                  # catálogo: entidad Componente y su servicio
+│       ├── configurador/                 # core: compatibilidad, rendimiento y armado automático
+│       ├── usuarios/                     # Usuario, Rol y Permiso; catálogo de permisos
+│       ├── admin/                        # panel: un controlador por sección
+│       │   ├── zona-admin.ts             #   decorador @ZonaAdmin: sesión + permisos
+│       │   ├── tablero.controller.ts     #   tablero, reportes y reglas
+│       │   ├── catalogo-admin.controller.ts
+│       │   ├── precios-admin.controller.ts
+│       │   ├── usuarios-admin.controller.ts
+│       │   ├── roles-admin.controller.ts
+│       │   └── dto/                      #   validación de los datos sensibles
+│       ├── auth/                         # ingreso, sesiones y PermisosGuard
+│       └── semilla/                      # datos de prueba (componentes, tiendas, cuentas)
+├── frontend/                             # VISTA (puerto 5173 en desarrollo)
+│   ├── *.html                            # una página por pantalla
 │   └── src/
-│       ├── paginas/                 # JS de cada página (admin.js = panel)
-│       └── sass/                    # estilos: abstractos, base, componentes y páginas
-├── docs/                            # especificación funcional, diagramas y guion del video
-├── package.json                     # scripts para correr backend y frontend a la vez
-└── render.yaml                      # configuración del despliegue
+│       ├── styles.scss                   # archivo principal de Sass: solo junta las partes
+│       ├── sass/                         # estilos (ver "Estilos con Sass y BEM")
+│       ├── js/                           # piezas comunes: layout, api, util, tarjetas…
+│       └── paginas/                      # JS de cada página
+│           ├── admin.js                  #   menú del panel
+│           └── admin/                    #   una sección por archivo
+│               └── roles/                #   Roles y permisos: modelo.js, vista.js, controlador.js
+├── docs/                                 # especificación funcional, diagramas y guion del video
+├── package.json                          # scripts para correr backend y frontend a la vez
+└── render.yaml                           # configuración del despliegue
 ```
 
 | Capa | Qué hace aquí |
 |------|---------------|
 | Modelo | Entidades de TypeORM (`*.entity.ts`) y servicios (`*.service.ts`): tablas, compatibilidad, puntajes y precios. |
-| Vista | Páginas HTML que piden datos a la API y los muestran. No guardan nada por su cuenta. |
+| Vista | Páginas HTML con Sass que piden datos a la API y los muestran. No guardan nada por su cuenta. |
 | Controlador | Recibe la petición, valida los datos con DTOs, llama al servicio y responde JSON. |
+
+Dentro del frontend, la pantalla de **Roles y permisos** repite el mismo patrón en pequeño: `modelo.js` guarda el estado y habla con la API, `vista.js` solo arma HTML y `controlador.js` escucha los clics y une a los dos.
+
+## Estilos con Sass y BEM
+
+Misma estructura que el examen del parcial:
+
+```
+frontend/src/
+├── styles.scss            # solo @use de las partes (no tiene estilos propios)
+└── sass/
+    ├── _variables.scss    # colores, fuentes, medidas y UN solo punto de quiebre ($movil: 1024px)
+    ├── _mixins.scss       # mixins (movil, fuente, panel, color, escalonado…) y placeholders (%desplegable, %pastilla…)
+    ├── _base.scss         # solo etiquetas (reset) y animaciones compartidas
+    └── bloques/           # un archivo por bloque BEM: _boton.scss, _tabla.scss, _configurador.scss…
+```
+
+- **BEM estricto:** `bloque__elemento--modificador`, por ejemplo `boton boton--violeta boton--pequeno` o `pieza-config__precio`. No hay selectores por etiqueta dentro de los bloques (la única excepción es el texto de las guías, que llega como HTML desde la base de datos).
+- **Estados como modificadores:** `menu--abierto`, `boton--cargando`, `panel__opcion--activa`. Para ocultar se usa el atributo `hidden` de HTML.
+- **Sass que se puede mostrar:** mapas con `@each` para generar modificadores (`insignia--verde`, `estado-armado--aprobado`), `@for` en el mixin `escalonado` y placeholders con `@extend`.
+- **Orden de `styles.scss`:** primero los componentes reutilizables y después los bloques que los acomodan, así en un elemento con dos clases (`boton sesion__boton`) gana la del bloque que lo contiene.
 
 ## Panel de administración
 
@@ -130,10 +165,10 @@ Lo mismo al crear un usuario o cambiar su rol: el rol se elige en un desplegable
 
 ## Animaciones e interfaz sin saltos
 
-Están en `frontend/src/sass/componentes/_movimiento.scss`:
+Cada animación vive en el bloque que la usa (por ejemplo `bloques/_campana.scss` o `bloques/_modal.scss`); las compartidas están en `sass/_base.scss`:
 
 - **Transición entre páginas** con View Transitions de CSS: la barra se queda quieta y el contenido se funde (Chrome, Edge y Opera).
-- **Sin saltos al cargar:** el contenido espera a que exista la barra y entra suave; `main` ocupa al menos una pantalla, así el pie no aparece arriba y luego baja. El cambio acumulado de diseño (CLS) de inicio, configurador y biblioteca bajó de entre 0,86 y 1,08 a menos de 0,01.
+- **Sin saltos al cargar:** la página llega con `pagina--cargando`, el contenido espera a que exista la barra y entra suave; `main` ocupa al menos una pantalla, así el pie no aparece arriba y luego baja. El cambio acumulado de diseño (CLS) de inicio, configurador y biblioteca bajó de entre 0,86 y 1,08 a menos de 0,01.
 - **Notificaciones:** la campana suena y el número rebota cuando hay avisos nuevos; los avisos nuevos se resaltan en la cuenta.
 - **Ingreso y registro:** el error sacude el mensaje, el botón muestra que está cargando y se pone verde con un saludo antes de cambiar de página.
 - **Ventanas y avisos flotantes** con entrada y salida animadas. Todo se desactiva si el sistema pide reducir el movimiento (`prefers-reduced-motion`).
